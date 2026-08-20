@@ -1,0 +1,310 @@
+schema_version: "1.0"
+handoff_id: C01-ER2-A04-to-hf
+run_id: pilot-20260813
+mode: VERIFY
+from_agent: A04
+to_agent: hf
+research_id: R004
+experiment_id: null
+owner: A04
+cycle_id: C01-object-target-benchmark-pin
+cycle_step: C01-ER2B -> C01-H2
+
+input_refs:
+- kimodo/simulation/pilot-20260813/outputs/A03/C01-ER2-training-manifest-linkage.yaml
+- kimodo/simulation/pilot-20260813/evidence/ER2-training-manifest-linkage-inventory.yaml
+- kimodo/simulation/pilot-20260813/outputs/A02/C01-ER1-disjoint-pool-survey.yaml
+- kimodo/research/R004/protocol.yaml
+- kimodo/simulation/pilot-20260813/outputs/A03/training-invariants.yaml
+- kimodo/simulation/pilot-20260813/collaboration/ledger.yaml
+- kimodo/simulation/pilot-20260813/decisions/human-collaboration-C01.yaml
+- kimodo/simulation/pilot-20260813/handoffs/C01-ER2-A03-to-A04.yaml
+- kimodo/simulation/pilot-20260813/audit/session-index.yaml
+- kimodo/simulation/pilot-20260813/handoffs/handoff-template.yaml
+
+output_refs:
+- kimodo/simulation/pilot-20260813/outputs/A04/C01-ER2-independent-linkage-verification.yaml
+- kimodo/simulation/pilot-20260813/handoffs/C01-ER2-A04-to-hf.yaml
+
+upstream_inputs_consumed:
+  a03_er2a_output:
+    ref: kimodo/simulation/pilot-20260813/outputs/A03/C01-ER2-training-manifest-linkage.yaml
+    commit_sha: 1cd5926043954917ff9fee0c662e72ce46535ad7
+    commit_sha_state: VERIFIED_FROM_LEDGER
+  er2_inventory:
+    ref: kimodo/simulation/pilot-20260813/evidence/ER2-training-manifest-linkage-inventory.yaml
+    collected_at: '2026-08-13T10:16:46Z'
+    collection_mode: READ_ONLY_SANITIZED_OPERATIONAL_LINEAGE
+  er1_survey:
+    ref: kimodo/simulation/pilot-20260813/outputs/A02/C01-ER1-disjoint-pool-survey.yaml
+    commit_sha: 51a3fb434c71a67e52eab72dc91b060568c58d59
+  r004_freeze_sha256: 1f911559b69c5a7d3b68cf269c746c76ad1384f96a23963d533560eb83e8f0e5
+  human_authorization:
+    ref: kimodo/simulation/pilot-20260813/decisions/human-collaboration-C01.yaml
+    commit_sha: 6994bdad6d7d48f576dcbc3a27aaedca00b80a72
+    response: REQUEST_MORE_EVIDENCE
+    allowed: ER-2 candidate-to-training-manifest linkage verification
+    prohibited: [GPU use, model training, final holdout metric access, R004 modification]
+  base_commit_built_on: 8bedbc0dc754f9d160ec824036e8bb5b4679f665
+
+verified_actions:
+- mode: VERIFY
+  action: >-
+    Cited the exact committed A03 output consumed
+    (outputs/A03/C01-ER2-training-manifest-linkage.yaml at commit
+    1cd5926043954917ff9fee0c662e72ce46535ad7) and independently confirmed that
+    commit sha from the ledger primary record
+    (collaboration/ledger.yaml#sequence[C01-ER2A].commit_sha), the gitStatus
+    short-sha prefix 1cd5926, and the task envelope — all three agree. A04 used
+    NO Bash and NO remote access; sha not recomputed.
+- mode: VERIFY
+  action: >-
+    Independently re-derived the manifest->checkpoint chain from the sanitized
+    ER2 inventory (NOT from A03's text) and CONFIRMED each link: L1 manifest
+    (95dcd9c7, 5810 ids) -> target cache index (60124c2b, set_equal=true) ;
+    L2 -> mixed cache index (b2aea4b3) + mix_manifest (35a8fa93, 15620 rows);
+    L3 launch (run_phase1_ablation_s3000_from_cache.sh, e45ed7a5; observed_call
+    'train_one abl_object_lr1e7_s3000_20260811 cat_object_manip_fp32_20260811_0005
+    object_manip'; resolved_feature_cache = mixed cache root; resolved_output_dir
+    = candidate run dir) -> run directory; L4 -> checkpoint_step_3000.pt
+    (metadata 959429d5, inode 366586283) and checkpoint_last.pt (metadata
+    bd9aa35d, inode 366586832). Confirmed the two checkpoints are DISTINCT
+    artifacts (distinct inodes/sizes/metadata digests) and that the log selects
+    checkpoint_last.pt for Object eval, loaded at step 3000.
+- mode: VERIFY
+  action: >-
+    Independently reproduced the mixing arithmetic on carried counts: 11620
+    target rows == 5810 unique target ids * 2; 4000 replay rows == 4000 * 1;
+    15620 == 11620 + 4000; target_repeat_histogram {2: 5810} consistent;
+    target_unique_path_ids 5810 == L1 manifest unique_path_ids 5810.
+    INTERNALLY_CONSISTENT.
+- mode: VERIFY
+  action: >-
+    Independently re-checked the candidate invariants from A03's
+    training-invariants.yaml against the ER2 evidence: target_domain, steps
+    (3000), target_repeat (2), replay_size (4000), replay_repeat (1) match;
+    learning_rate (1e-7) and dtype (fp32) match by name-encoding; base_model
+    matches from frozen R004 inputs. No invariant contradicted.
+- mode: VERIFY
+  action: >-
+    Independently confirmed the frozen R004 identity match: R004.inputs
+    candidate abl_object_lr1e7_s3000_20260811 == launch_call candidate name ==
+    run directory name == checkpoint-producing run.
+- mode: VERIFY
+  action: >-
+    Cross-tied the linkage manifest sha256 to ER-1's degeneracy manifest sha256:
+    both are 95dcd9c7f1e73d99e5bce10abb6bf94d55f58a17e8eefc7b83fbdfe74597bbd5
+    (same artifact, 5810 ids). The manifest A03 proved trained the candidate is
+    the SAME manifest A02/ER1 proved equals the entire non-mirror Object
+    universe (U = T = 5810) — by content hash, not filename. This is the
+    integration A03 could not make (A03 did not consume the ER1 survey).
+- mode: VERIFY
+  action: >-
+    Applied ER-1's authoritative path-identity correction and explicitly
+    superseded the stale 284/292 (97.26%) motion_id figure. A03's output and
+    handoff still cite 284 (in risk_resolution.consequence_for_a02_leakage,
+    open_risks[C01-RISK-09], handoff.key_finding_for_A04, verified_actions)
+    because A03 consumed the older C01-S2 provenance (fcdd2a4), not the ER1
+    correction (51a3fb4). The authoritative figure is 292/292 = 100% (Content
+    235/235, Repetition 57/57, 0 non-overlapping for both). The leakage
+    DIRECTION is unchanged and STRENGTHENED (100% vs 97.26%). Flagged as
+    C01-ER2B-R01 (documentation consistency; does not refute the linkage).
+- mode: VERIFY
+  action: >-
+    Returned an overall verdict of CONFIRM (qualifier: WITH_CONSEQUENCE_CORRECTION)
+    with explicit evidence gaps: all sha256 digests are CARRIED from the
+    sanitized ER2 inventory (not recomputed; Bash/remote forbidden);
+    source_config vs copied_run_config semantic equality is carried, NOT
+    independently re-attested by A04 (C01-ER2A-R02 stays open; no Bash/remote to
+    re-parse the YAML bodies); checkpoint_content_sha256 MISSING_NOT_COMPUTED
+    by design (C01-ER2A-R01); base_model DECLARED in ER2 / VERIFIED from frozen
+    R004 (C01-ER2A-R03); training workspace non-git (C01-RISK-07); SSH
+    transport warning carried (C01-RISK-06).
+- mode: VERIFY
+  action: >-
+    Preserved the approval boundary: no remote access, no Bash, no GPU, no
+    training, no evaluation, no checkpoint mutation, no final holdout metric
+    VALUE inspection (only the operational log event that checkpoint_last.pt
+    was loaded at step 3000), no R004 modification, no model-quality verdict,
+    no MODIFY/REJECT selection. Candidate remains PROVISIONAL until R004 closes.
+    A04 returns evidence to hf for C01-H2; the scientific decision stays with
+    Human Gate 2.
+
+gate_result: PASS-C01-ER2B-linkage-independently-confirmed-handed-to-hf
+gate_result_note: >-
+  C01-ER2B is complete: A04 independently confirms A03's manifest->candidate
+  linkage (verdict CONFIRM, with consequence correction) from the sanitized
+  ER2 inventory, with the ER1 manifest-sha keystone cross-tie, independently
+  reproduced mixing arithmetic, and the ER1 292/292 correction applied. This is
+  NOT a scientific decision and NOT a model-quality verdict. Combined with
+  A02's ER-1 VERIFIED_DEGENERATE, the evidence for C01-H2 is: (1) the manifest
+  that trained the candidate is the same manifest (sha256 95dcd9c7) that equals
+  the entire non-mirror Object universe, so the 292/292 Object-eval-train
+  overlap is operative and total (100%, not the stale 97.26%); (2) a disjoint
+  Object-Manipulation pool does not exist in the observed SEED v004 universe.
+  The MODIFY-vs-REJECT choice and any scope expansion stay with Human Gate 2.
+
+open_risks:
+- id: C01-RISK-09
+  severity: medium
+  a03_state: VERIFIED
+  a04_state: CONFIRMED
+  description: >-
+    Candidate-to-training-manifest linkage CONFIRMED by A04. Manifest
+    cat_object_manip_fp32_20260811_0005.csv (sha256 95dcd9c7, 5810 ids)
+    supplied the target portion of the mixed cache that trained
+    abl_object_lr1e7_s3000_20260811. Under ER-1's authoritative path identity,
+    Object-eval-train overlap is 292/292 = 100% (NOT the stale 284/292).
+    Leakage is operative and total.
+  owner: hf (C01-H2)
+- id: C01-ER2B-R01
+  severity: low
+  description: >-
+    A03's C01-ER2A output and A03-to-A04 handoff still circulate the stale
+    284/292 (97.26%) motion_id figure in their consequence statements. A04
+    supersedes these with ER-1's authoritative 292/292 (100%) path-identity
+    figure. Downstream synthesis (A01) and the human decision (hf) must use
+    292/292, not 284/292. Documentation-consistency issue; does NOT refute the
+    linkage verdict.
+  owner: A01 (if a C01-S3b re-synthesis runs) / hf
+- id: C01-ER2A-R02
+  severity: low
+  a04_state: NOT_CLOSED_BY_A04
+  description: >-
+    source_config (4489a812) vs copied_run_config (50c709dd) byte hashes differ;
+    inventory asserts semantic equality (formatting only). A04 CANNOT re-parse
+    the YAML bodies (no Bash/remote; configs on lintrain, not in the worktree).
+    Semantic equality remains DECLARED-from-inventory, NOT independently
+    re-attested by A04. Closing requires an authorized remote YAML re-parse or
+    acceptance of the inventory attestation.
+  owner: hf / orchestrator (authorize remote re-parse) or accept inventory attestation
+- id: C01-ER2A-R01
+  severity: low
+  description: >-
+    checkpoint_content_sha256 MISSING_NOT_COMPUTED (3.4 GB, by design). Linkage
+    uses path/log/step/size/inode/metadata digest, not content. Artifact-level
+    byte reproducibility not attested.
+  owner: hf
+- id: C01-ER2A-R03
+  severity: low
+  description: >-
+    base_model identity VERIFIED from frozen R004.inputs + A03 prior but
+    DECLARED within the ER2 chain (loaded base weights not re-verified;
+    checkpoint content not computed). Outside linkage scope.
+  owner: hf
+- id: C01-RISK-06
+  severity: medium
+  description: >-
+    SSH bad RSA signature transport warning during inventory collection; all
+    reads succeeded, residual provenance risk carried (not silently promoted).
+  owner: hf / orchestrator (re-collect or attest)
+- id: C01-RISK-07
+  severity: medium
+  description: >-
+    Training workspace kimodo_seed_repro_train is NOT a git repository; launch
+    script, train.py, data.py, source config, and copied run config are
+    hash-addressed (sha256) but NOT commit-addressed.
+  owner: hf (C01-H1/H2)
+- id: A03-R01
+  severity: medium
+  description: >-
+    Prior A03 risk partially closed for THIS candidate (ER2 supplies
+    code/config/log hashes); the other six runs remain unverified against run
+    cards.
+  owner: A04 (future authorized scope)
+
+next_owner: hf
+next_state: "C01-H2 (human decision: MODIFY vs REJECT after ER-1 + ER-2)"
+next_action: >-
+  hf consumes A04's independent CONFIRM (with consequence correction) together
+  with A02's ER-1 VERIFIED_DEGENERATE and chooses MODIFY (ALT-B) or REJECT
+  (ALT-C) at C01-H2. Key integrated facts: the manifest that trained the
+  candidate (sha256 95dcd9c7) is the same manifest that equals the entire
+  non-mirror Object universe, so the 292/292 Object-eval-train overlap is
+  operative and total (100%); a disjoint Object-Manipulation pool does not
+  exist in the observed SEED v004 universe. Use 292/292 (authoritative path
+  identity), NOT the stale 284/292 that appears in A03's consequence
+  statements. A04 did NOT choose MODIFY/REJECT, did NOT interpret model
+  quality, did NOT inspect final holdout metric values, did NOT mutate
+  checkpoints, did NOT start GPU training, and did NOT modify R004 or any
+  frozen evaluation rule. R004 stays FROZEN; any pin is an additive
+  research-revise AFTER C01-H2. Final adoption stays with Human Gate 2.
+
+key_evidence_summary_for_hf:
+  a04_verdict: CONFIRM
+  qualifier: WITH_CONSEQUENCE_CORRECTION
+  what_breaks_the_chain: NOTHING
+  a03_commit_consumed: 1cd5926043954917ff9fee0c662e72ce46535ad7
+  a03_commit_state: VERIFIED_FROM_LEDGER
+  linkage_classification: VERIFIED (independently confirmed by A04)
+  manifest_sha256: 95dcd9c7f1e73d99e5bce10abb6bf94d55f58a17e8eefc7b83fbdfe74597bbd5
+  manifest_rows: 5810
+  manifest_sha_matches_er1_degeneracy_manifest: true
+  target_cache_index_sha256: 60124c2b526e2b37848097c340c98779cc95c2d529434402530bd5da07989291
+  mixed_cache_index_sha256: b2aea4b3442077387aacce84fd0c96bb1c6d5a01a15832ef50a22f76e7f1f4fb
+  mixed_cache_mix_manifest_sha256: 35a8fa933266fa380e6c3b5641ec68ed4145e46fe68482938fba2af8ebd78fdf
+  mixed_cache_rows: {total: 15620, target: 11620, replay: 4000}
+  launch_script_sha256: e45ed7a59f809c10336bff1dfdc9b153a5964cbd6dd81411fff9eb8a226e4563
+  observed_call: "train_one abl_object_lr1e7_s3000_20260811 cat_object_manip_fp32_20260811_0005 object_manip"
+  training_entrypoint_sha256: 180b3ec5ff08af80425b63b476b48b41d33744a1efc0bd104d53e6b524c3bf95
+  dataset_loader_sha256: c9d25e179878851380fd6e495e14635c3dc5aee0ea43320ab65bc554562b4cce
+  source_config_sha256: 4489a812a611dcf97e993933c64595aad5e5cb858df6d6037dc09ae4e201b171
+  copied_run_config_sha256: 50c709dd75f74f887a8726de6c329fee099fd4499938e5b2909a120402987e48
+  config_semantic_equality: true
+  config_semantic_equality_a04_re_attested: false
+  config_semantic_equality_note: >-
+    Carried from the ER2 inventory; A04 could NOT re-parse the YAML bodies
+    (no Bash/remote). C01-ER2A-R02 stays open.
+  training_log_sha256: b0eb15a1aafb7c8302f868a279d94f5b004be628db9b74a196b8a60ab4e2fffc
+  checkpoint_step_3000_metadata_sha256: 959429d50e40be95c8e6e06b533e2757791694fe393c92baf13ade3f9ff3a1d6
+  checkpoint_last_metadata_sha256: bd9aa35d76d85b87b853e1b474cd80ad8fcaadc3feff00f8d2ca0193de181542
+  checkpoints_distinct: true
+  object_eval_checkpoint_selected: checkpoint_last.pt (loaded at step 3000 per training log)
+  checkpoint_content_sha256: MISSING_NOT_COMPUTED
+  r004_candidate_identity_match: true
+  a04_mixing_arithmetic: INTERNALLY_CONSISTENT (independently reproduced)
+  a04_invariant_crosscheck: ALL_MATCH (independently reproduced)
+  er1_authoritative_train_eval_overlap: 292/292 = 100%
+  er1_stale_figure_superseded: 284/292 = 97.26% (motion_id, REJECTED)
+  risk_resolution:
+    C01-RISK-09: DECLARED -> VERIFIED (A03) -> CONFIRMED (A04)
+    ME-2: CLOSED_BY_EVIDENCE
+  scope_fence: >-
+    A04 confirms LINKAGE ONLY and applies the ER-1 overlap correction as a
+    consequence. Model quality, target_success, metric-inflation magnitude,
+    and the MODIFY-vs-REJECT decision are NOT assessed by A04 and remain owned
+    by A02/A01/hf. The scientific decision is Human Gate 2's.
+
+commit_sha: 8bedbc0
+commit_sha_note: >-
+  Short sha from the session-start gitStatus snapshot (most recent commit
+  8bedbc0 "Advance ER2 to independent A04 verification"), the base A04 built
+  on. The full 40-char sha was NOT recomputed by A04 (Bash forbidden). The
+  commit that will RECORD A04's C01-ER2B outputs is a pending orchestrator
+  commit on top of 8bedbc0 and is not yet known to A04. Stated pending; NOT
+  fabricated (consistent with A02/A03 commit_sha handling).
+
+kscc_session_id: 91a1659b-f7b5-4f13-ba21-c26ab8ab7a18
+kscc_session_id_note: >-
+  Backfilled by the orchestrator from the successful launcher audit record.
+
+timestamp: '2026-08-13T10:33:04+00:00'
+timestamp_note: >-
+  Launcher audit completion time, backfilled after successful completion.
+
+attestation:
+  historical_work_not_misrepresented: true
+  historical_work_not_misrepresented_note: >-
+    VERIFY mode only. A03's linkage reconstruction, A02's disjointness
+    findings, and A03's prior invariants are cited as evidence, not
+    re-described as original six-agent work. No historical training is claimed
+    as new execution. A04 independently re-derives the linkage from the
+    sanitized ER2 inventory and adds the ER1 keystone cross-tie + 292/292
+    correction; A04 did not recompute digests (Bash/remote forbidden) and
+    discloses this per-link, adding only arithmetic/invariant cross-checks on
+    carried counts.
+  secrets_removed: true
+  secrets_removed_note: >-
+    No credentials, private data, raw manifest rows, or final holdout metric
+    values referenced. No checkpoint content read. No remote access performed by
+    A04. The transport_warning is disclosed as C01-RISK-06, not hidden.

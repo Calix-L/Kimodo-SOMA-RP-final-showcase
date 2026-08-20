@@ -1,0 +1,43 @@
+schema_version: '1.0'
+research_id: R002
+status: DRAFT
+owner: A01
+created_at: '2026-08-13T07:53:15+00:00'
+updated_at: '2026-08-13T07:53:15+00:00'
+inputs:
+- gc_safe_fp32_20260810_2045
+- cat_dancing_fp32_20260811_0005
+- cat_object_manip_fp32_20260811_0005
+- target-domain Content and Repetition benchmark artifacts
+method: Import the three historical main runs as pre-R-SDD evidence, verify their comparable configuration and metric provenance, then independently assess stability across Content, Repetition, and motion-quality indicators. Do not rerun expensive training only to recreate history.
+tasks:
+- A02 verifies domain manifests and dataset boundaries.
+- A03 verifies the shared training setup and identifies configuration differences.
+- A04 reconstructs run cards from configs, logs, and checkpoint references.
+- A05 recomputes or verifies all target-domain comparison tables.
+- A06 challenges cherry-picking, unstable gains, and foot-skate omissions.
+- A01 records the reviewed domain-selection rationale and next handoff.
+outputs:
+- simulation/pilot-20260813/outputs/R002/domain-run-cards.yaml
+- simulation/pilot-20260813/outputs/R002/independent-domain-comparison.yaml
+- one R002 Experiment Record per main run after READY
+evaluation:
+  criteria:
+  - Content and Repetition evidence is reported for all three domains without cherry-picking
+  - Metric regressions and foot-skate risks remain visible in the decision
+artifacts:
+- work/codex_pipeline/build_domain_text_benchmark.py
+- work/codex_pipeline/run_domain_text_eval.sh
+- work/codex_pipeline/summarize_domain_text_ablation.py
+risks:
+- Historical suites may not share identical sample counts or preprocessing.
+- Selecting only favorable Content metrics would overstate evidence.
+- Foot-skate and Repetition regression may invalidate an apparently positive candidate.
+collaboration:
+  owner_agent: A04
+  supporting_agents: [A01, A02, A03]
+  evaluator_agent: A05
+  reviewer_agent: A06
+  human_gate: human-gate-1
+ready_review: null
+freeze: null

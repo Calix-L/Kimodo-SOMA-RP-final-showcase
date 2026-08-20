@@ -1,0 +1,849 @@
+schema_version: '1.0'
+run_id: pilot-20260813
+status: P01_OUTPUTS_COLLECTED_WITH_RETRIES
+summary:
+  attempt_records: 21
+  agents_started:
+  - A01
+  - A02
+  - A03
+  - A04
+  - A05
+  - A06
+  successful_exit_agents:
+  - A02
+  - A03
+  - A04
+  - A05
+  output_validated_after_turn_limit_agents:
+  - A01
+  - A06
+  output_validated_after_turn_limit_tasks:
+  - P01-A01-project-cognition
+  - P01-A06-cold-start-red-team
+  - C01-A01-object-benchmark-synthesis
+  failed_attempts_preserved: 12
+  reassignment:
+    original_agent: A02
+    replacement_session_role: A02-r2
+    reason: Original session repeatedly exhausted its turn budget without writing
+      outputs.
+    outcome: SUCCESS
+  total_captured_cost_usd: 20.003267
+  bounded_evidence_tasks_completed:
+  - C01-A02-ER1-disjoint-pool-feasibility
+  - C01-A03-ER2-training-manifest-linkage
+  - C01-A04-ER2-independent-linkage-verification
+  resumed_success_tasks:
+  - C01-A03-ER2-training-manifest-linkage
+  gpu_jobs_started: 0
+  scientific_decision_made: false
+sessions:
+- agent_id: A02
+  task_id: P01-A02-provenance-recovery
+  mode: VERIFY
+  kscc_session_id: ad72473a-e499-4f71-b649-0860231f3c5f
+  model: KSCC_DEFAULT
+  prompt_version: pilot-20260813-v1
+  started_at: '2026-08-13T08:24:13+00:00'
+  completed_at: '2026-08-13T08:25:56+00:00'
+  exit_code: 1
+  token_usage:
+    input_tokens: 13546
+    cache_creation_input_tokens: 0
+    cache_read_input_tokens: 280576
+    output_tokens: 1311
+    server_tool_use:
+      web_search_requests: 0
+      web_fetch_requests: 0
+    service_tier: standard
+    cache_creation:
+      ephemeral_1h_input_tokens: 0
+      ephemeral_5m_input_tokens: 0
+    inference_geo: ''
+    iterations: []
+    speed: standard
+  cost:
+    amount: 0.242823
+    currency: USD
+    capture_status: CAPTURED
+  commit_sha: cd67942b718e92d1fc5961572063c30f11772bb7
+  output_refs:
+  - kimodo/simulation/pilot-20260813/outputs/A02/provenance-report.yaml
+  - kimodo/simulation/pilot-20260813/outputs/A02/missing-evidence-register.yaml
+  transcript_ref: simulation/pilot-20260813/transcripts/raw/A02-ad72473a-e499-4f71-b649-0860231f3c5f.log
+  transcript_sha256: 0c112b96479134e6fea986f2d8d1d3cef2ccc2dfc5b87f22cd9b1ab73277e5db
+  secrets_removed: false
+  note: Raw transcript is ignored. Sanitize before sharing; then set secrets_removed
+    true in a reviewed audit record.
+- agent_id: A04
+  task_id: P01-A04-execution-readiness
+  mode: VERIFY
+  kscc_session_id: 758dbe6b-6e6a-4df0-913c-e794fe2bb93f
+  model: KSCC_DEFAULT
+  prompt_version: pilot-20260813-v1
+  started_at: '2026-08-13T08:24:10+00:00'
+  completed_at: '2026-08-13T08:26:12+00:00'
+  exit_code: 1
+  token_usage:
+    input_tokens: 13548
+    cache_creation_input_tokens: 0
+    cache_read_input_tokens: 279808
+    output_tokens: 4656
+    server_tool_use:
+      web_search_requests: 0
+      web_fetch_requests: 0
+    service_tier: standard
+    cache_creation:
+      ephemeral_1h_input_tokens: 0
+      ephemeral_5m_input_tokens: 0
+    inference_geo: ''
+    iterations: []
+    speed: standard
+  cost:
+    amount: 0.32826900000000003
+    currency: USD
+    capture_status: CAPTURED
+  commit_sha: cd67942b718e92d1fc5961572063c30f11772bb7
+  output_refs:
+  - kimodo/simulation/pilot-20260813/outputs/A04/execution-readiness.yaml
+  - kimodo/simulation/pilot-20260813/outputs/A04/artifact-register.yaml
+  transcript_ref: simulation/pilot-20260813/transcripts/raw/A04-758dbe6b-6e6a-4df0-913c-e794fe2bb93f.log
+  transcript_sha256: 454132cc0999e9b3b713099d88ae781e5fb0621b6dc7f30f71f02be2c8157847
+  secrets_removed: false
+  note: Raw transcript is ignored. Sanitize before sharing; then set secrets_removed
+    true in a reviewed audit record.
+- agent_id: A03
+  task_id: P01-A03-training-invariants
+  mode: VERIFY
+  kscc_session_id: 5976aab5-1e56-466b-aed4-4d386855683c
+  model: KSCC_DEFAULT
+  prompt_version: pilot-20260813-v1
+  started_at: '2026-08-13T08:24:08+00:00'
+  completed_at: '2026-08-13T08:27:58+00:00'
+  exit_code: 1
+  token_usage:
+    input_tokens: 28737
+    cache_creation_input_tokens: 0
+    cache_read_input_tokens: 389120
+    output_tokens: 13962
+    server_tool_use:
+      web_search_requests: 0
+      web_fetch_requests: 0
+    service_tier: standard
+    cache_creation:
+      ephemeral_1h_input_tokens: 0
+      ephemeral_5m_input_tokens: 0
+    inference_geo: ''
+    iterations: []
+    speed: standard
+  cost:
+    amount: 0.691005
+    currency: USD
+    capture_status: CAPTURED
+  commit_sha: cd67942b718e92d1fc5961572063c30f11772bb7
+  output_refs:
+  - kimodo/simulation/pilot-20260813/outputs/A03/training-invariants.yaml
+  - kimodo/simulation/pilot-20260813/outputs/A03/ablation-design-review.yaml
+  transcript_ref: simulation/pilot-20260813/transcripts/raw/A03-5976aab5-1e56-466b-aed4-4d386855683c.log
+  transcript_sha256: 487599a3efba592786422c0ad5bf34759c9bf759044b5b4f882f205f7be09450
+  secrets_removed: false
+  note: Raw transcript is ignored. Sanitize before sharing; then set secrets_removed
+    true in a reviewed audit record.
+- agent_id: A06
+  task_id: P01-A06-cold-start-red-team
+  mode: VERIFY
+  kscc_session_id: bbd665fc-44d9-4cd4-bccd-ef3ed341c7f3
+  model: KSCC_DEFAULT
+  prompt_version: pilot-20260813-v1
+  started_at: '2026-08-13T08:24:12+00:00'
+  completed_at: '2026-08-13T08:28:11+00:00'
+  exit_code: 1
+  token_usage:
+    input_tokens: 27939
+    cache_creation_input_tokens: 0
+    cache_read_input_tokens: 350592
+    output_tokens: 12129
+    server_tool_use:
+      web_search_requests: 0
+      web_fetch_requests: 0
+    service_tier: standard
+    cache_creation:
+      ephemeral_1h_input_tokens: 0
+      ephemeral_5m_input_tokens: 0
+    inference_geo: ''
+    iterations: []
+    speed: standard
+  cost:
+    amount: 0.620796
+    currency: USD
+    capture_status: CAPTURED
+  commit_sha: cd67942b718e92d1fc5961572063c30f11772bb7
+  output_refs:
+  - kimodo/simulation/pilot-20260813/outputs/A06/ready-red-team-review.yaml
+  - kimodo/simulation/pilot-20260813/outputs/A06/cold-start-cognition.yaml
+  transcript_ref: simulation/pilot-20260813/transcripts/raw/A06-bbd665fc-44d9-4cd4-bccd-ef3ed341c7f3.log
+  transcript_sha256: 9c8b64480ae92e59bb1059b0dd0b71ba32e99c964c08f6730bae04d6ec82165b
+  secrets_removed: false
+  note: Raw transcript is ignored. Sanitize before sharing; then set secrets_removed
+    true in a reviewed audit record.
+- agent_id: A05
+  task_id: P01-A05-evaluation-recovery
+  mode: VERIFY
+  kscc_session_id: 235cc886-10d8-4662-af70-48b3576b7e57
+  model: KSCC_DEFAULT
+  prompt_version: pilot-20260813-v1
+  started_at: '2026-08-13T08:24:10+00:00'
+  completed_at: '2026-08-13T08:28:41+00:00'
+  exit_code: 1
+  token_usage:
+    input_tokens: 25068
+    cache_creation_input_tokens: 0
+    cache_read_input_tokens: 352000
+    output_tokens: 18521
+    server_tool_use:
+      web_search_requests: 0
+      web_fetch_requests: 0
+    service_tier: standard
+    cache_creation:
+      ephemeral_1h_input_tokens: 0
+      ephemeral_5m_input_tokens: 0
+    inference_geo: ''
+    iterations: []
+    speed: standard
+  cost:
+    amount: 0.7666649999999999
+    currency: USD
+    capture_status: CAPTURED
+  commit_sha: cd67942b718e92d1fc5961572063c30f11772bb7
+  output_refs:
+  - kimodo/simulation/pilot-20260813/outputs/A05/benchmark-integrity-review.yaml
+  - kimodo/simulation/pilot-20260813/outputs/A05/unresolved-evaluation-contract.yaml
+  transcript_ref: simulation/pilot-20260813/transcripts/raw/A05-235cc886-10d8-4662-af70-48b3576b7e57.log
+  transcript_sha256: 78c61a0a469455314746939b3a56788618e0b575e1f1c90eafe625f5ea10116f
+  secrets_removed: false
+  note: Raw transcript is ignored. Sanitize before sharing; then set secrets_removed
+    true in a reviewed audit record.
+- agent_id: A01
+  task_id: P01-A01-project-cognition
+  mode: VERIFY
+  kscc_session_id: 01fd32ad-a1b2-4fd2-9c34-3a27a96e15de
+  model: KSCC_DEFAULT
+  prompt_version: pilot-20260813-v1
+  started_at: '2026-08-13T08:24:10+00:00'
+  completed_at: '2026-08-13T08:29:14+00:00'
+  exit_code: 1
+  token_usage:
+    input_tokens: 33524
+    cache_creation_input_tokens: 0
+    cache_read_input_tokens: 396224
+    output_tokens: 17958
+    server_tool_use:
+      web_search_requests: 0
+      web_fetch_requests: 0
+    service_tier: standard
+    cache_creation:
+      ephemeral_1h_input_tokens: 0
+      ephemeral_5m_input_tokens: 0
+    inference_geo: ''
+    iterations: []
+    speed: standard
+  cost:
+    amount: 0.816627
+    currency: USD
+    capture_status: CAPTURED
+  commit_sha: cd67942b718e92d1fc5961572063c30f11772bb7
+  output_refs:
+  - kimodo/simulation/pilot-20260813/outputs/A01/project-state-snapshot.yaml
+  - kimodo/simulation/pilot-20260813/outputs/A01/dependency-and-risk-log.yaml
+  transcript_ref: simulation/pilot-20260813/transcripts/raw/A01-01fd32ad-a1b2-4fd2-9c34-3a27a96e15de.log
+  transcript_sha256: 8e5c54ad97af9ba73039ebf413df3af82bc4487fd3a18f5b4ac2509eb2da7ff9
+  secrets_removed: false
+  note: Raw transcript is ignored. Sanitize before sharing; then set secrets_removed
+    true in a reviewed audit record.
+- agent_id: A02
+  task_id: P01-A02-provenance-recovery
+  mode: VERIFY
+  kscc_session_id: ad72473a-e499-4f71-b649-0860231f3c5f
+  resume_session_id: ad72473a-e499-4f71-b649-0860231f3c5f
+  launcher_attempt_id: f0671a94-8bf7-4a04-9ef6-3c6c839fa15f
+  model: KSCC_DEFAULT
+  prompt_version: pilot-20260813-v1
+  started_at: '2026-08-13T08:31:55+00:00'
+  completed_at: '2026-08-13T08:32:48+00:00'
+  exit_code: 1
+  token_usage:
+    input_tokens: 35810
+    cache_creation_input_tokens: 0
+    cache_read_input_tokens: 238528
+    output_tokens: 974
+    server_tool_use:
+      web_search_requests: 0
+      web_fetch_requests: 0
+    service_tier: standard
+    cache_creation:
+      ephemeral_1h_input_tokens: 0
+      ephemeral_5m_input_tokens: 0
+    inference_geo: ''
+    iterations: []
+    speed: standard
+  cost:
+    amount: 0.32266399999999995
+    currency: USD
+    capture_status: CAPTURED
+  commit_sha: c65209ad095e9105714a7f4776a3b0a1b730c4c3
+  output_refs:
+  - kimodo/simulation/pilot-20260813/outputs/A02/provenance-report.yaml
+  - kimodo/simulation/pilot-20260813/outputs/A02/missing-evidence-register.yaml
+  transcript_ref: simulation/pilot-20260813/transcripts/raw/A02-f0671a94-8bf7-4a04-9ef6-3c6c839fa15f.log
+  transcript_sha256: c6dad8a36c0568e8ff089520b57b5a5c5a8ca05e12d7ed51847049d13ddc517a
+  secrets_removed: false
+  note: Raw transcript is ignored. Sanitize before sharing; then set secrets_removed
+    true in a reviewed audit record.
+- agent_id: A01
+  task_id: P01-A01-project-cognition
+  mode: VERIFY
+  kscc_session_id: 01fd32ad-a1b2-4fd2-9c34-3a27a96e15de
+  resume_session_id: 01fd32ad-a1b2-4fd2-9c34-3a27a96e15de
+  launcher_attempt_id: cbce0fcc-56ad-4c59-90f1-a880855c8f11
+  model: KSCC_DEFAULT
+  prompt_version: pilot-20260813-v1
+  started_at: '2026-08-13T08:31:48+00:00'
+  completed_at: '2026-08-13T08:33:58+00:00'
+  exit_code: 1
+  token_usage:
+    input_tokens: 96042
+    cache_creation_input_tokens: 0
+    cache_read_input_tokens: 432960
+    output_tokens: 10327
+    server_tool_use:
+      web_search_requests: 0
+      web_fetch_requests: 0
+    service_tier: standard
+    cache_creation:
+      ephemeral_1h_input_tokens: 0
+      ephemeral_5m_input_tokens: 0
+    inference_geo: ''
+    iterations: []
+    speed: standard
+  cost:
+    amount: 0.9548650000000002
+    currency: USD
+    capture_status: CAPTURED
+  commit_sha: c65209ad095e9105714a7f4776a3b0a1b730c4c3
+  output_refs:
+  - kimodo/simulation/pilot-20260813/outputs/A01/project-state-snapshot.yaml
+  - kimodo/simulation/pilot-20260813/outputs/A01/dependency-and-risk-log.yaml
+  transcript_ref: simulation/pilot-20260813/transcripts/raw/A01-cbce0fcc-56ad-4c59-90f1-a880855c8f11.log
+  transcript_sha256: 329c09b1c3267b0cc6185cd7069b0c1f5a461e5f350e3f8cbd2d24e8aae0574b
+  secrets_removed: false
+  note: Raw transcript is ignored. Sanitize before sharing; then set secrets_removed
+    true in a reviewed audit record.
+- agent_id: A03
+  task_id: P01-A03-training-invariants
+  mode: VERIFY
+  kscc_session_id: 5976aab5-1e56-466b-aed4-4d386855683c
+  resume_session_id: 5976aab5-1e56-466b-aed4-4d386855683c
+  launcher_attempt_id: 3b7b1b30-ed09-4438-82bd-43568603c3cc
+  model: KSCC_DEFAULT
+  prompt_version: pilot-20260813-v1
+  started_at: '2026-08-13T08:31:50+00:00'
+  completed_at: '2026-08-13T08:34:54+00:00'
+  exit_code: 0
+  token_usage:
+    input_tokens: 63574
+    cache_creation_input_tokens: 0
+    cache_read_input_tokens: 220992
+    output_tokens: 19305
+    server_tool_use:
+      web_search_requests: 0
+      web_fetch_requests: 0
+    service_tier: standard
+    cache_creation:
+      ephemeral_1h_input_tokens: 0
+      ephemeral_5m_input_tokens: 0
+    inference_geo: ''
+    iterations: []
+    speed: standard
+  cost:
+    amount: 0.9109910000000001
+    currency: USD
+    capture_status: CAPTURED
+  commit_sha: c65209ad095e9105714a7f4776a3b0a1b730c4c3
+  output_refs:
+  - kimodo/simulation/pilot-20260813/outputs/A03/training-invariants.yaml
+  - kimodo/simulation/pilot-20260813/outputs/A03/ablation-design-review.yaml
+  transcript_ref: simulation/pilot-20260813/transcripts/raw/A03-3b7b1b30-ed09-4438-82bd-43568603c3cc.log
+  transcript_sha256: 58e00384e54813f922c968bf6eee1a633e43a6f614d38f3da2863e96e29cc849
+  secrets_removed: false
+  note: Raw transcript is ignored. Sanitize before sharing; then set secrets_removed
+    true in a reviewed audit record.
+- agent_id: A04
+  task_id: P01-A04-execution-readiness
+  mode: VERIFY
+  kscc_session_id: 758dbe6b-6e6a-4df0-913c-e794fe2bb93f
+  resume_session_id: 758dbe6b-6e6a-4df0-913c-e794fe2bb93f
+  launcher_attempt_id: 897d05db-89e0-4880-9569-442f38a5f9f7
+  model: KSCC_DEFAULT
+  prompt_version: pilot-20260813-v1
+  started_at: '2026-08-13T08:31:51+00:00'
+  completed_at: '2026-08-13T08:35:22+00:00'
+  exit_code: 0
+  token_usage:
+    input_tokens: 50204
+    cache_creation_input_tokens: 0
+    cache_read_input_tokens: 177664
+    output_tokens: 17184
+    server_tool_use:
+      web_search_requests: 0
+      web_fetch_requests: 0
+    service_tier: standard
+    cache_creation:
+      ephemeral_1h_input_tokens: 0
+      ephemeral_5m_input_tokens: 0
+    inference_geo: ''
+    iterations: []
+    speed: standard
+  cost:
+    amount: 0.769452
+    currency: USD
+    capture_status: CAPTURED
+  commit_sha: c65209ad095e9105714a7f4776a3b0a1b730c4c3
+  output_refs:
+  - kimodo/simulation/pilot-20260813/outputs/A04/execution-readiness.yaml
+  - kimodo/simulation/pilot-20260813/outputs/A04/artifact-register.yaml
+  transcript_ref: simulation/pilot-20260813/transcripts/raw/A04-897d05db-89e0-4880-9569-442f38a5f9f7.log
+  transcript_sha256: cbf5133861e039c743ef03878b4f4953c6d633e2532e538378f9935974e1f4c4
+  secrets_removed: false
+  note: Raw transcript is ignored. Sanitize before sharing; then set secrets_removed
+    true in a reviewed audit record.
+- agent_id: A06
+  task_id: P01-A06-cold-start-red-team
+  mode: VERIFY
+  kscc_session_id: bbd665fc-44d9-4cd4-bccd-ef3ed341c7f3
+  resume_session_id: bbd665fc-44d9-4cd4-bccd-ef3ed341c7f3
+  launcher_attempt_id: b66a96f1-02e1-4051-ae11-3a9bac28f4d3
+  model: KSCC_DEFAULT
+  prompt_version: pilot-20260813-v1
+  started_at: '2026-08-13T08:31:53+00:00'
+  completed_at: '2026-08-13T08:35:46+00:00'
+  exit_code: 1
+  token_usage:
+    input_tokens: 57484
+    cache_creation_input_tokens: 0
+    cache_read_input_tokens: 409728
+    output_tokens: 19466
+    server_tool_use:
+      web_search_requests: 0
+      web_fetch_requests: 0
+    service_tier: standard
+    cache_creation:
+      ephemeral_1h_input_tokens: 0
+      ephemeral_5m_input_tokens: 0
+    inference_geo: ''
+    iterations: []
+    speed: standard
+  cost:
+    amount: 0.9789340000000001
+    currency: USD
+    capture_status: CAPTURED
+  commit_sha: c65209ad095e9105714a7f4776a3b0a1b730c4c3
+  output_refs:
+  - kimodo/simulation/pilot-20260813/outputs/A06/ready-red-team-review.yaml
+  - kimodo/simulation/pilot-20260813/outputs/A06/cold-start-cognition.yaml
+  transcript_ref: simulation/pilot-20260813/transcripts/raw/A06-b66a96f1-02e1-4051-ae11-3a9bac28f4d3.log
+  transcript_sha256: c75cfd7b3b2527b61d6d9ccf52ba4eff7a6d00363b0669b1c54dd2831809b0d8
+  secrets_removed: false
+  note: Raw transcript is ignored. Sanitize before sharing; then set secrets_removed
+    true in a reviewed audit record.
+- agent_id: A05
+  task_id: P01-A05-evaluation-recovery
+  mode: VERIFY
+  kscc_session_id: 235cc886-10d8-4662-af70-48b3576b7e57
+  resume_session_id: 235cc886-10d8-4662-af70-48b3576b7e57
+  launcher_attempt_id: 8da86876-22d4-4ff9-b907-00a5f37775bb
+  model: KSCC_DEFAULT
+  prompt_version: pilot-20260813-v1
+  started_at: '2026-08-13T08:31:50+00:00'
+  completed_at: '2026-08-13T08:36:07+00:00'
+  exit_code: 0
+  token_usage:
+    input_tokens: 65241
+    cache_creation_input_tokens: 0
+    cache_read_input_tokens: 159488
+    output_tokens: 27383
+    server_tool_use:
+      web_search_requests: 0
+      web_fetch_requests: 0
+    service_tier: standard
+    cache_creation:
+      ephemeral_1h_input_tokens: 0
+      ephemeral_5m_input_tokens: 0
+    inference_geo: ''
+    iterations: []
+    speed: standard
+  cost:
+    amount: 1.0905239999999998
+    currency: USD
+    capture_status: CAPTURED
+  commit_sha: c65209ad095e9105714a7f4776a3b0a1b730c4c3
+  output_refs:
+  - kimodo/simulation/pilot-20260813/outputs/A05/benchmark-integrity-review.yaml
+  - kimodo/simulation/pilot-20260813/outputs/A05/unresolved-evaluation-contract.yaml
+  transcript_ref: simulation/pilot-20260813/transcripts/raw/A05-8da86876-22d4-4ff9-b907-00a5f37775bb.log
+  transcript_sha256: 6350b0a1c69bc159830b3e7bdd96e8b692c72590d1062a58952d03828f635efd
+  secrets_removed: false
+  note: Raw transcript is ignored. Sanitize before sharing; then set secrets_removed
+    true in a reviewed audit record.
+- agent_id: A02
+  task_id: P01-A02-provenance-recovery
+  mode: VERIFY
+  kscc_session_id: ad72473a-e499-4f71-b649-0860231f3c5f
+  resume_session_id: ad72473a-e499-4f71-b649-0860231f3c5f
+  launcher_attempt_id: f3d41adf-e3a5-4879-a35e-00ed8630dec4
+  model: KSCC_DEFAULT
+  prompt_version: pilot-20260813-v1
+  started_at: '2026-08-13T08:37:11+00:00'
+  completed_at: '2026-08-13T08:38:15+00:00'
+  exit_code: 1
+  token_usage:
+    input_tokens: 11947
+    cache_creation_input_tokens: 0
+    cache_read_input_tokens: 497088
+    output_tokens: 1981
+    server_tool_use:
+      web_search_requests: 0
+      web_fetch_requests: 0
+    service_tier: standard
+    cache_creation:
+      ephemeral_1h_input_tokens: 0
+      ephemeral_5m_input_tokens: 0
+    inference_geo: ''
+    iterations: []
+    speed: standard
+  cost:
+    amount: 0.35780399999999996
+    currency: USD
+    capture_status: CAPTURED
+  commit_sha: c65209ad095e9105714a7f4776a3b0a1b730c4c3
+  output_refs:
+  - kimodo/simulation/pilot-20260813/outputs/A02/provenance-report.yaml
+  - kimodo/simulation/pilot-20260813/outputs/A02/missing-evidence-register.yaml
+  transcript_ref: simulation/pilot-20260813/transcripts/raw/A02-f3d41adf-e3a5-4879-a35e-00ed8630dec4.log
+  transcript_sha256: a279b1cb9e4d95698f24591735adfa05d2b1aed1fd1d52d974e394fd665be76e
+  secrets_removed: false
+  note: Raw transcript is ignored. Sanitize before sharing; then set secrets_removed
+    true in a reviewed audit record.
+- agent_id: A02
+  task_id: P01-A02-provenance-recovery-r2
+  mode: VERIFY
+  kscc_session_id: 7f73445a-525d-4cb4-a0a1-085eb42ffbd1
+  resume_session_id: null
+  launcher_attempt_id: 7f73445a-525d-4cb4-a0a1-085eb42ffbd1
+  model: KSCC_DEFAULT
+  prompt_version: pilot-20260813-v1
+  started_at: '2026-08-13T08:39:23+00:00'
+  completed_at: '2026-08-13T08:44:27+00:00'
+  exit_code: 0
+  token_usage:
+    input_tokens: 15680
+    cache_creation_input_tokens: 0
+    cache_read_input_tokens: 177984
+    output_tokens: 33085
+    server_tool_use:
+      web_search_requests: 0
+      web_fetch_requests: 0
+    service_tier: standard
+    cache_creation:
+      ephemeral_1h_input_tokens: 0
+      ephemeral_5m_input_tokens: 0
+    inference_geo: ''
+    iterations: []
+    speed: standard
+  cost:
+    amount: 0.9962819999999999
+    currency: USD
+    capture_status: CAPTURED
+  commit_sha: d4705b5621616cf39f29b247cc86acfe67f6f6ea
+  output_refs:
+  - kimodo/simulation/pilot-20260813/outputs/A02/provenance-report.yaml
+  - kimodo/simulation/pilot-20260813/outputs/A02/missing-evidence-register.yaml
+  - kimodo/simulation/pilot-20260813/handoffs/H-R001-A02-r2.yaml
+  transcript_ref: simulation/pilot-20260813/transcripts/raw/A02-7f73445a-525d-4cb4-a0a1-085eb42ffbd1.log
+  transcript_sha256: ea7c5b97a0c0758a06e386f8bbfe8b35ee461b48711df3b3d77fc112e71c6367
+  secrets_removed: false
+  note: Raw transcript is ignored. Sanitize before sharing; then set secrets_removed
+    true in a reviewed audit record.
+- agent_id: A01
+  task_id: C01-A01-object-benchmark-framing
+  mode: VERIFY
+  kscc_session_id: d34d3534-af09-4e5e-af3d-0e438ad71640
+  resume_session_id: null
+  launcher_attempt_id: d34d3534-af09-4e5e-af3d-0e438ad71640
+  model: KSCC_DEFAULT
+  prompt_version: pilot-20260813-v1
+  started_at: '2026-08-13T09:31:35+00:00'
+  completed_at: '2026-08-13T09:35:45+00:00'
+  exit_code: 0
+  token_usage:
+    input_tokens: 65382
+    cache_creation_input_tokens: 0
+    cache_read_input_tokens: 362048
+    output_tokens: 31166
+    server_tool_use:
+      web_search_requests: 0
+      web_fetch_requests: 0
+    service_tier: standard
+    cache_creation:
+      ephemeral_1h_input_tokens: 0
+      ephemeral_5m_input_tokens: 0
+    inference_geo: ''
+    iterations: []
+    speed: standard
+  cost:
+    amount: 1.290804
+    currency: USD
+    capture_status: CAPTURED
+  commit_sha: 046ed3e19b338084836862126c7997a51cc549ce
+  output_refs:
+  - kimodo/simulation/pilot-20260813/outputs/A01/C01-benchmark-decision-framing.yaml
+  - kimodo/simulation/pilot-20260813/handoffs/C01-A01-to-A02.yaml
+  transcript_ref: simulation/pilot-20260813/transcripts/raw/A01-d34d3534-af09-4e5e-af3d-0e438ad71640.log
+  transcript_sha256: 6c95afb877bf956e6041859e9306e44008ad250f16cc1535d1fa321006390906
+  secrets_removed: false
+  note: Raw transcript is ignored. Sanitize before sharing; then set secrets_removed
+    true in a reviewed audit record.
+- agent_id: A02
+  task_id: C01-A02-object-benchmark-provenance
+  mode: VERIFY
+  kscc_session_id: 320fbfae-d1cc-4b9c-a9fc-ed476288dbfc
+  resume_session_id: null
+  launcher_attempt_id: 320fbfae-d1cc-4b9c-a9fc-ed476288dbfc
+  model: KSCC_DEFAULT
+  prompt_version: pilot-20260813-v1
+  started_at: '2026-08-13T09:47:05+00:00'
+  completed_at: '2026-08-13T09:52:34+00:00'
+  exit_code: 0
+  token_usage:
+    input_tokens: 113551
+    cache_creation_input_tokens: 0
+    cache_read_input_tokens: 331456
+    output_tokens: 36572
+    server_tool_use:
+      web_search_requests: 0
+      web_fetch_requests: 0
+    service_tier: standard
+    cache_creation:
+      ephemeral_1h_input_tokens: 0
+      ephemeral_5m_input_tokens: 0
+    inference_geo: ''
+    iterations: []
+    speed: standard
+  cost:
+    amount: 1.6510130000000003
+    currency: USD
+    capture_status: CAPTURED
+  commit_sha: 6c3f651c58a1d128a90754aa86e2bb4ea0cf5016
+  output_refs:
+  - kimodo/simulation/pilot-20260813/outputs/A02/C01-object-benchmark-provenance.yaml
+  - kimodo/simulation/pilot-20260813/handoffs/C01-A02-to-A01.yaml
+  transcript_ref: simulation/pilot-20260813/transcripts/raw/A02-320fbfae-d1cc-4b9c-a9fc-ed476288dbfc.log
+  transcript_sha256: eaab130c17f10a37fce94a1347aa2d34879b3fbabe6d29cc476e14bc69ee056e
+  secrets_removed: false
+  note: Raw transcript is ignored. Sanitize before sharing; then set secrets_removed
+    true in a reviewed audit record.
+- agent_id: A01
+  task_id: C01-A01-object-benchmark-synthesis
+  mode: VERIFY
+  kscc_session_id: 4b4faca3-bb7f-4cee-a5aa-50e38118fe71
+  resume_session_id: null
+  launcher_attempt_id: 4b4faca3-bb7f-4cee-a5aa-50e38118fe71
+  model: KSCC_DEFAULT
+  prompt_version: pilot-20260813-v1
+  started_at: '2026-08-13T09:55:33+00:00'
+  completed_at: '2026-08-13T09:58:52+00:00'
+  exit_code: 1
+  token_usage:
+    input_tokens: 53647
+    cache_creation_input_tokens: 0
+    cache_read_input_tokens: 440512
+    output_tokens: 36238
+    server_tool_use:
+      web_search_requests: 0
+      web_fetch_requests: 0
+    service_tier: standard
+    cache_creation:
+      ephemeral_1h_input_tokens: 0
+      ephemeral_5m_input_tokens: 0
+    inference_geo: ''
+    iterations: []
+    speed: standard
+  cost:
+    amount: 1.398261
+    currency: USD
+    capture_status: CAPTURED
+  commit_sha: ea74e0495ec4f614f133731f1598b5b4fb4d4af1
+  output_refs:
+  - kimodo/simulation/pilot-20260813/outputs/A01/C01-benchmark-recommendation.yaml
+  - kimodo/simulation/pilot-20260813/decisions/human-collaboration-C01.yaml
+  transcript_ref: simulation/pilot-20260813/transcripts/raw/A01-4b4faca3-bb7f-4cee-a5aa-50e38118fe71.log
+  transcript_sha256: 86886f5a9ff6b7db51f0ff2e8dd6ad08cc2d3a6badccafa3953eb00e5fd5c537
+  secrets_removed: false
+  note: Raw transcript is ignored. Sanitize before sharing; then set secrets_removed
+    true in a reviewed audit record.
+- agent_id: A02
+  task_id: C01-A02-ER1-disjoint-pool-feasibility
+  mode: VERIFY
+  kscc_session_id: 11c6748d-88e1-4fd3-9098-a5098aad7fcc
+  resume_session_id: null
+  launcher_attempt_id: 11c6748d-88e1-4fd3-9098-a5098aad7fcc
+  model: KSCC_DEFAULT
+  prompt_version: pilot-20260813-v1
+  started_at: '2026-08-13T10:18:49+00:00'
+  completed_at: '2026-08-13T10:22:06+00:00'
+  exit_code: 0
+  token_usage:
+    input_tokens: 72379
+    cache_creation_input_tokens: 0
+    cache_read_input_tokens: 314368
+    output_tokens: 38047
+    server_tool_use:
+      web_search_requests: 0
+      web_fetch_requests: 0
+    service_tier: standard
+    cache_creation:
+      ephemeral_1h_input_tokens: 0
+      ephemeral_5m_input_tokens: 0
+    inference_geo: ''
+    iterations: []
+    speed: standard
+  cost:
+    amount: 1.473759
+    currency: USD
+    capture_status: CAPTURED
+  commit_sha: e2750806ec9c096c78902e5e192a20c26af1bd87
+  output_refs:
+  - kimodo/simulation/pilot-20260813/outputs/A02/C01-ER1-disjoint-pool-survey.yaml
+  - kimodo/simulation/pilot-20260813/handoffs/C01-ER1-A02-to-hf.yaml
+  transcript_ref: simulation/pilot-20260813/transcripts/raw/A02-11c6748d-88e1-4fd3-9098-a5098aad7fcc.log
+  transcript_sha256: dc4024f316b67e7f761a33fa155e59f61e523bdd05df1c8dba2d3dae366ddf1b
+  secrets_removed: false
+  note: Raw transcript is ignored. Sanitize before sharing; then set secrets_removed
+    true in a reviewed audit record.
+- agent_id: A03
+  task_id: C01-A03-ER2-training-manifest-linkage
+  mode: VERIFY
+  kscc_session_id: e0610711-143b-4f24-80f8-0588706da8d8
+  resume_session_id: null
+  launcher_attempt_id: e0610711-143b-4f24-80f8-0588706da8d8
+  model: KSCC_DEFAULT
+  prompt_version: pilot-20260813-v1
+  started_at: '2026-08-13T10:18:52+00:00'
+  completed_at: '2026-08-13T10:22:44+00:00'
+  exit_code: 1
+  token_usage:
+    input_tokens: 114060
+    cache_creation_input_tokens: 0
+    cache_read_input_tokens: 307904
+    output_tokens: 18575
+    server_tool_use:
+      web_search_requests: 0
+      web_fetch_requests: 0
+    service_tier: standard
+    cache_creation:
+      ephemeral_1h_input_tokens: 0
+      ephemeral_5m_input_tokens: 0
+    inference_geo: ''
+    iterations: []
+    speed: standard
+  cost:
+    amount: 1.191322
+    currency: USD
+    capture_status: CAPTURED
+  commit_sha: e2750806ec9c096c78902e5e192a20c26af1bd87
+  output_refs:
+  - kimodo/simulation/pilot-20260813/outputs/A03/C01-ER2-training-manifest-linkage.yaml
+  - kimodo/simulation/pilot-20260813/handoffs/C01-ER2-A03-to-A04.yaml
+  transcript_ref: simulation/pilot-20260813/transcripts/raw/A03-e0610711-143b-4f24-80f8-0588706da8d8.log
+  transcript_sha256: 9f97650a63d0300130fb7f30a3864dd4cc9958325d0536b137139a9ed7682343
+  secrets_removed: false
+  note: Raw transcript is ignored. Sanitize before sharing; then set secrets_removed
+    true in a reviewed audit record.
+- agent_id: A03
+  task_id: C01-A03-ER2-training-manifest-linkage
+  mode: VERIFY
+  kscc_session_id: e0610711-143b-4f24-80f8-0588706da8d8
+  resume_session_id: e0610711-143b-4f24-80f8-0588706da8d8
+  launcher_attempt_id: e95bb78f-6eba-4672-8a02-07d769712a12
+  model: KSCC_DEFAULT
+  prompt_version: pilot-20260813-v1
+  started_at: '2026-08-13T10:23:23+00:00'
+  completed_at: '2026-08-13T10:25:33+00:00'
+  exit_code: 0
+  token_usage:
+    input_tokens: 132455
+    cache_creation_input_tokens: 0
+    cache_read_input_tokens: 289152
+    output_tokens: 21851
+    server_tool_use:
+      web_search_requests: 0
+      web_fetch_requests: 0
+    service_tier: standard
+    cache_creation:
+      ephemeral_1h_input_tokens: 0
+      ephemeral_5m_input_tokens: 0
+    inference_geo: ''
+    iterations: []
+    speed: standard
+  cost:
+    amount: 1.3531259999999998
+    currency: USD
+    capture_status: CAPTURED
+  commit_sha: e2750806ec9c096c78902e5e192a20c26af1bd87
+  output_refs:
+  - kimodo/simulation/pilot-20260813/outputs/A03/C01-ER2-training-manifest-linkage.yaml
+  - kimodo/simulation/pilot-20260813/handoffs/C01-ER2-A03-to-A04.yaml
+  transcript_ref: simulation/pilot-20260813/transcripts/raw/A03-e95bb78f-6eba-4672-8a02-07d769712a12.log
+  transcript_sha256: 1d7bd715da6b2805b49e1f018a16a24d342be35f936262e7e8019b2b44aeb2f5
+  secrets_removed: false
+  note: Raw transcript is ignored. Sanitize before sharing; then set secrets_removed
+    true in a reviewed audit record.
+- agent_id: A04
+  task_id: C01-A04-ER2-independent-linkage-verification
+  mode: VERIFY
+  kscc_session_id: 91a1659b-f7b5-4f13-ba21-c26ab8ab7a18
+  resume_session_id: null
+  launcher_attempt_id: 91a1659b-f7b5-4f13-ba21-c26ab8ab7a18
+  model: KSCC_DEFAULT
+  prompt_version: pilot-20260813-v1
+  started_at: '2026-08-13T10:29:43+00:00'
+  completed_at: '2026-08-13T10:33:04+00:00'
+  exit_code: 0
+  token_usage:
+    input_tokens: 166037
+    cache_creation_input_tokens: 0
+    cache_read_input_tokens: 196352
+    output_tokens: 34652
+    server_tool_use:
+      web_search_requests: 0
+      web_fetch_requests: 0
+    service_tier: standard
+    cache_creation:
+      ephemeral_1h_input_tokens: 0
+      ephemeral_5m_input_tokens: 0
+    inference_geo: ''
+    iterations: []
+    speed: standard
+  cost:
+    amount: 1.797281
+    currency: USD
+    capture_status: CAPTURED
+  commit_sha: 8bedbc0dc754f9d160ec824036e8bb5b4679f665
+  output_refs:
+  - kimodo/simulation/pilot-20260813/outputs/A04/C01-ER2-independent-linkage-verification.yaml
+  - kimodo/simulation/pilot-20260813/handoffs/C01-ER2-A04-to-hf.yaml
+  transcript_ref: simulation/pilot-20260813/transcripts/raw/A04-91a1659b-f7b5-4f13-ba21-c26ab8ab7a18.log
+  transcript_sha256: c8ed83bb1e00191d6421f0f46798d2a4cec4a5c472f3db25fc73137188396553
+  secrets_removed: false
+  note: Raw transcript is ignored. Sanitize before sharing; then set secrets_removed
+    true in a reviewed audit record.

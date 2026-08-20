@@ -1,0 +1,98 @@
+schema_version: "1.0"
+run_id: pilot-20260813
+cycles:
+- cycle_id: C01-object-target-benchmark-pin
+  status: HUMAN_DECISION_REQUIRED_AFTER_EVIDENCE
+  research_id: R004
+  objective: Pin the Object target-domain benchmark before any R004 LIVE holdout interpretation.
+  trigger:
+    source: simulation/pilot-20260813/outputs/A05/benchmark-integrity-review.yaml
+    finding: The target success thresholds are frozen but the Object benchmark they apply to is under-specified.
+  human_intent:
+    actor: hf
+    statement: 可以，继续下一步
+    interpreted_scope:
+    - continue with the recommended staged human-AI collaboration loop
+    - do not start GPU training or final holdout during benchmark discovery
+    - return a concrete evidence-backed choice to hf before revising R004
+    recorded_at: '2026-08-13T09:30:28Z'
+  sequence:
+  - step: C01-S1
+    actor: A01
+    action: frame the decision and evidence request
+    state: COMPLETE
+    output_ref: simulation/pilot-20260813/outputs/A01/C01-benchmark-decision-framing.yaml
+    commit_sha: c5106bdc96aad9c4a8941275c91b821f9b8e2530
+  - step: C01-S2
+    actor: A02
+    action: consume A01 output and verify benchmark provenance
+    state: COMPLETE
+    input_ref: simulation/pilot-20260813/evidence/remote-object-benchmark-inventory.yaml
+    output_ref: simulation/pilot-20260813/outputs/A02/C01-object-benchmark-provenance.yaml
+    commit_sha: fcdd2a4a49f97be40bcae9ce3fd700407557eee3
+  - step: C01-S3
+    actor: A01
+    action: synthesize verified options and recommendation
+    state: COMPLETE_OUTPUT_VALIDATED_AFTER_TURN_LIMIT
+    output_ref: simulation/pilot-20260813/outputs/A01/C01-benchmark-recommendation.yaml
+    handoff_ref: simulation/pilot-20260813/handoffs/C01-A01-to-hf.yaml
+    commit_sha: 6ac4d11718721c912f70a7173b435a31ba085acc
+  - step: C01-H1
+    actor: hf
+    action: ACCEPT, MODIFY, REJECT, or REQUEST_MORE_EVIDENCE for the proposed benchmark pin
+    state: COMPLETE_REQUEST_MORE_EVIDENCE
+    decision_ref: simulation/pilot-20260813/decisions/human-collaboration-C01.yaml
+    decided_at: '2026-08-13T10:05:26Z'
+  - step: C01-ER1
+    actor: A02
+    action: survey disjoint Object pool feasibility from sanitized set metadata
+    state: COMPLETE
+    input_ref: simulation/pilot-20260813/evidence/ER1-disjoint-pool-inventory.yaml
+    output_ref: simulation/pilot-20260813/outputs/A02/C01-ER1-disjoint-pool-survey.yaml
+    commit_sha: 51a3fb434c71a67e52eab72dc91b060568c58d59
+  - step: C01-ER2A
+    actor: A03
+    action: reconstruct candidate-to-training-manifest linkage from sanitized source records
+    state: COMPLETE_AFTER_RESUME
+    input_ref: simulation/pilot-20260813/evidence/ER2-training-manifest-linkage-inventory.yaml
+    output_ref: simulation/pilot-20260813/outputs/A03/C01-ER2-training-manifest-linkage.yaml
+    commit_sha: 1cd5926043954917ff9fee0c662e72ce46535ad7
+  - step: C01-ER2B
+    actor: A04
+    action: independently verify A03 linkage against operational records
+    state: COMPLETE_CONFIRMED
+    input_ref: simulation/pilot-20260813/handoffs/C01-ER2-A03-to-A04.yaml
+    output_ref: simulation/pilot-20260813/outputs/A04/C01-ER2-independent-linkage-verification.yaml
+    commit_sha: ffae6aecb898e04eae0127922396190d182c7e13
+  - step: C01-H2
+    actor: hf
+    action: choose MODIFY or REJECT after ER-1 and ER-2 evidence
+    state: READY_AWAITING_HF
+    decision_ref: simulation/pilot-20260813/decisions/human-collaboration-C01-H2.yaml
+  human_response:
+    actor: hf
+    response: REQUEST_MORE_EVIDENCE
+    statement: "审批人：hf。同意 REQUEST_MORE_EVIDENCE，仅开展 ER-1 数据池调查和 ER-2 训练 manifest 关联核验；禁止 GPU、训练、读取最终 holdout 指标及修改 R004。"
+    decided_at: '2026-08-13T10:05:26Z'
+  executed_action: SANITIZED_ER1_ER2_INVENTORIES_COLLECTED
+  observed_result:
+    er1: VERIFIED_DEGENERATE — eligible Content 0, Repetition 0 within SEED v004 non-mirror.
+    er2: CONFIRMED — the complete Object manifest trained the candidate.
+    correction: authoritative train-eval overlap is 292/292, superseding motion_id-based 284/292.
+  result_driven_adjustment: Stop treating ALT-B as feasible within C01. Present hf with MODIFY-as-new-expanded-cycle or REJECT-current-pin; do not modify R004.
+  evidence_refs:
+  - simulation/pilot-20260813/outputs/A05/benchmark-integrity-review.yaml
+  - research/R004/protocol.yaml
+  - simulation/pilot-20260813/outputs/A01/C01-benchmark-decision-framing.yaml
+  - simulation/pilot-20260813/evidence/remote-object-benchmark-inventory.yaml
+  - simulation/pilot-20260813/outputs/A02/C01-object-benchmark-provenance.yaml
+  - simulation/pilot-20260813/outputs/A01/C01-benchmark-recommendation.yaml
+  - simulation/pilot-20260813/handoffs/C01-A01-to-hf.yaml
+  - simulation/pilot-20260813/evidence/ER1-disjoint-pool-inventory.yaml
+  - simulation/pilot-20260813/evidence/ER2-training-manifest-linkage-inventory.yaml
+  - simulation/pilot-20260813/outputs/A02/C01-ER1-disjoint-pool-survey.yaml
+  - simulation/pilot-20260813/outputs/A03/C01-ER2-training-manifest-linkage.yaml
+  - simulation/pilot-20260813/handoffs/C01-ER2-A03-to-A04.yaml
+  - simulation/pilot-20260813/outputs/A04/C01-ER2-independent-linkage-verification.yaml
+  - simulation/pilot-20260813/handoffs/C01-ER2-A04-to-hf.yaml
+  - simulation/pilot-20260813/decisions/human-collaboration-C01-H2.yaml

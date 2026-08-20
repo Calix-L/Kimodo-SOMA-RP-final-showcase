@@ -1,0 +1,48 @@
+schema_version: "1.0"
+handoff_id: H-R001-A03
+run_id: pilot-20260813
+mode: VERIFY
+from_agent: A03
+to_agent: A04
+research_id: R001
+experiment_id: null
+owner: A03
+input_refs:
+  - research/R001/protocol.yaml
+  - research/R002/protocol.yaml
+  - research/R003/protocol.yaml
+  - research/R004/protocol.yaml
+  - source/phase1_ai_native_project_brain_20260813.md
+  - simulation/pilot-20260813/evidence-map.yaml
+  - simulation/pilot-20260813/decisions/human-gate-1.yaml
+output_refs:
+  - simulation/pilot-20260813/outputs/A03/training-invariants.yaml
+  - simulation/pilot-20260813/outputs/A03/ablation-design-review.yaml
+verified_actions:
+  - "VERIFY: recovered candidate training invariants (lr=1e-7, steps=3000, warmup=200, batch=4, grad_accum=8, target_repeat=2, replay_size=4000, replay_repeat=1, text_dropout=0.10, max_grad_norm=0.5, dtype=fp32) from source brain section 6.3."
+  - "VERIFY: recovered main-run config (lr=2e-7, steps=4000) from source brain section 5 decision table."
+  - "VERIFY: confirmed main->ablation is a two-variable change (lr and steps), not a one-variable ablation."
+  - "VERIFY: confirmed R003 one-variable boundary is training duration within each domain at lr=1e-7 (R003 protocol lines 13, 15)."
+  - "VERIFY: confirmed work/codex_pipeline/ is absent from worktree; all scripts/runs remain DECLARED in evidence-map.yaml."
+  - "VERIFY: confirmed no training-side conclusion in either output references R004 holdout results; candidate status kept provisional."
+  - "VERIFY: confirmed Human Gate 1 blinding is NOT_ATTESTED; policy is retrospective acceptance, not preregistration."
+gate_result: PARTIAL
+partial_reason: "Core invariants (lr, steps, precision, mixing ratio, main vs ablation) are explicit and verified from the source brain; loss function, optimizer, cache format, and replay-mixing implementation are MISSING, and all invariants are verified only against the summary because training code/configs/logs are absent from the worktree."
+open_risks:
+  - {id: A03-R01, risk: "Training code and run configs/logs absent; invariants verified only against source-brain summary."}
+  - {id: A03-R02, risk: "Undocumented hyperparameter drift across claimed comparable ablation pairs."}
+  - {id: A03-R03, risk: "Loss function and optimizer not recorded; full reproduction underspecified."}
+  - {id: A03-R04, risk: "Main->ablation two-variable change may be misread as a single ablation."}
+  - {id: A03-R05, risk: "Candidate status is strictly provisional; R004 holdout not closed."}
+next_owner: A04
+next_state: R001-pipeline-replay
+next_action: "A04 reconstructs run cards (configs/logs/checkpoint refs) for the seven training runs and performs the approved low-cost command/config smoke verification, using these invariants to promote ASSUMED_SHARED fields to VERIFIED or to raise configuration-drift."
+commit_sha: cd67942
+kscc_session_id: MISSING
+kscc_session_id_note: "audit/session-index.yaml is NOT_STARTED with an empty sessions list; no session id has been recorded by the launcher. Not fabricated per contract rule 6; logged as risk."
+timestamp: 2026-08-13T08:27:58Z
+attestation:
+  historical_work_not_misrepresented: true
+  historical_work_not_misrepresented_note: "Outputs are current VERIFY recovery of training semantics, not a claim that six agents originally performed the historical training."
+  secrets_removed: true
+  secrets_removed_note: "No credentials or private data recorded; remote paths cited are already public in the primary records."

@@ -1,0 +1,25 @@
+schema_version: "1.0"
+id: human-gate-2
+type: FINAL_DECISION
+human_owned: true
+status: PENDING
+research_id: R004
+reviewer_name: BLOCKING_INPUT
+reviewed_at: null
+allowed_decisions: [ADOPT, REJECT, REVISE, REPRODUCE, STOP]
+decision: null
+validity: null
+evidence_assessment: null
+primary_evidence_refs: []
+ai_recommendations:
+- agent_id: A06
+  recommendation: null
+  human_response: null
+  response_reason: null
+accepted_tradeoffs: []
+rejected_tradeoffs: []
+rationale: null
+next_owner: null
+next_state: null
+instructions: Inspect primary artifacts and record how the human decision adopts, modifies, or rejects AI advice. AI agents cannot approve this file.
+

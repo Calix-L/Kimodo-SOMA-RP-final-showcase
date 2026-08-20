@@ -1,0 +1,376 @@
+schema_version: "1.0"
+task_id: P01-A02-provenance-recovery-r2
+run_id: pilot-20260813
+mode: VERIFY
+agent_id: A02
+agent_display_name: "Qiao — Repository and Data Engineer"
+research_id: R001
+experiment_id: null
+produced_at: "2026-08-13"
+produced_at_precision: "date_only_subday_time_unavailable_bash_forbidden"
+
+# ---------------------------------------------------------------------------
+# Basis records: the four input records named in the task envelope.
+# All read by A02 with the Read tool. A02 used no Bash, no remote access,
+# and no repository-wide discovery. Reading a file is a process fact (READ),
+# distinct from a provenance-VERIFIED claim.
+# ---------------------------------------------------------------------------
+basis_records:
+  description: "Four input records named in the task envelope; all READ by A02."
+  records:
+    - ref: kimodo/research/R001/protocol.yaml
+      read: true
+      a02_state: READ
+      provenance_digest: MISSING
+      notes: "R001 protocol; status DRAFT; freeze null; ready_review null. Not frozen."
+    - ref: kimodo/source/phase1_ai_native_project_brain_20260813.md
+      read: true
+      evidence_map_id: SRC-PHASE1-BRAIN
+      a02_state: VERIFIED
+      declared_sha256: b71b202fc07b743e3d39869b81e5700cb5251d14637cb7e6b1d6d021a0877c17
+      sha256_source: evidence-map.yaml
+      sha256_recomputed_by_a02: false
+      sha256_recompute_reason: "Bash forbidden by task envelope; digest carried verbatim from evidence map. File presence confirmed by direct Read within allowed path source/."
+    - ref: kimodo/simulation/pilot-20260813/evidence-map.yaml
+      read: true
+      a02_state: READ
+      provenance_digest: MISSING
+    - ref: kimodo/simulation/pilot-20260813/decisions/human-gate-1.yaml
+      read: true
+      a02_state: READ
+      provenance_digest: MISSING
+      declared_protocol_sha256: 1f911559b69c5a7d3b68cf269c746c76ad1384f96a23963d533560eb83e8f0e5
+      declared_protocol_sha256_state: DECLARED
+      declared_protocol_sha256_source: "human-gate-1.yaml (embedded R004 protocol contract)"
+      notes: "human-gate-1 is a READY gate for research_id R004, not an R001 gate. status APPROVED. R004 protocol contract must be frozen before final holdout use."
+
+# ---------------------------------------------------------------------------
+# Classification rule. Acceptance criterion: only the source snapshot digest
+# may remain VERIFIED from the evidence map. Nothing else is promoted.
+# ---------------------------------------------------------------------------
+classification_rule:
+  rule: "Only the source snapshot digest may remain VERIFIED from the evidence map. All other evidence-map assets/runs are DECLARED or MISSING. A02 does not promote any DECLARED item to VERIFIED: the codex_pipeline scripts lie outside A02 allowed_paths, repository-wide discovery and Bash are forbidden, and remote access is forbidden. Primary material was unavailable for everything except the source snapshot file."
+  states_used: [VERIFIED, DECLARED, MISSING]
+  state_definitions:
+    VERIFIED: "Independently checked by this pilot against primary material within allowed scope."
+    DECLARED: "Referenced with a declared ref/owner in the supplied records but not independently checked by this pilot (per evidence-map integrity_note)."
+    MISSING: "Needed for provenance but no declared path/owner/hash/version in the four records, OR access forbidden to A02."
+  counts:
+    VERIFIED: 1
+    DECLARED_assets: 7
+    DECLARED_runs: 8
+    MISSING_items: 11
+
+# ---------------------------------------------------------------------------
+# Assets (evidence-map). 8 total: 1 VERIFIED + 7 DECLARED.
+# ---------------------------------------------------------------------------
+assets:
+  - id: SRC-PHASE1-BRAIN
+    kind: project-summary
+    owner: A01
+    ref: source/phase1_ai_native_project_brain_20260813.md
+    evidence_map_state: VERIFIED
+    a02_state: VERIFIED
+    sha256: b71b202fc07b743e3d39869b81e5700cb5251d14637cb7e6b1d6d021a0877c17
+    sha256_status: CARRIED_FROM_EVIDENCE_MAP_NOT_RECOMPUTED
+    basis: "File present and readable at declared ref within allowed path source/."
+  - id: SCRIPT-MANIFEST
+    kind: script
+    owner: A02
+    ref: work/codex_pipeline/build_training_subset_manifest.py
+    evidence_map_state: DECLARED
+    a02_state: DECLARED
+    a02_note: "Owned by A02 but outside A02 allowed read paths (work/ not in allowed_paths; discovery forbidden). Not independently checked by A02 in this run. Content/hash MISSING."
+    also_declared_in: ["protocol.yaml artifacts", "source summary section 8"]
+  - id: SCRIPT-DOMAIN-BENCHMARK
+    kind: script
+    owner: A05
+    ref: work/codex_pipeline/build_domain_text_benchmark.py
+    evidence_map_state: DECLARED
+    a02_state: DECLARED
+    a02_note: "Outside A02 allowed paths; not checked."
+  - id: SCRIPT-SEED-HOLDOUT
+    kind: script
+    owner: A05
+    ref: work/codex_pipeline/build_seed_text_test_benchmark.py
+    evidence_map_state: DECLARED
+    a02_state: DECLARED
+  - id: SCRIPT-TRAIN
+    kind: script
+    owner: A03
+    ref: work/codex_pipeline/run_category_domain_finetune.sh
+    evidence_map_state: DECLARED
+    a02_state: DECLARED
+    a02_note: "Training entry point; owned by A03 (next handoff target)."
+  - id: SCRIPT-DOMAIN-EVAL
+    kind: script
+    owner: A05
+    ref: work/codex_pipeline/run_domain_text_eval.sh
+    evidence_map_state: DECLARED
+    a02_state: DECLARED
+  - id: SCRIPT-FULL-HOLDOUT
+    kind: script
+    mode: LIVE
+    owner: A04
+    reviewer: A05
+    ref: work/codex_pipeline/run_seed_full_text_holdout_eval.sh
+    evidence_map_state: DECLARED
+    a02_state: DECLARED
+    a02_note: "LIVE mode script; final holdout results out of scope and forbidden to A02."
+  - id: SCRIPT-SUMMARY
+    kind: script
+    owner: A05
+    ref: work/codex_pipeline/summarize_domain_text_ablation.py
+    evidence_map_state: DECLARED
+    a02_state: DECLARED
+
+# ---------------------------------------------------------------------------
+# Runs (evidence-map). 8 total, all DECLARED. Training runs have no per-run
+# artifact path; the holdout run has a remote ref (DECLARED, not verified).
+# Run identity = DECLARED; run artifacts = MISSING.
+# ---------------------------------------------------------------------------
+runs:
+  - id: gc_safe_fp32_20260810_2045
+    research_id: R002
+    planned_experiment_id: E001
+    mode: REPLAY
+    owner: A04
+    evaluator: A05
+    domain: Gestures-and-Communication
+    evidence_map_state: DECLARED
+    a02_state_run_identity: DECLARED
+    a02_state_artifacts: MISSING
+    a02_note: "No per-run output/checkpoint path or hash declared. historical_observation is a DECLARED quality claim; not assessed by A02 (model quality forbidden)."
+  - id: cat_dancing_fp32_20260811_0005
+    research_id: R002
+    planned_experiment_id: E002
+    mode: REPLAY
+    owner: A04
+    evaluator: A05
+    domain: Dancing
+    evidence_map_state: DECLARED
+    a02_state_run_identity: DECLARED
+    a02_state_artifacts: MISSING
+  - id: cat_object_manip_fp32_20260811_0005
+    research_id: R002
+    planned_experiment_id: E003
+    mode: REPLAY
+    owner: A04
+    evaluator: A05
+    domain: Object-Manipulation
+    evidence_map_state: DECLARED
+    a02_state_run_identity: DECLARED
+    a02_state_artifacts: MISSING
+  - id: abl_dancing_lr1e7_s2000_20260811
+    research_id: R003
+    planned_experiment_id: E001
+    mode: REPLAY
+    owner: A04
+    evaluator: A05
+    domain: Dancing
+    evidence_map_state: DECLARED
+    a02_state_run_identity: DECLARED
+    a02_state_artifacts: MISSING
+  - id: abl_dancing_lr1e7_s3000_20260811
+    research_id: R003
+    planned_experiment_id: E002
+    mode: REPLAY
+    owner: A04
+    evaluator: A05
+    domain: Dancing
+    evidence_map_state: DECLARED
+    a02_state_run_identity: DECLARED
+    a02_state_artifacts: MISSING
+  - id: abl_object_lr1e7_s2000_20260811
+    research_id: R003
+    planned_experiment_id: E003
+    mode: REPLAY
+    owner: A04
+    evaluator: A05
+    domain: Object-Manipulation
+    evidence_map_state: DECLARED
+    a02_state_run_identity: DECLARED
+    a02_state_artifacts: MISSING
+  - id: abl_object_lr1e7_s3000_20260811
+    research_id: R003
+    planned_experiment_id: E004
+    mode: REPLAY
+    owner: A04
+    evaluator: A05
+    domain: Object-Manipulation
+    evidence_map_state: DECLARED
+    a02_state_run_identity: DECLARED
+    a02_state_artifacts: MISSING
+    a02_note: "Provisional candidate (per evidence-map historical_observation and source summary section 6.3). Checkpoint MISSING. Quality not assessed by A02."
+  - id: seed_text_test_full_eval_20260813
+    research_id: R004
+    planned_experiment_id: E001
+    mode: LIVE
+    owner: A04
+    evaluator: A05
+    reviewer: A06
+    ref: /home/share/user/zyc/kimodo/eval_work/seed_text_test_full_eval_20260813
+    expected_counts:
+      content: 3510
+      repetition: 3428
+      total: 6938
+    evidence_map_state: DECLARED
+    a02_state_run_identity: DECLARED
+    a02_state_remote_ref: DECLARED
+    a02_state_results: MISSING_OUT_OF_SCOPE_FORBIDDEN
+    a02_note: "Remote ref under approved root /home/share/user/zyc/kimodo. Remote access forbidden to A02; final holdout results explicitly forbidden to A02. expected_counts DECLARED, not verified."
+
+# ---------------------------------------------------------------------------
+# Candidate + declared hyperparameters. Values DECLARED from source summary;
+# backing config artifact MISSING.
+# ---------------------------------------------------------------------------
+candidate:
+  run_id: abl_object_lr1e7_s3000_20260811
+  research_id: R003
+  planned_experiment_id: E004
+  evidence_map_state: DECLARED
+  a02_state_identity: DECLARED
+  a02_state_checkpoint: MISSING
+  base_model: Kimodo-SOMA-RP-v1.1
+  base_model_provenance: MISSING
+  declared_hyperparameters:
+    source: "source summary section 6.3"
+    a02_state: DECLARED
+    values:
+      target_domain: Object Manipulation
+      base_model: Kimodo-SOMA-RP-v1.1
+      dtype: fp32
+      lr: 1e-7
+      steps: 3000
+      warmup: 200
+      batch: 4
+      grad_accum: 8
+      target_repeat: 2
+      replay_size: 4000
+      replay_repeat: 1
+      text_dropout: 0.10
+      max_grad_norm: 0.5
+    backing_config_artifact: MISSING
+  foot_skate_risk_note: "DECLARED historical observation; quality not assessed by A02 (forbidden). Belongs to A05/A06 and Human Gate 2."
+
+# ---------------------------------------------------------------------------
+# Lineage chain (manifest -> checkpoint). Reconstructed from source summary
+# sections 7 and 8. Every link DECLARED or MISSING; none verified by A02.
+# ---------------------------------------------------------------------------
+lineage_chain:
+  description: "Reconstructed from source summary section 7 (work loop) and section 8 (scripts). Each link's concrete artifact is DECLARED or MISSING; none verified by A02."
+  chain:
+    - step: data_selection
+      script_id: SCRIPT-MANIFEST
+      script_ref: work/codex_pipeline/build_training_subset_manifest.py
+      produces: "target/replay training manifests"
+      artifact_state: MISSING
+    - step: feature_cache
+      produces: ["target cache", "replay cache", "combined cache"]
+      artifact_state: MISSING
+    - step: cache_merge
+      produces: "combined cache"
+      artifact_state: MISSING
+    - step: finetune
+      script_id: SCRIPT-TRAIN
+      script_ref: work/codex_pipeline/run_category_domain_finetune.sh
+      base_model: "Kimodo-SOMA-RP-v1.1 (provenance MISSING)"
+      produces: "checkpoint"
+      artifact_state: MISSING
+    - step: domain_eval
+      script_id: SCRIPT-DOMAIN-EVAL
+      script_ref: work/codex_pipeline/run_domain_text_eval.sh
+      produces: "summary_rows.json / metrics"
+      artifact_state: MISSING
+    - step: holdout_eval
+      script_id: SCRIPT-FULL-HOLDOUT
+      script_ref: work/codex_pipeline/run_seed_full_text_holdout_eval.sh
+      produces: "SEED full-test holdout results"
+      artifact_state: MISSING_OUT_OF_SCOPE_FORBIDDEN
+  verdict: "The manifest-to-checkpoint pipeline is reconstructable as a DECLARED chain from the source summary, but no link has verified primary material (path+hash) within A02's allowed scope. Provenance is PARTIAL."
+
+# ---------------------------------------------------------------------------
+# Split provenance. Required splits declared in human-gate-1; split manifests
+# and count sources MISSING. Train/eval overlap cannot be ruled out.
+# ---------------------------------------------------------------------------
+split_provenance:
+  required_splits: [Content, Repetition]
+  declared_in: ["human-gate-1 target_success_rule.required_splits", "source summary section 9 expected counts"]
+  split_manifest_paths: MISSING
+  split_case_count_source: MISSING
+  declared_expected_counts:
+    source: "source summary section 9 / evidence-map expected_counts (holdout run)"
+    content: 3510
+    repetition: 3428
+    total: 6938
+    a02_state: DECLARED
+  train_eval_overlap_check: NOT_PERFORMED
+  risk: "Without split manifests + count source, train/evaluation overlap cannot be ruled out (A02 escalation trigger)."
+  escalate_to: [A03, A05, A06]
+
+# ---------------------------------------------------------------------------
+# Threshold provenance (human-gate-1). Retrospective, not blinded-preregistered.
+# ---------------------------------------------------------------------------
+threshold_provenance:
+  human_gate: human-gate-1
+  gate_research_id: R004
+  gate_type: READY
+  gate_status: APPROVED
+  result_visibility_at_approval: NOT_ATTESTED
+  policy_classification: RETROSPECTIVE_ACCEPTANCE_POLICY_UNLESS_BLINDING_ATTESTED
+  approver_statement: "The approver is uncertain whether the final holdout result was visible before threshold approval."
+  preregistration_status: "Thresholds may NOT be described as preregistered because result blinding is not attested."
+  declared_protocol_sha256: 1f911559b69c5a7d3b68cf269c746c76ad1384f96a23963d533560eb83e8f0e5
+  declared_protocol_sha256_state: DECLARED
+  freeze_instruction: "Freeze the embedded R004 Protocol contract before using final holdout evidence for a decision."
+  r004_contract_freeze_state: DECLARED_NOT_VERIFIED_BY_A02
+  a02_note: "Threshold provenance is retrospective, not blinded-preregistered. Material for A03 (target_success_rule semantics) and A06 (independent review). Distinct from the VERIFIED source snapshot digest."
+
+# ---------------------------------------------------------------------------
+# Data boundary review. Folded into this report because data-boundary-review.yaml
+# is not in this run's allowed_output_refs. Source: human-gate-1
+# resource_and_data_boundary.
+# ---------------------------------------------------------------------------
+data_boundary_review:
+  scope_note: "Role profile lists data-boundary-review.yaml as a required output, but this run's task-envelope allowed_output_refs do not include it; the review is recorded here to preserve the boundary requirement without writing outside allowed paths."
+  source: "human-gate-1 resource_and_data_boundary"
+  boundaries:
+    approved_host: lintrain
+    approved_gpu_count: 2
+    approved_remote_roots:
+      - /home/share/user/zyc/kimodo
+      - /home/share/user/zyc/kimodo_seed_repro_train
+    private_data_allowed: false
+    raw_credentials_in_transcript: false
+    external_artifact_upload: false
+  a02_compliance:
+    private_data_accessed: false
+    credentials_in_outputs: false
+    external_upload_performed: false
+    remote_access_performed: false
+    final_holdout_results_accessed: false
+    bash_used: false
+    repository_wide_discovery_performed: false
+    operated_within_allowed_paths: true
+    allowed_paths_used:
+      - source/
+      - research/R001/
+      - simulation/pilot-20260813/evidence-map.yaml
+      - simulation/pilot-20260813/decisions/human-gate-1.yaml
+      - simulation/pilot-20260813/handoffs/handoff-template.yaml
+      - simulation/pilot-20260813/handoffs/README.md
+    paths_not_accessed:
+      - "work/codex_pipeline/* (outside allowed_paths; DECLARED only)"
+      - "approved remote roots (remote access forbidden)"
+  verdict: "All four boundaries (private data, credentials, external upload, approved paths) preserved by A02. Remote and final-holdout results explicitly not accessed."
+
+# ---------------------------------------------------------------------------
+# Provenance verdict.
+# ---------------------------------------------------------------------------
+provenance_verdict:
+  status: PARTIAL
+  rationale: "Source snapshot provenance VERIFIED (digest carried from evidence map; file confirmed readable). All 7 scripts and 8 runs are DECLARED (referenced, owned) but not independently verified by A02. 11 provenance items are MISSING, including the base model version, SEED dataset/split manifests, per-run checkpoints/caches/manifests, eval outputs, training config artifact, and final holdout results (out of scope). The chain is reconstructable as a DECLARED chain but no link has verified primary material within A02's allowed scope."
+  can_promote_to_verified: false
+  reason_no_promotion: "No primary material available within allowed paths for any DECLARED item; Bash, remote access, and repository-wide discovery are forbidden by the task envelope."
+  task_deliverable_status: PASS
+  task_deliverable_rationale: "Both required output files written; VERIFIED/DECLARED/MISSING separated with only the source snapshot digest VERIFIED; private-data, credential, external-upload, and approved-path boundaries preserved; structured handoff to A03 produced."

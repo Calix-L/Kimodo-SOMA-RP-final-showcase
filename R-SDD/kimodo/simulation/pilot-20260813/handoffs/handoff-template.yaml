@@ -1,0 +1,24 @@
+schema_version: "1.0"
+handoff_id: REQUIRED
+run_id: pilot-20260813
+mode: REQUIRED_REPLAY_VERIFY_OR_LIVE
+from_agent: REQUIRED
+to_agent: REQUIRED
+research_id: REQUIRED
+experiment_id: null
+owner: REQUIRED
+input_refs: []
+output_refs: []
+verified_actions: []
+gate_result: REQUIRED
+open_risks: []
+next_owner: REQUIRED
+next_state: REQUIRED
+next_action: REQUIRED
+commit_sha: REQUIRED
+kscc_session_id: REQUIRED
+timestamp: REQUIRED_ISO8601
+attestation:
+  historical_work_not_misrepresented: REQUIRED_BOOLEAN
+  secrets_removed: REQUIRED_BOOLEAN
+

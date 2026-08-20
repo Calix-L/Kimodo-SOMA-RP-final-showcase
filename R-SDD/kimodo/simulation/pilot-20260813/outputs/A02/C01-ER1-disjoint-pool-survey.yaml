@@ -1,0 +1,622 @@
+schema_version: "1.0"
+artifact: c01-er1-disjoint-pool-survey
+run_id: pilot-20260813
+task_id: C01-A02-ER1-disjoint-pool-feasibility
+mode: VERIFY
+agent_id: A02
+agent_display_name: "Qiao — Repository and Data Engineer"
+research_id: R004
+experiment_id: null
+cycle_id: C01-object-target-benchmark-pin
+cycle_step: C01-ER1
+produced_at: '2026-08-13T10:22:06+00:00'
+produced_at_precision: launcher_audit_completed_at
+kscc_session_id: 11c6748d-88e1-4fd3-9098-a5098aad7fcc
+kscc_session_id_note: >-
+  Backfilled by the orchestrator from the launcher-managed audit/session-index.yaml
+  after successful completion.
+model: glm-5.2
+
+# ---------------------------------------------------------------------------
+# Mode statement (shared contract item 2). This is a VERIFY step answering
+# evidence request ER-1, authorized by hf's C01-H1 REQUEST_MORE_EVIDENCE.
+# A02 did NOT modify R004, did NOT select the benchmark for hf, did NOT inspect
+# final holdout metrics, used NO Bash, performed NO remote access itself, and
+# started NO GPU training. A02 consumed a sanitized read-only set-metadata
+# inventory only.
+# ---------------------------------------------------------------------------
+mode_statement:
+  this_step: C01-ER1
+  mode: VERIFY
+  rule: >-
+    A02 consumes the sanitized ER-1 disjoint-pool inventory (collected
+    READ_ONLY_SANITIZED_SET_METADATA by codex-primary within the two approved
+    roots) plus A02's own prior C01-S2 provenance and A01's C01-S3
+    recommendation, computes/verifies whether a non-degenerate
+    Object-Manipulation pool exists that is disjoint from BOTH the candidate
+    training manifest and the SEED-test full holdout, and returns the
+    feasibility evidence to hf. A02 does NOT choose MODIFY or REJECT for hf
+    and does NOT edit R004. Evidence + feasibility classification only.
+
+# ===========================================================================
+# 1. COMMIT LINEAGE  (acceptance criterion 1: exact approval/base commit)
+# ===========================================================================
+commit_lineage:
+  approval_commit_sha: 6994bdad6d7d48f576dcbc3a27aaedca00b80a72
+  approval_commit_sha_state: VERIFIED
+  approval_commit_sha_evidence:
+    - "evidence/ER1-disjoint-pool-inventory.yaml#human_authorization.commit_sha = 6994bdad6d7d48f576dcbc3a27aaedca00b80a72"
+    - "collaboration/ledger.yaml#cycles[C01].sequence[C01-H1] state COMPLETE_REQUEST_MORE_EVIDENCE decided_at 2026-08-13T10:05:26Z"
+    - "decisions/human-collaboration-C01.yaml#human_response REQUEST_MORE_EVIDENCE; human_modification.authorized_scope = [ER-1 disjoint Object pool investigation, ER-2 ...]"
+    - "session-start gitStatus snapshot short sha 6994bda 'Authorize bounded C01 evidence collection' (consistent prefix)"
+  approval_commit_role: >-
+    The commit that recorded hf's C01-H1 REQUEST_MORE_EVIDENCE authorization and
+    the bounded ER-1 / ER-2 evidence-collection scope. This is the approval
+    that enabled the ER-1 inventory A02 consumes. Full 40-char sha confirmed
+    by the inventory primary record; A02 did NOT recompute it (Bash forbidden).
+  base_commit_sha: e2750806ec9c096c78902e5e192a20c26af1bd87
+  base_commit_sha_state: VERIFIED_ORCHESTRATOR_BACKFILL
+  base_commit_sha_evidence:
+    - "session-start gitStatus snapshot: 'e275080 Record bounded ER1 and ER2 evidence inventories' (most recent commit; harness primary)"
+    - "audit/session-index.yaml launcher record commit_sha = e2750806ec9c096c78902e5e192a20c26af1bd87"
+  base_commit_sha_caveat: >-
+    The commit the worktree used and the commit that recorded the ER1 + ER2
+    inventory artifacts. A02 observed the short sha; the orchestrator later
+    backfilled the full launcher-audited sha without changing the conclusion.
+  recording_commit_sha: PENDING
+  recording_commit_sha_note: >-
+    A02's outputs are not yet committed. The orchestrator/launcher records them
+    (as in prior steps; ledger C01-ER1 currently has state READY and no
+    commit_sha). A02's own prior C01-S2 handoff likewise recorded base 6c3f651
+    with the recording commit pending; the ledger later confirmed fcdd2a4.
+
+# ===========================================================================
+# 2. RECORDS READ BY A02  (process facts; READ != VERIFIED). All reads used
+#    the Read/Glob tools only. No Bash, no remote access by A02, no
+#    repository-wide discovery beyond the named refs. All paths are inside
+#    kimodo/ (task: operate only inside kimodo/).
+# ===========================================================================
+records_read:
+  - ref: kimodo/simulation/pilot-20260813/evidence/ER1-disjoint-pool-inventory.yaml
+    read: true
+    role: sanitized primary set-metadata inventory for ER-1 (the sanctioned evidence channel)
+  - ref: kimodo/simulation/pilot-20260813/outputs/A02/C01-object-benchmark-provenance.yaml
+    read: true
+    role: A02's own prior C01-S2 provenance (disjointness baseline being corrected/refined)
+  - ref: kimodo/simulation/pilot-20260813/outputs/A01/C01-benchmark-recommendation.yaml
+    read: true
+    role: A01 C01-S3 synthesis (defines the ER-1 question; pre-stated secondary preferences)
+  - ref: kimodo/simulation/pilot-20260813/decisions/human-collaboration-C01.yaml
+    read: true
+    role: hf C01-H1 authorization (REQUEST_MORE_EVIDENCE; ER-1/ER-2 scope; prohibitions)
+  - ref: kimodo/simulation/pilot-20260813/collaboration/ledger.yaml
+    read: true
+    role: C01 cycle sequence + C01-H1 decision + C01-ER1/ER2 step state (read-only)
+  - ref: kimodo/simulation/pilot-20260813/evidence-map.yaml
+    read: true
+    role: asset/run registry (sanity check; no Object target benchmark enumerated as VERIFIED)
+  - ref: kimodo/simulation/pilot-20260813/audit/session-index.yaml
+    read: true
+    role: launcher audit index (for kscc_session_id backfill convention; my entry not yet present)
+  - ref: kimodo/simulation/pilot-20260813/workflow.yaml
+    read: true
+    role: cycle/phase state + protocol_change_after_ready = research-revise-required
+  - ref: kimodo/simulation/pilot-20260813/tasks/C01-A02-ER1.yaml
+    read: true
+    role: this task envelope (objective, acceptance criteria, forbidden actions)
+  - ref: kimodo/simulation/pilot-20260813/handoffs/handoff-template.yaml
+    read: true
+    role: handoff schema for C01-ER1-A02-to-hf
+records_not_read_this_run:
+  - ref: kimodo/research/R004/protocol.yaml
+    note: >-
+      A02 did NOT read R004 directly this run (forbidden_action: do not modify
+      R004; reading is not modifying but is unnecessary here). R004 facts below
+      are CARRIED from the consumed upstream outputs (C01-object-benchmark-
+      provenance.yaml and C01-benchmark-recommendation.yaml), which are
+      authorized input_refs. Carried, not re-verified by A02 this run.
+
+# ===========================================================================
+# 3. INVENTORY HASHES CONSUMED  (acceptance criterion 1: every inventory hash)
+#    One inventory consumed: evidence/ER1-disjoint-pool-inventory.yaml. Every
+#    digest it carries is listed below with its source field. A02 did NOT
+#    recompute any digest (Bash forbidden); each is carried from the sanitized
+#    inventory and cross-checked for internal consistency only.
+# ===========================================================================
+inventory_hashes_consumed:
+  inventory_ref: kimodo/simulation/pilot-20260813/evidence/ER1-disjoint-pool-inventory.yaml
+  inventory_collected_at: "2026-08-13T10:16:46Z"
+  inventory_collection_mode: READ_ONLY_SANITIZED_SET_METADATA
+  inventory_collector: codex-primary
+  digests:
+    - name: source_metadata_sha256
+      value: 71d09422034946d17dbb0db027d569408c486545bdb12f7979d55e6ffd9bbc39
+      source_field: source_universe.metadata_sha256
+      artifact: /home/share/user/zyc/kimodo/seed/metadata/seed_metadata_v004.csv
+      supplemental: { metadata_total_rows: 142220 }
+    - name: object_universe_set_sha256
+      value: bb2a995a0770ca18168c31434c3c7132d4672cca424de4dac1301cfb7430aba6
+      source_field: source_universe.universe_set_sha256
+      artifact: "Object-Manipulation non-mirror universe (is_mirror == False)"
+      supplemental: { object_nonmirror_rows: 5810, object_nonmirror_unique_path_ids: 5810 }
+    - name: candidate_training_manifest_sha256
+      value: 95dcd9c7f1e73d99e5bce10abb6bf94d55f58a17e8eefc7b83fbdfe74597bbd5
+      source_field: exclusion_sets.candidate_training_manifest.sha256
+      artifact: /home/share/user/zyc/kimodo_seed_repro_train/work/manifests/cat_object_manip_fp32_20260811_0005.csv
+      supplemental: { rows: 5810, unique_path_ids: 5810 }
+    - name: full_holdout_manifest_sha256
+      value: 479f284385178ff323795a6b08a2458c7d161e148e8be6b626ef68fb82a47d20
+      source_field: exclusion_sets.full_holdout.sha256
+      artifact: /home/share/user/zyc/kimodo/eval_work/seed_text_test_full_20260813/domain_manifest.json
+      supplemental: { unique_path_ids: 6938, final_metric_values_read: false }
+    - name: construction_script_sha256
+      value: 18a602ddf4922f42dad03a2478a9ac731607663d54460dee1472210e393d88f3
+      source_field: identity_method.construction_script_sha256
+      artifact: /home/share/user/zyc/kimodo_seed_repro_train/work/codex_pipeline/build_domain_text_benchmark.py
+      role: >-
+        Identifies the authoritative rel_key transform (soma_uniform/bvh prefix
+        and .bvh suffix removed) used to build the path identity.
+    - name: eligible_set_sha256
+      value: 01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b
+      source_field: set_results.eligible_set_sha256
+      artifact: "canonical empty newline-terminated set serialization"
+      source_note: "inventory set_results.eligible_set_sha256_note"
+      interpretation: "SHA-256 of the EMPTY eligible set; corroborates eligible_outside_training_and_holdout = 0."
+  upstream_output_hashes_cross_referenced:
+    note: >-
+      These digests are NOT from the ER1 inventory; they are carried from the
+      two upstream outputs A02 consumed (authorized input_refs) and are used
+      only to reconcile the prior C01-S2 disjointness against the ER-1 result.
+      Carried, not recomputed by A02 this run.
+    items:
+    - name: object_eval_manifest_sha256
+      value: 97d13dcc78016c66396faee8a59a0cd8f126c9552542e2ad94de914d4bf519a3
+      source: outputs/A02/C01-object-benchmark-provenance.yaml#benchmark_pin_classification.splits
+    - name: object_eval_ordered_unique_motion_id_set_sha256
+      value: 8f60670735432c31e24166b7b8a8f6785c1f50a10e471877d8e68db47d700c1b
+      source: outputs/A02/C01-object-benchmark-provenance.yaml#viable_candidate_identity
+    - name: r004_protocol_freeze_sha256
+      value: 1f911559b69c5a7d3b68cf269c746c76ad1384f96a23963d533560eb83e8f0e5
+      source: outputs/A01/C01-benchmark-recommendation.yaml#facts[F7] (carried from research/R004/protocol.yaml#freeze)
+
+# ===========================================================================
+# 4. SOURCE UNIVERSE AND EXCLUSION SETS  (the three sets under comparison)
+# ===========================================================================
+sets_under_comparison:
+  universe_U:
+    description: "Object-Manipulation non-mirror universe from SEED metadata v004"
+    metadata_path: /home/share/user/zyc/kimodo/seed/metadata/seed_metadata_v004.csv
+    metadata_sha256: 71d09422034946d17dbb0db027d569408c486545bdb12f7979d55e6ffd9bbc39
+    metadata_total_rows: 142220
+    category: Object Manipulation
+    mirror_policy: "is_mirror == \"False\""
+    object_nonmirror_rows: 5810
+    object_nonmirror_unique_path_ids: 5810
+    split_columns_present: false
+    universe_set_sha256: bb2a995a0770ca18168c31434c3c7132d4672cca424de4dac1301cfb7430aba6
+  exclusion_T:
+    description: "candidate training manifest"
+    path: /home/share/user/zyc/kimodo_seed_repro_train/work/manifests/cat_object_manip_fp32_20260811_0005.csv
+    sha256: 95dcd9c7f1e73d99e5bce10abb6bf94d55f58a17e8eefc7b83fbdfe74597bbd5
+    rows: 5810
+    unique_path_ids: 5810
+    linkage_state: DECLARED_AS_CANDIDATE_TRAINING
+    linkage_note: >-
+      Declared-as-the-candidate's-training-manifest by naming convention and
+      source summary, NOT VERIFIED by A02 (C01-RISK-09; owner A03/A04 via
+      ER-2). The disjoint-pool result below does NOT depend on this linkage
+      being true: degeneracy holds for ANY training manifest that contains the
+      non-mirror Object universe, which this manifest provably does
+      (object_universe_x_training = 5810 = |U|).
+  exclusion_H:
+    description: "SEED-test full holdout"
+    path: /home/share/user/zyc/kimodo/eval_work/seed_text_test_full_20260813/domain_manifest.json
+    sha256: 479f284385178ff323795a6b08a2458c7d161e148e8be6b626ef68fb82a47d20
+    unique_path_ids: 6938
+    final_metric_values_read: false
+
+# ===========================================================================
+# 5. IDENTITY METHOD  (acceptance criterion 2: define the identity used)
+# ===========================================================================
+identity_method:
+  authoritative_rule: "last two BVH path components without the file suffix"
+  normalized_form: "take_date/motion_file_stem"
+  basis:
+    - "build_domain_text_benchmark.py rel_key uses move_soma_uniform_path with the soma_uniform/bvh prefix and .bvh suffix removed (construction_script_sha256 18a602dd...)."
+    - "training manifest exposes bvh_path; benchmark cases expose seed_motion.bvh_path; both reduce to the same dated relative path identity."
+  why_motion_id_is_not_authoritative: >-
+    Exact move_name/motion_id comparison produced 187 naming mismatches and a
+    FALSE 179-case residual pool. The benchmark constructor and source
+    metadata are keyed by dated BVH relative paths, not bare move_name text.
+    Path identity resolves every training row to the metadata universe.
+  identity_correction_audit:
+    preliminary_non_authoritative_motion_id_result:
+      exact_eligible_count: 179
+      state: REJECTED_IDENTITY_METHOD
+    authoritative_path_result:
+      eligible_count: 0
+      state: VERIFIED
+    correction_reason: "Dated BVH relative paths are the authoritative key; bare move_name is not."
+  a02_treatment: >-
+    A02 adopts the inventory's AUTHORITATIVE path identity for the
+    feasibility verdict. The rejected motion_id preliminary is disclosed here
+    for transparency but is NOT treated as a CONFLICTING feasibility result: the
+    inventory resolved the method conflict in favor of the path identity
+    (motion_id REJECTED, path VERIFIED), so the feasibility classification
+    rests on a single internally-consistent authoritative method.
+
+# ===========================================================================
+# 6. SET OPERATION AND COMPUTED RESULTS  (acceptance criterion 2)
+# ===========================================================================
+set_operation:
+  definition: "eligible = U ∩ ¬T ∩ ¬H"
+  notation:
+    U: "Object-Manipulation non-mirror universe (|U| = 5810 unique path ids)"
+    T: "candidate training manifest (|T| = 5810 unique path ids)"
+    H: "SEED-test full holdout (|H| = 6938 unique path ids)"
+    "¬X": "set complement with respect to the Object-Manipulation non-mirror universe U"
+  identity: "last two BVH path components (take_date/motion_file_stem); exact equality; no fuzzy matching"
+  computed_from_inventory:
+    object_universe_x_training: 5810
+    object_universe_x_holdout: 292
+    training_not_in_object_universe: 0
+    object_universe_not_in_training: 0
+    object_universe_not_in_holdout: 5518
+    eligible_outside_training_and_holdout: 0
+    eligible_set_sha256: 01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b
+  derivation:
+    step_1: "U ∩ T = object_universe_x_training = 5810 = |U| = 5810, so U ⊆ T."
+    step_2: "Because |U| = 5810 and |T| = 5810 and U ⊆ T, the sets are equal: U = T (the candidate training manifest IS the entire non-mirror Object-Manipulation universe)."
+    step_3: "Therefore U ∩ ¬T = object_universe_not_in_training = 0 (no non-mirror Object case lies outside training)."
+    step_4: "eligible = U ∩ ¬T ∩ ¬H = (U ∩ ¬T) ∩ ¬H = ∅ ∩ ¬H = ∅, regardless of H."
+    step_5: "eligible_outside_training_and_holdout = 0 (corroborated by eligible_set_sha256 = empty-set digest)."
+  binding_constraint: >-
+    Training containment alone (U = T) forces the eligible pool to be empty;
+    the holdout is not the binding constraint for degeneracy. The holdout
+    subset fact (U ∩ H = 292; the current Object eval is a 292/292 exact
+    subset of H) is unchanged from C01-S2 but is moot for the disjoint-pool
+    question because U ∩ ¬T is already empty.
+
+# ===========================================================================
+# 7. ELIGIBLE COUNTS BY SPLIT  (acceptance criterion 2: separately for Content
+#    and Repetition)
+# ===========================================================================
+eligible_counts_by_split:
+  identity_used: "last two BVH path components (take_date/motion_file_stem); authoritative"
+  set_operation_used: "eligible_split = (current split cases) ∩ ¬T; maximum_eligible = U ∩ ¬T (then restricted to the split's official membership), reported per split"
+  Content:
+    current_cases: 235
+    training_intersection: 235
+    eligible_current_cases_after_training_exclusion: 0
+    maximum_eligible_from_observed_universe: 0
+    state: DEGENERATE
+  Repetition:
+    current_cases: 57
+    training_intersection: 57
+    eligible_current_cases_after_training_exclusion: 0
+    maximum_eligible_from_observed_universe: 0
+    state: DEGENERATE
+  aggregate:
+    current_cases_total: 292
+    training_intersection_total: 292
+    eligible_outside_training_and_holdout: 0
+    maximum_eligible_from_observed_universe_total: 0
+  interpretation: >-
+    BOTH splits are degenerate. The maximum_eligible_from_observed_universe is
+    0 for BOTH splits, meaning even drawing Object-Manipulation cases from the
+    entire observed SEED v004 non-mirror universe yields no case outside the
+    candidate training manifest. There is no non-mirror Object-Manipulation
+    case in SEED v004 that is not already in training; therefore no disjoint
+    Object eval — Content or Repetition — can be assembled from this universe.
+
+# ===========================================================================
+# 8. FEASIBILITY CLASSIFICATION  (acceptance criterion 3)
+# ===========================================================================
+feasibility_classification:
+  classification: VERIFIED_DEGENERATE
+  classification_state: VERIFIED
+  inventory_classification: "evidence/ER1-disjoint-pool-inventory.yaml#feasibility_evidence.classification = VERIFIED_DEGENERATE"
+  a02_verification: >-
+    A02 verified the inventory's classification against the underlying
+    set_results: |U| = 5810, |T| = 5810, U ∩ T = 5810 ⇒ U = T ⇒ U ∩ ¬T = ∅ ⇒
+    eligible = ∅. The per-split split_implication (Content 0, Repetition 0;
+    max-from-universe 0 for both) is internally consistent with the aggregate
+    eligible_outside_training_and_holdout = 0 and the empty-set
+    eligible_set_sha256. No field relies on the rejected motion_id method.
+  statement: >-
+    Within SEED metadata v004 and the approved training/holdout artifacts, the
+    candidate training manifest equals the entire non-mirror Object-Manipulation
+    universe (5810 = 5810), so NO non-mirror Object-Manipulation case lies
+    outside training. The pool disjoint from BOTH training and holdout is empty
+    (0 cases) for Content and Repetition alike; the maximum draw from the
+    observed universe is also 0 for both splits. A non-degenerate
+    Object-Manipulation evaluation pool disjoint from both the candidate
+    training manifest and the full holdout DOES NOT EXIST in the observed
+    SEED v004 universe. (Carried verbatim-in-substance from the inventory's
+    feasibility_evidence.statement, with A02's set-derivation overlay.)
+  why_not_missing: "Primary evidence is present and computed (counts + hashes + empty-set digest); this is not an absence of evidence."
+  why_not_conflicting: >-
+    The motion_id-vs-path method discrepancy was RESOLVED by the inventory
+    (motion_id REJECTED_IDENTITY_METHOD; path VERIFIED). The feasibility
+    result is internally consistent under the single authoritative method, so
+    this is not a CONFLICTING classification.
+  why_not_non_degenerate: "eligible_outside_training_and_holdout = 0 for both splits; the pool is empty."
+  escape_hatches_requiring_out_of_scope_action:
+    - "Change the candidate training data (retrain on a smaller disjoint set) — requires GPU/training, FORBIDDEN in the C01 cycle."
+    - "Source a new/external or later dataset version — NOT authorized in ER-1; UNSURVEYED (see dataset_coverage_limits)."
+    - "Permit mirror Object-Manipulation rows — NOT surveyed (excluded by mirror_policy); would also change the benchmark definition (see dataset_coverage_limits)."
+
+# ===========================================================================
+# 9. CORRECTION vs PRIOR C01-S2  (scientific honesty; contract rules 3, 4, 6)
+#    The prior C01-S2 disjointness used motion_id identity and is SUPERSEDED
+#    on the by_split granularity by the authoritative path identity. The
+#    leakage DIRECTION is unchanged and STRENGTHENED, not reversed.
+# ===========================================================================
+correction_vs_prior_c01s2:
+  prior_artifact: outputs/A02/C01-object-benchmark-provenance.yaml
+  prior_commit_sha: fcdd2a4a49f97be40bcae9ce3fd700407557eee3
+  prior_identity: "Exact equality of motion_id / seed_motion.move_name (NON-AUTHORITATIVE; now REJECTED)"
+  prior_train_eval_intersection: 284
+  prior_by_split:
+    Content: { object_cases: 235, intersection: 235, non_overlapping: 0 }
+    Repetition: { object_cases: 57, intersection: 49, non_overlapping: 8 }
+    overlap_ratio: 0.972603
+  corrected_train_eval_intersection: 292
+  corrected_by_split:
+    Content: { object_cases: 235, intersection: 235, non_overlapping: 0 }
+    Repetition: { object_cases: 57, intersection: 57, non_overlapping: 0 }
+    overlap_ratio: 1.0
+  correction_summary: >-
+    Under the AUTHORITATIVE path identity, ALL 292 Object eval cases are in the
+    candidate training manifest (292/292 = 100%), not 284/292 = 97.26% as
+    previously reported. The 8 "non-overlapping Repetition cases" were a FALSE
+    RESIDUAL caused by the non-authoritative motion_id identity (187 naming
+    mismatches). The entire non-mirror Object universe (5810) equals the
+    training manifest (5810) as sets.
+  effect_on_direction:
+    leakage_finding: >-
+      C01-RISK-02 (target-train leakage) is STRENGTHENED, not reversed: 100%
+      overlap vs the prior 97.26%. The CONFLICTING/non-disjoint classification in
+      the prior C01-S2 output HOLDS and is refined upward.
+    holdout_finding: >-
+      C01-RISK-03 (eval is an exact 292/292 subset of the 6938-case holdout)
+      is UNCHANGED. It is now moot for the disjoint-pool question because
+      training containment alone makes the pool empty.
+    a01_obs_superseded: >-
+      A01's OBS-S3-1 (naive train-disjoint eval collapses Content to 0 and
+      Repetition to 8) is SUPERSEDED: the authoritative result is Content 0 and
+      Repetition 0, and maximum_eligible_from_observed_universe is 0 for both.
+      The degeneracy is TOTAL, not partial.
+  stale_numbers_in_circulation:
+    - "decisions/human-collaboration-C01.yaml#ai_recommendation.reason cites 284/292 (97.26%) and 'naive train-disjoint eval collapses Content to 0 cases'"
+    - "outputs/A01/C01-benchmark-recommendation.yaml#observations[OBS-S3-1] cites Repetition non_overlapping 8"
+    - "outputs/A01/C01-benchmark-recommendation.yaml#facts[F3] cites 284/292 and Repetition 49/57 (non_overlapping 8)"
+  a02_action_on_stale_numbers: >-
+    A02 surfaces the correction so hf does not act on the stale 284/8 figures.
+    The decision DIRECTION (existing benchmark is contaminated; ALT-A not
+    viable) is unchanged. The corrected numbers make the disjoint-pool
+    feasibility question close NEGATIVE (VERIFIED_DEGENERATE), which is the
+    input A01's secondary_preference_if_evidence_closes_negative anticipated.
+
+# ===========================================================================
+# 10. DATASET-COVERAGE LIMITS  (acceptance criterion 4: expose limits)
+# ===========================================================================
+dataset_coverage_limits:
+  universe_bounded_to_seed_v004:
+    statement: >-
+      Degeneracy is proven only for the observed SEED metadata v004 universe
+      (metadata_sha256 71d09422..., 142220 rows; object_nonmirror_unique_path_ids
+      5810). A later SEED version or an external Object-Manipulation dataset
+      could contain cases outside this universe.
+    surveyed: false
+    reason: "hf authorized only the two approved roots and ER-1; no external/later dataset was searched."
+  mirror_rows_excluded_unsurveyed:
+    statement: >-
+      The universe applies mirror_policy is_mirror == "False" (object_nonmirror_rows
+      5810). Object-Manipulation MIRROR rows were NOT surveyed: the inventory
+      reports no count of Object mirror rows and no test of their disjointness
+      from training/holdout. The benchmark constructor also excludes mirrors by
+      default (per C01-S2 selection_criteria), so mirrors are out of scope by
+      construction.
+    surveyed: false
+    caveat: >-
+      Even if some mirror Object rows were outside training AND outside holdout,
+      using them would (a) change the benchmark definition (mirrors excluded by
+      construction default) and (b) require a new construction run with
+      include-mirrors, which is beyond ER-1's set-metadata scope.
+  no_split_column:
+    statement: >-
+      metadata split_columns_present = false, so no alternative official split
+      assignment exists within this source record.
+    decisive: false
+    reason: >-
+      The absence of a split column is NON-DECISIVE because U ∩ ¬T is already
+      empty (zero universe residual vs training); there is no official 'test'
+      split to appeal to that could supply disjoint Object cases.
+  approved_roots_only:
+    statement: >-
+      Only the two approved roots were in scope:
+      /home/share/user/zyc/kimodo and /home/share/user/zyc/kimodo_seed_repro_train.
+      Other hosts/paths are unsurveyed.
+  set_metadata_only:
+    statement: >-
+      The eligible pool is computed from set metadata (counts + ordered-set
+      hashes) only — no motion content, no generation, no holdout metric
+      values. final_metric_values_read = false.
+  coverage_summary: >-
+    VERIFIED_DEGENERATE is established within SEED v004 Object-Manipulation
+    non-mirror, inside the approved roots. A non-degenerate pool is NOT
+    excluded in absolute terms — it could exist in (a) a later/external
+    dataset, (b) mirror Object rows, or (c) other hosts — but all three are
+    outside the ER-1 authorization and were not surveyed. Whether to expand
+    scope (new dataset, mirrors, or retraining) is hf's decision, not A02's.
+
+# ===========================================================================
+# 11. TRANSPORT WARNING  (carried; not silently promoted away)
+# ===========================================================================
+transport_warning:
+  state: OBSERVED
+  message: "client_global_hostkeys_prove_confirm: server gave bad signature for RSA key 0: incorrect signature"
+  handling_from_inventory: "All reads exited successfully; carry as a provenance warning."
+  a02_treatment: >-
+    Carried forward as ER1-RISK-03. The warning does NOT downgrade the
+    VERIFIED_DEGENERATE finding (the inventory states all reads succeeded and
+    the counts/hashes are internally consistent), but it remains a residual
+    provenance risk for hf/orchestrator to re-collect or attest. Consistent
+    with the prior C01-S2 treatment (C01-RISK-06).
+
+# ===========================================================================
+# 12. SANITIZATION AND FORBIDDEN-ACTION COMPLIANCE
+# ===========================================================================
+sanitization:
+  raw_case_ids_included: false
+  raw_training_rows_included: false
+  final_holdout_metrics_included: false
+  credentials_included: false
+  GPU_or_training_started: false
+  R004_modified: false
+forbidden_action_compliance:
+  remote_access_or_bash: NOT_PERFORMED
+  gpu_training_or_benchmark_generation: NOT_PERFORMED
+  inspect_final_holdout_metric_values: NOT_PERFORMED
+  modify_R004: NOT_PERFORMED
+  select_benchmark_choose_modify_or_reject_for_hf: NOT_PERFORMED
+  expose_raw_case_identifiers_or_private_rows: NOT_PERFORMED
+  operated_within_kimodo_only: true
+  tools_used: [Read, Glob]
+  a02_compliance_note: >-
+    A02 consumed the sanitized ER-1 inventory and two upstream outputs only.
+    No remote access, no Bash, no GPU, no training, no benchmark generation, no
+    holdout metric inspection, no R004 access, no raw case identifiers, no
+    private rows. All reads were inside kimodo/.
+
+# ===========================================================================
+# 13. EVIDENCE-ONLY STATEMENT  (acceptance criterion 4; do not choose for hf)
+# ===========================================================================
+evidence_only_statement:
+  a02_selection: NONE
+  rule: >-
+    A02 returns feasibility evidence only. A02 does NOT choose MODIFY (ALT-B)
+    or REJECT (ALT-C) for hf. The classification VERIFIED_DEGENERATE is
+    evidence, not a decision.
+  consistency_with_a01_pre_stated_preference:
+    kind: OBSERVATION_not_selection
+    statement: >-
+      A01's C01-S3 recommendation pre-declared
+      secondary_preference_if_evidence_closes_negative = ALT-C (REJECT/escalate)
+      if the disjoint pool is degenerate (e.g., Content would be 0). The ER-1
+      evidence closes negative (Content 0 AND Repetition 0). This is the input
+      A01's pre-stated secondary preference referenced. Stating this
+      consistency is an OBSERVATION for hf; it is NOT a selection by A02.
+  coupling_with_er2:
+    statement: >-
+      ER-1 closes the disjoint-POOL feasibility question (VERIFIED_DEGENERATE).
+      It does NOT close the LINKAGE question (C01-RISK-09: whether
+      cat_object_manip_fp32_20260811_0005.csv actually trained the candidate),
+      which is ER-2's owner (A03/A04). Note: degeneracy here does NOT depend on
+      the linkage being true — U = T holds for this manifest regardless of
+      whether it trained abl_object_lr1e7_s3000_20260811. hf decides at C01-H2
+      after both ER-1 and ER-2 land.
+  forbidden_respected: >-
+    A02 did not infer a fact from a filename alone (every count/hash is carried
+    from the sanitized inventory with its source field), did not inspect final
+    holdout metrics, did not modify R004, and did not select the benchmark.
+
+# ===========================================================================
+# 14. OPEN RISKS  (ER-1 specific; opened/upgraded by A02 C01-ER1)
+# ===========================================================================
+open_risks:
+  - id: ER1-RISK-01
+    severity: high
+    state: NEW
+    statement: >-
+      Disjoint Object-Manipulation pool is VERIFIED_DEGENERATE within SEED v004
+      non-mirror (Content 0, Repetition 0; max-from-universe 0 for both). A
+      disjoint target benchmark cannot be assembled from the observed
+      universe without changing training data or sourcing a new
+      dataset/version. This closes A01's C01-RISK-11 (ALT-B feasibility
+      UNKNOWN) to NEGATIVE.
+    owner: hf (C01-H2)
+  - id: ER1-RISK-02
+    severity: medium
+    state: NEW
+    statement: >-
+      Prior C01-S2 by_split numbers (train-eval 284/292 = 97.26%; Repetition
+      non_overlapping 8) are STALE: under authoritative path identity the
+      overlap is 292/292 = 100% with 0 non-overlapping for both splits. A01's
+      OBS-S3-1 and the human-collaboration-C01 reason cite the stale figures.
+      hf and any downstream synthesis must use the corrected 292/100% figures.
+    owner: hf / A01 (if a C01-S3b re-synthesis runs)
+  - id: ER1-RISK-03
+    severity: medium
+    state: CARRIED
+    statement: >-
+      Transport warning (SSH bad RSA signature) during inventory collection;
+      all reads succeeded but residual provenance risk remains. (Same as
+      prior C01-RISK-06.)
+    owner: hf / orchestrator (re-collect over clean transport or attest)
+  - id: ER1-RISK-04
+    severity: resolved
+    state: RESOLVED_BY_ORCHESTRATOR
+    statement: >-
+      A02 initially carried short sha e275080; the orchestrator backfilled full
+      sha e2750806ec9c096c78902e5e192a20c26af1bd87 from the launcher audit.
+    owner: none
+  - id: ER1-RISK-05
+    severity: low
+    state: NEW
+    statement: >-
+      Candidate-to-training-manifest linkage (C01-RISK-09) remains DECLARED,
+      not VERIFIED by A02. ER-1 degeneracy does NOT depend on it (U = T for
+      this manifest regardless), but the separate leakage interpretation of
+      the 292 overlap does. ER-2 (A03/A04) owns the linkage verification.
+    owner: A03 / A04 (ER-2)
+  - id: ER1-RISK-06
+    severity: low
+    state: NEW
+    statement: >-
+      Dataset-coverage limits: mirror Object rows, later/external SEED versions,
+      and non-approved hosts are UNSURVEYED. A non-degenerate pool is not
+      excluded in absolute terms, only within the ER-1-authorized scope.
+    owner: hf (scope-expansion decision)
+
+# ===========================================================================
+# 15. ACCEPTANCE-CRITERIA SELF-CHECK
+# ===========================================================================
+acceptance_criteria_self_check:
+  - criterion: "Cite the exact approval/base commit and every inventory hash consumed."
+    status: MET
+    where: "section 1 commit_lineage (approval 6994bdad... VERIFIED full sha; base e275080 short, full not recomputed, flagged ER1-RISK-04); section 3 inventory_hashes_consumed (all 6 ER1 inventory digests + upstream cross-refs)"
+  - criterion: "Report eligible counts separately for Content and Repetition and define the identity/set operation used."
+    status: MET
+    where: "section 5 identity_method (authoritative path rule); section 6 set_operation (eligible = U ∩ ¬T ∩ ¬H); section 7 eligible_counts_by_split (Content 0 / Repetition 0; max-from-universe 0 both)"
+  - criterion: "Classify feasibility as VERIFIED_NON_DEGENERATE, VERIFIED_DEGENERATE, MISSING, or CONFLICTING without inventing cases."
+    status: MET
+    where: "section 8 feasibility_classification (VERIFIED_DEGENERATE; why-not-missing/conflicting/non-degenerate each stated; no cases invented)"
+  - criterion: "Expose dataset-coverage limits and return evidence only; do not choose MODIFY or REJECT for hf."
+    status: MET
+    where: "section 10 dataset_coverage_limits (SEED v004 bound, mirrors unsurveyed, no split column, approved roots only, set-metadata only); section 13 evidence_only_statement (a02_selection = NONE; ALT-B/ALT-C not chosen; A01 preference consistency is an OBSERVATION)"
+
+# ===========================================================================
+# 16. HANDOFF POINTER
+# ===========================================================================
+handoff:
+  to_agent: hf
+  handoff_path: simulation/pilot-20260813/handoffs/C01-ER1-A02-to-hf.yaml
+  cycle_step: C01-ER1 -> C01-H2
+  next_action_for_hf: >-
+    Consume this ER-1 evidence (VERIFIED_DEGENERATE; Content 0 / Repetition 0;
+    corrected train-eval overlap 292/292 = 100%) together with ER-2 (A03/A04
+    linkage verification, still pending) and choose MODIFY (ALT-B) or REJECT
+    (ALT-C) at C01-H2. A02 does NOT choose. Note that ALT-B (reconstruct a
+    disjoint Object benchmark) is INFEASIBLE within the observed SEED v004
+    non-mirror universe because no non-mirror Object case lies outside the
+    candidate training manifest; ALT-B would require changing training data
+    (GPU, forbidden in C01) or sourcing a new dataset/version/mirrors (outside
+    ER-1 scope). Whether to expand scope or retrain is hf's decision.
+  forbidden_for_hf_reminder: >-
+    A02 returns evidence only. Any selection (MODIFY/REJECT) and any scope
+    expansion (new dataset, mirrors, retraining) is hf's. R004 stays FROZEN;
+    any pin is an additive research-revise AFTER C01-H2, changing no frozen
+    threshold/count/comparison-protocol field. Final adoption stays with
+    Human Gate 2.

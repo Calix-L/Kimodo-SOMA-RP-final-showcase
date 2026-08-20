@@ -1,0 +1,401 @@
+schema_version: '1.0'
+review_id: A05-benchmark-integrity-review
+run_id: pilot-20260813
+task_id: P01-A05-evaluation-recovery
+mode: VERIFY
+agent_id: A05
+display_name: 'Wei — Evaluation Auditor'
+research_id: R004
+experiment_id: null
+prepared_at: '2026-08-13'
+prepared_at_precision: date_only_shell_clock_unavailable
+commit_sha: cd67942
+commit_sha_basis: 'session-start HEAD from gitStatus; worktree clean; no new commit by A05; outputs are uncommitted working-tree files'
+model: glm-5.2
+kscc_session_id: MISSING
+kscc_session_id_note: 'audit/session-index.yaml status NOT_STARTED, sessions: []; no session id registered yet'
+prompt_version: MISSING
+prompt_basis:
+  - kimodo/simulation/pilot-20260813/agents/A05.yaml
+  - kimodo/simulation/pilot-20260813/tasks/P01-A05.yaml
+
+# ---------------------------------------------------------------------------
+# Independent recovery of the frozen evaluation contract.
+# Scope: verify benchmark construction, sample counts, metric aggregation,
+# baseline/candidate deltas, leakage, and motion-quality risks WITHOUT
+# interpreting candidate success. No candidate metrics exist yet.
+# Fact / Hypothesis / Observation / Evidence / Recommendation are separated.
+# ---------------------------------------------------------------------------
+
+contract_refs:
+  frozen_protocol:
+    path: kimodo/research/R004/protocol.yaml
+    status: FROZEN
+    freeze_sha256: 1f911559b69c5a7d3b68cf269c746c76ad1384f96a23963d533560eb83e8f0e5
+    frozen_at: '2026-08-13T08:21:58+00:00'
+    reviewer: hf
+  frozen_snapshot:
+    path: kimodo/.specify/rsdd/protocols/R004/1f911559b69c5a7d3b68cf269c746c76ad1384f96a23963d533560eb83e8f0e5.yaml
+  prior_snapshot:
+    path: kimodo/.specify/rsdd/protocols/R004/37bbff58a5f60d38ffd8a3a1d0c47b54e42c9d9c81e9a707b7b6a187ed68ce1a.yaml
+    note: 'pre-amendment snapshot; amendment 37bbff.. -> 1f9115.. recorded in research/R004/research.yaml'
+  human_gate_1:
+    path: kimodo/simulation/pilot-20260813/decisions/human-gate-1.yaml
+    status: APPROVED
+    decision: APPROVE_READY
+  source_brain:
+    path: kimodo/source/phase1_ai_native_project_brain_20260813.md
+  evidence_map:
+    path: kimodo/simulation/pilot-20260813/evidence-map.yaml
+  human_gate_2:
+    path: kimodo/simulation/pilot-20260813/decisions/human-gate-2.yaml
+    status: PENDING
+    note: 'A05 must not modify; final decision is human-owned'
+
+# --- Digest reconciliation (Fact) -------------------------------------------
+digest_reconciliation:
+  gate1_protocol_sha256: 1f911559b69c5a7d3b68cf269c746c76ad1384f96a23963d533560eb83e8f0e5
+  r004_freeze_sha256: 1f911559b69c5a7d3b68cf269c746c76ad1384f96a23963d533560eb83e8f0e5
+  snapshot_filename_sha256: 1f911559b69c5a7d3b68cf269c746c76ad1384f96a23963d533560eb83e8f0e5
+  three_way_string_alignment: PASS
+  snapshot_vs_live_protocol_content: IDENTICAL
+  snapshot_vs_live_protocol_evidence: 'Both files read in full; content byte-for-byte identical (142 lines each, same fields and values)'
+  independent_sha256_recompute: NOT_EXECUTED
+  independent_sha256_recompute_note: 'Operator declined the shasum command and Bash is disabled in this context; cryptographic recompute of snapshot bytes not performed. Residual integrity gap mitigated by content identity + three-way string alignment.'
+  result_visibility_at_approval: NOT_ATTESTED
+  policy_classification: RETROSPECTIVE_ACCEPTANCE_POLICY_UNLESS_BLINDING_ATTESTED
+  result_visibility_note: 'Thresholds may not be described as preregistered (Gate1 approval_context + R004 risks). Non-blocking for recovery; must be weighed by Human Gate 2.'
+
+# --- Meaning separation (acceptance criterion 1) ---------------------------
+# Fact: the frozen contract overloads "Content" and "Repetition" across two
+# distinct benchmarks. The final_adopt_rule distinguishes target_* from
+# holdout_*. The five meanings are separated below.
+meaning_separation:
+  Content:
+    meaning: 'A benchmark split name, overloaded across two benchmarks.'
+    holdout_Content:
+      benchmark: SEED-test-Content-3510
+      count: 3510
+      role: general-capability non-regression (holdout)
+      frozen_in_R004: true
+      evidence: [kimodo/research/R004/protocol.yaml#inputs, kimodo/simulation/pilot-20260813/evidence-map.yaml#expected_counts]
+    target_Content:
+      benchmark: Object-Manipulation target-domain Content split
+      count: NOT_FROZEN_IN_R004
+      role: target-domain improvement (target)
+      frozen_in_R004: false
+      evidence: 'final_adopt_rule target_Content_PASS (R004 line 111); Gate1 target_success_rule.description = "target-domain improvement"; Object target-domain benchmark NOT listed in R004.inputs'
+  Repetition:
+    meaning: 'A benchmark split name, overloaded across two benchmarks.'
+    holdout_Repetition:
+      benchmark: SEED-test-Repetition-3428
+      count: 3428
+      role: general-capability non-regression (holdout)
+      frozen_in_R004: true
+      evidence: [kimodo/research/R004/protocol.yaml#inputs, kimodo/simulation/pilot-20260813/evidence-map.yaml#expected_counts]
+    target_Repetition:
+      benchmark: Object-Manipulation target-domain Repetition split
+      count: NOT_FROZEN_IN_R004
+      role: target-domain improvement (target)
+      frozen_in_R004: false
+      evidence: 'final_adopt_rule target_Repetition_PASS (R004 line 112); Object target-domain benchmark NOT listed in R004.inputs'
+  target:
+    meaning: 'The Object-Manipulation target-domain benchmark where the candidate is expected to IMPROVE.'
+    candidate: abl_object_lr1e7_s3000_20260811
+    baseline: nvidia/Kimodo-SOMA-RP-v1.1
+    success_rule: 'minimum_improved_primary_metrics_per_split = 2; one_required_metric in [TMR_R_at_3, TMR_FID_gen_text]; all other primary metrics pass non-regression; foot_skate gate pass'
+    improvement_thresholds:
+      TMR_R_at_3_improvement_pp: 1.0
+      TMR_t2m_similarity_improvement_abs: 0.005
+      TMR_FID_gen_text_relative_reduction: 0.05
+    construction_script: work/codex_pipeline/build_domain_text_benchmark.py
+    construction_script_state: DECLARED
+    construction_script_in_worktree: false
+    frozen_in_R004_inputs: false
+    note: 'Improvement thresholds are frozen (Gate1 target_success_rule == R004 target_success), but the benchmark they apply to is not pinned in R004.inputs and its split counts are not frozen in R004.'
+  holdout:
+    meaning: 'The SEED full-test general-capability benchmark where the candidate must NOT regress.'
+    benchmark_splits:
+      Content: 3510
+      Repetition: 3428
+      total: 6938
+    candidate: abl_object_lr1e7_s3000_20260811
+    baseline: nvidia/Kimodo-SOMA-RP-v1.1
+    non_regression_thresholds:
+      TMR_R_at_3_max_drop_pp: 1.0
+      TMR_t2m_similarity_max_drop_abs: 0.005
+      TMR_FID_gen_text_max_increase_abs: 0.005
+      TMR_FID_gen_text_max_increase_relative: 0.1
+      foot_contact_consistency_max_drop_abs: 0.005
+    construction_script: work/codex_pipeline/build_seed_text_test_benchmark.py
+    construction_script_state: DECLARED
+    construction_script_in_worktree: false
+    remote_output: /home/share/user/zyc/kimodo/eval_work/seed_text_test_full_eval_20260813
+    run_state: DECLARED
+    run_historical_observation: 'Evaluation was still running when the source snapshot was supplied'
+    frozen_in_R004_inputs: true
+  foot_skate:
+    meaning: 'Motion-quality gate plus mandatory qualitative review; semantic gains cannot compensate for a foot-skate failure (Gate1 rationale).'
+    gate_must_pass: true
+    hard_metrics:
+      foot_skate_from_height_max_increase_mps: 0.002
+      foot_skate_from_height_max_relative_increase: 0.05
+      foot_skate_ratio_max_increase_abs: 0.01
+      foot_contact_consistency_max_drop_abs: 0.005
+    conditional_metric:
+      foot_skate_from_pred_contacts: 'usable only if foot_contact_consistency_drop <= 0.005'
+    velocity_limits:
+      warning_relative_increase: 0.1
+      hard_fail_relative_increase: 0.2
+    qualitative_review:
+      sample_count: 50
+      selection_frozen_before_review: true
+      blind_randomized_AB: true
+      reviewer_count: 2
+      third_reviewer_on_disagreement: true
+      major_defect_rate_max_increase_pp: 5
+    note: 'foot_contact_consistency_max_drop_abs (0.005) is dual-registered under non_regression and foot_skate with consistent value.'
+
+# --- Threshold trace Gate1 <-> frozen R004 (acceptance criterion 2) ---------
+# Fact: every threshold below was traced field-by-field between
+# decisions/human-gate-1.yaml and research/R004/protocol.yaml. No mismatch found.
+# Observation: 0.1 vs 0.10 and 0.2 vs 0.20 are numeric-format differences only.
+threshold_trace:
+  target_success:
+    status: PASS
+    fields_matched:
+      required_splits: '[Content, Repetition]'
+      minimum_improved_primary_metrics_per_split: 2
+      TMR_R_at_3_improvement_pp: 1.0
+      TMR_t2m_similarity_improvement_abs: 0.005
+      TMR_FID_gen_text_relative_reduction: 0.05
+      one_required_metric: '[TMR_R_at_3, TMR_FID_gen_text]'
+      all_other_primary_metrics_must_pass_non_regression: true
+      foot_skate_gate_must_pass: true
+  non_regression:
+    status: PASS
+    fields_matched:
+      TMR_R_at_3_max_drop_pp: 1.0
+      TMR_t2m_similarity_max_drop_abs: 0.005
+      TMR_FID_gen_text_max_increase_abs: 0.005
+      TMR_FID_gen_text_max_increase_relative: '0.1 (R004) == 0.10 (Gate1)'
+      foot_contact_consistency_max_drop_abs: 0.005
+  statistical_rule:
+    status: PASS
+    fields_matched:
+      comparison: 'paired_same_cases_same_prompts_same_seeds'
+      effect_direction: positive_is_candidate_better
+      bootstrap_iterations: 2000
+      confidence: one_sided_95_percent
+      pass_condition: lower_confidence_bound_greater_than_or_equal_to_negative_margin
+    frozen_in_R004_only_not_restated_in_Gate1:
+      - generation_batch_size: 1
+      - postprocess: false
+      - text_encoder_precision: fp32
+    note: 'These three are part of the frozen R004 protocol that Gate1.protocol_sha256 endorses; their absence in Gate1.statistical_rule is not a contradiction.'
+  foot_skate:
+    status: PASS
+    fields_matched:
+      foot_skate_from_height_max_increase_mps: 0.002
+      foot_skate_from_height_max_relative_increase: 0.05
+      foot_skate_ratio_max_increase_abs: 0.01
+      foot_contact_consistency_max_drop_abs: 0.005
+      predicted_contact_metric_usable_only_if_contact_consistency_drop_max: 0.005
+      foot_skate_max_vel_warning_relative_increase: '0.1 (R004) == 0.10 (Gate1)'
+      foot_skate_max_vel_hard_fail_relative_increase: '0.2 (R004) == 0.20 (Gate1)'
+      qualitative_review_sample_count: 50
+      qualitative_review_selection_frozen_before_review: true
+      qualitative_review_blind_randomized_AB: true
+      qualitative_review_reviewer_count: 2
+      qualitative_review_third_reviewer_on_disagreement: true
+      qualitative_review_major_defect_rate_max_increase_pp: 5
+  aggregation:
+    status: PASS
+    fields_matched:
+      content_and_repetition_must_pass_separately: true
+      cross_split_compensation: false
+      macro_average_for_display_only: true
+      macro_weights: 'Content 0.5 / Repetition 0.5'
+      macro_average_can_determine_pass: false
+      missing_or_invalid_metric: INCONCLUSIVE
+  metric_priority:
+    status: PASS
+    hard_identical: [TMR/t2m_R/R03, TMR/t2m_sim, TMR/FID/gen_text, foot_skate_from_height, foot_skate_ratio, foot_contact_consistency]
+    diagnostic_identical: [TMR/t2m_R/R01, TMR/t2m_R/R05, TMR/t2m_R/MedR, foot_skate_from_pred_contacts, foot_skate_max_vel]
+  final_adopt_rule:
+    status: PASS
+    all_required: [target_Content_PASS, target_Repetition_PASS, holdout_Content_PASS, holdout_Repetition_PASS, foot_skate_PASS, A06_independent_reproduction_VALID, human_gate_2_APPROVED]
+    note: 'final_adopt_rule is the frozen adopt rule; it references target_* and holdout_* as distinct outcomes, confirming the meaning separation above.'
+
+# --- Benchmark integrity (Fact + Observation) -------------------------------
+benchmark_integrity:
+  holdout_count_contract:
+    status: PASS
+    content: 3510
+    repetition: 3428
+    total: 6938
+    arithmetic_check: '3510 + 3428 = 6938'
+    declared_consistently_in:
+      - kimodo/research/R004/protocol.yaml#inputs
+      - kimodo/research/R004/protocol.yaml#evaluation.criteria
+      - kimodo/research/R004/research.yaml#scope
+      - kimodo/simulation/pilot-20260813/evidence-map.yaml#expected_counts
+      - kimodo/simulation/pilot-20260813/workflow.yaml#R004-holdout-live
+      - kimodo/source/phase1_ai_native_project_brain_20260813.md#section-9
+    drift_check: 'Grep across kimodo/ found 3510/3428/6938 ONLY in the mutually-consistent set above; no contradicting count anywhere.'
+  holdout_count_construction_verification:
+    status: MISSING
+    reason: 'build_seed_text_test_benchmark.py and run_seed_full_text_holdout_eval.sh are DECLARED in evidence-map but work/ is absent from this worktree; manifest/meta.json/seed_motion.json not inspectable.'
+  holdout_run_artifacts:
+    status: MISSING
+    reason: 'Remote output /home/share/user/zyc/kimodo/eval_work/seed_text_test_full_eval_20260813; remote root approved by Gate1 but no remote access in sandbox; run state DECLARED and was still running per source snapshot.'
+  a04_raw_artifact_register:
+    status: MISSING
+    ref: kimodo/simulation/pilot-20260813/outputs/R004/holdout-run-card.yaml
+    reason: 'Required A04 raw artifact register (required_context for A05) does not exist; outputs/R004/ not created yet.'
+  target_domain_benchmark_pin:
+    status: INCONCLUSIVE
+    reason: 'final_adopt_rule requires target_Content_PASS and target_Repetition_PASS, and Gate1 target_success_rule describes target-domain improvement, but the Object target-domain benchmark is NOT listed in R004.inputs and its split counts are not frozen in R004. The improvement thresholds are frozen; the benchmark they apply to (for the target side) is under-specified.'
+    construction_script: work/codex_pipeline/build_domain_text_benchmark.py
+    construction_script_state: DECLARED
+    construction_script_in_worktree: false
+  early_constraint_suite_separation:
+    status: PASS
+    reason: 'Source brain section 5 explicitly records that the early constraint/no-postprocess small suite is a smoke test and is NOT the full holdout; the full holdout is SEED-test Content 3510 / Repetition 3428. Grep confirms "constraint"/"smoke" appear only as historical smoke-test references, never as registered holdout evidence.'
+    evidence: [kimodo/source/phase1_ai_native_project_brain_20260813.md#section-5, kimodo/simulation/pilot-20260813/tasks/P01-A05.yaml#acceptance_criteria]
+  leakage:
+    status: INCONCLUSIVE
+    train_holdout_disjointness: 'Cannot verify Object training manifest vs SEED-test (holdout) disjointness; build_training_subset_manifest.py DECLARED and absent from worktree.'
+    target_train_test_disjointness: 'Cannot verify Object target-domain evaluation benchmark vs Object training data disjointness; target benchmark construction not inspectable.'
+    pairing_control: 'Frozen comparison_protocol pairing = same_cases_same_prompts_same_seeds (paired) reduces seed noise; generation_batch_size 1; postprocess false; fp32.'
+  candidate_success_interpretation:
+    status: NOT_APPLICABLE
+    reason: 'No candidate metrics are available (holdout run DECLARED/running; no A04 run card). A05 performed no candidate-success interpretation, per forbidden_actions.'
+
+# --- Gate table summary -----------------------------------------------------
+gate_table:
+  - check: Digest three-way alignment (Gate1.protocol_sha256 == R004.freeze.sha256 == snapshot filename)
+    result: PASS
+    evidence: digest_reconciliation
+  - check: Frozen snapshot content == live R004 protocol content
+    result: PASS
+    evidence: 'full read of both files; content identical'
+  - check: Independent sha256 recompute of snapshot bytes
+    result: NOT_EXECUTED
+    evidence: 'operator declined shasum; Bash disabled; residual integrity gap'
+  - check: Threshold trace target_success (Gate1 <-> R004)
+    result: PASS
+    evidence: threshold_trace.target_success
+  - check: Threshold trace non_regression (Gate1 <-> R004)
+    result: PASS
+    evidence: threshold_trace.non_regression
+  - check: Threshold trace statistical_rule (Gate1 <-> R004)
+    result: PASS
+    evidence: threshold_trace.statistical_rule
+  - check: Threshold trace foot_skate (Gate1 <-> R004)
+    result: PASS
+    evidence: threshold_trace.foot_skate
+  - check: Threshold trace aggregation/split_policy (Gate1 <-> R004)
+    result: PASS
+    evidence: threshold_trace.aggregation
+  - check: Threshold trace metric_priority (Gate1 <-> R004)
+    result: PASS
+    evidence: threshold_trace.metric_priority
+  - check: Holdout count contract (3510 / 3428 / 6938) consistency + drift
+    result: PASS
+    evidence: benchmark_integrity.holdout_count_contract
+  - check: Holdout count construction verification
+    result: MISSING
+    evidence: benchmark_integrity.holdout_count_construction_verification
+  - check: Holdout run artifact verification
+    result: MISSING
+    evidence: benchmark_integrity.holdout_run_artifacts
+  - check: A04 raw artifact register present
+    result: MISSING
+    evidence: benchmark_integrity.a04_raw_artifact_register
+  - check: Target-domain (Object) benchmark pinned + counts frozen in R004
+    result: INCONCLUSIVE
+    evidence: benchmark_integrity.target_domain_benchmark_pin
+  - check: Early constraint-suite not treated as full holdout evidence
+    result: PASS
+    evidence: benchmark_integrity.early_constraint_suite_separation
+  - check: Train/holdout and target train/test leakage verification
+    result: INCONCLUSIVE
+    evidence: benchmark_integrity.leakage
+  - check: Result visibility / preregistration status
+    result: RISK_DOCUMENTED
+    evidence: digest_reconciliation.result_visibility_at_approval
+  - check: Candidate success interpretation by A05
+    result: NOT_APPLICABLE
+    evidence: benchmark_integrity.candidate_success_interpretation
+
+overall_integrity: PARTIAL
+overall_integrity_summary: >
+  The frozen THRESHOLD contract and the frozen holdout COUNT contract are
+  verified and internally consistent; every threshold traces cleanly between
+  Human Gate 1 and the frozen R004 Protocol digest with no mismatch. However,
+  construction-level and run-level benchmark evidence are MISSING (work/ code
+  absent, remote artifacts inaccessible, A04 holdout-run-card not yet created),
+  the Object target-domain benchmark is under-specified in R004.inputs, and an
+  independent cryptographic hash recompute was not executed. No candidate
+  success was interpreted.
+
+# --- Observations (not decisions) -------------------------------------------
+observations:
+  - id: OBS-01
+    kind: contract-gap
+    statement: 'final_adopt_rule requires target_Content_PASS and target_Repetition_PASS, but R004.inputs lists only the SEED-test holdout benchmarks; the Object target-domain benchmark is not pinned in the frozen contract.'
+  - id: OBS-02
+    kind: dual-registration
+    statement: 'foot_contact_consistency_max_drop_abs (0.005) is registered under both non_regression and foot_skate with a consistent value; not a mismatch.'
+  - id: OBS-03
+    kind: format-only
+    statement: '0.1 vs 0.10 and 0.2 vs 0.20 are numeric-format differences in foot_skate velocity limits and FID relative increase; values are equal.'
+  - id: OBS-04
+    kind: frozen-in-R004-only
+    statement: 'generation_batch_size, postprocess, and text_encoder_precision are frozen in R004.comparison_protocol but not restated in Gate1.statistical_rule; endorsed via protocol_sha256, not a contradiction.'
+  - id: OBS-05
+    kind: retrospective-acceptance
+    statement: 'Result visibility at Gate 1 approval is NOT_ATTESTED; thresholds are a retrospective acceptance policy unless blinding is later attested, not a strict preregistration.'
+
+# --- Risks ------------------------------------------------------------------
+risks:
+  - id: RISK-01
+    severity: high
+    statement: 'Target-domain (Object) benchmark is not pinned in R004.inputs; target_Content_PASS/target_Repetition_PASS could be evaluated against an unfrozen or substituted benchmark.'
+    mitigation: 'A01/Human to clarify the target-domain benchmark identity and freeze its split counts WITHOUT altering any frozen threshold or tuning to candidate results.'
+  - id: RISK-02
+    severity: high
+    statement: 'A04 holdout-run-card is MISSING; A05 cannot independently recompute the gate table until raw counts/commands/logs/metrics are registered.'
+    mitigation: 'A04 registers outputs/R004/holdout-run-card.yaml (LIVE) without success interpretation; then A05 computes outputs/R004/independent-gate-table.yaml.'
+  - id: RISK-03
+    severity: medium
+    statement: 'Independent sha256 recompute of the frozen snapshot was not executed; integrity rests on content identity and three-way string alignment.'
+    mitigation: 'Re-run shasum -a 256 on the snapshot when a shell is available and confirm it equals 1f9115..e8f0e5.'
+  - id: RISK-04
+    severity: medium
+    statement: 'Train/holdout and target train/test leakage cannot be verified from this worktree (manifests absent).'
+    mitigation: 'A02/A04 to register manifest boundaries; A05 to re-check disjointness before gate-table computation.'
+  - id: RISK-05
+    severity: low
+    statement: 'Result visibility NOT_ATTESTED weakens the preregistration claim for the thresholds.'
+    mitigation: 'Surface to Human Gate 2; do not represent thresholds as preregistered.'
+
+# --- Forbidden-action compliance -------------------------------------------
+forbidden_action_compliance:
+  alter_thresholds_after_gate1: NOT_PERFORMED
+  tune_thresholds_against_observed_results: NOT_PERFORMED
+  edit_training_code_or_checkpoints: NOT_PERFORMED
+  choose_thresholds_favoring_candidate: NOT_PERFORMED
+  modify_human_gate_2: NOT_PERFORMED
+  note: 'A05 wrote only to outputs/A05/ and the handoff; no frozen contract, threshold, decision, training code, or checkpoint was modified.'
+
+# --- Deferred A05 profile outputs (blocked) --------------------------------
+deferred_outputs:
+  - output: independent-comparison.yaml
+    block_reason: 'No A04 holdout-run-card and no candidate metrics; requires R004 LIVE phase.'
+    target_path: kimodo/simulation/pilot-20260813/outputs/R004/independent-comparison.yaml
+  - output: gate-table.yaml
+    block_reason: 'Independent gate-table recomputation requires A04 raw evidence; belongs to R004-independent-checks LIVE phase (outputs/R004/independent-gate-table.yaml).'
+    target_path: kimodo/simulation/pilot-20260813/outputs/R004/independent-gate-table.yaml
+deferred_note: 'These are A05 profile required_outputs but are outside this task allowed_output_refs and are blocked on MISSING evidence; they are NOT produced here to respect allowed_output_refs and the no-success-interpretation rule.'

@@ -1,0 +1,27 @@
+schema_version: "1.0"
+task_id: P01-A05-evaluation-recovery
+run_id: pilot-20260813
+mode: VERIFY
+agent_id: A05
+research_id: R004
+experiment_id: null
+objective: Independently recover and verify the frozen target-domain, SEED holdout, aggregation, non-regression, and foot-skate contract without interpreting candidate success.
+input_refs:
+- kimodo/research/R002/protocol.yaml
+- kimodo/research/R003/protocol.yaml
+- kimodo/research/R004/protocol.yaml
+- kimodo/source/phase1_ai_native_project_brain_20260813.md
+- kimodo/simulation/pilot-20260813/decisions/human-gate-1.yaml
+allowed_output_refs:
+- kimodo/simulation/pilot-20260813/outputs/A05/benchmark-integrity-review.yaml
+- kimodo/simulation/pilot-20260813/outputs/A05/unresolved-evaluation-contract.yaml
+acceptance_criteria:
+- Content, Repetition, target, holdout, and foot-skate meanings are separated.
+- Every threshold is traced to Human Gate 1 and the frozen R004 Protocol digest; mismatches are blocking.
+- Early constraint-suite evidence is not treated as full holdout evidence.
+forbidden_actions:
+- alter thresholds after Gate 1 or tune them against observed results
+- edit training code or checkpoints
+- choose thresholds that favor the candidate
+time_or_cost_limit: 12 turns; no training
+required_handoff_to: A06

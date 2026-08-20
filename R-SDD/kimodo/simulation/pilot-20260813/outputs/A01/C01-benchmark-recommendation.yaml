@@ -1,0 +1,559 @@
+schema_version: '1.0'
+artifact: c01-benchmark-recommendation
+run_id: pilot-20260813
+task_id: C01-A01-object-benchmark-synthesis
+mode: VERIFY
+agent_id: A01
+display_name: 'Lin — Research Lead and Brain Owner'
+research_id: R004
+experiment_id: null
+cycle_id: C01-object-target-benchmark-pin
+cycle_step: C01-S3
+produced_at: '2026-08-13T09:58:52+00:00'
+produced_at_precision: launcher_audit_completed_at
+base_commit_sha: ea74e04
+base_commit_sha_source: 'session-start gitStatus snapshot (most recent commit: ea74e04 Advance C01 to benchmark synthesis); not re-confirmed via git because Bash is unavailable in this VERIFY context'
+kscc_session_id: 4b4faca3-bb7f-4cee-a5aa-50e38118fe71
+kscc_session_id_note: Backfilled from the launcher-managed audit/session-index.yaml after turn-limit exit and artifact validation.
+model: glm-5.2
+
+# ---------------------------------------------------------------------------
+# Mode statement (shared contract item 2). This is a VERIFY step. No historical
+# step is described as original six-agent execution. A01 did NOT modify R004,
+# did NOT select a benchmark for hf, did NOT inspect final holdout metrics,
+# used NO Bash, performed NO remote access, and started NO GPU training.
+# ---------------------------------------------------------------------------
+mode_statement:
+  this_step: C01-S3
+  mode: VERIFY
+  rule: >
+    A01 consumes A02's committed C01-S2 provenance report, synthesizes
+    decision-ready alternatives against that evidence, and populates the AI
+    side of the C01 human decision (recommendation + alternatives + evidence +
+    missing-evidence) without selecting the benchmark or filling hf's
+    response. A01 did NOT modify R004, did NOT select a benchmark for hf, did
+    NOT inspect final holdout metrics, used NO Bash, performed NO remote
+    access, and started NO GPU training.
+
+# ===========================================================================
+# 1. UPSTREAM A02 CONSUMPTION  (acceptance criterion 1)
+# ===========================================================================
+upstream_A02_consumed:
+  output_ref: simulation/pilot-20260813/outputs/A02/C01-object-benchmark-provenance.yaml
+  commit_sha: fcdd2a4a49f97be40bcae9ce3fd700407557eee3
+  commit_sha_state: VERIFIED
+  commit_sha_evidence:
+    - "collaboration/ledger.yaml cycles[C01].sequence[C01-S2].commit_sha = fcdd2a4a49f97be40bcae9ce3fd700407557eee3 (state COMPLETE)"
+    - "session-start gitStatus snapshot short sha fcdd2a4 'Verify C01 Object benchmark provenance' (consistent prefix; harness primary)"
+  commit_sha_caveat: >-
+    Full 40-char sha is confirmed by the ledger primary record and is
+    consistent with the harness gitStatus short sha; A01 did NOT recompute it
+    (Bash unavailable). A02's own handoff recorded its base as 6c3f651 with the
+    recording commit pending; the ledger now confirms the recording commit is
+    fcdd2a4. This is the upstream commit A01 consumed, NOT A01's base ea74e04.
+  handoff_consumed: simulation/pilot-20260813/handoffs/C01-A02-to-A01.yaml
+  handoff_consumed_note: >-
+    The A02 -> A01 handoff carries key_evidence_summary_for_A01 (manifest
+    sha256s, counts, disjointness, alternatives_viability, a02_selection
+    NONE) and the next_action / forbidden_for_A01_at_C01_S3 constraints.
+  evidence_refs_consumed:
+    - outputs/A02/C01-object-benchmark-provenance.yaml#upstream_A01_consumed
+    - outputs/A02/C01-object-benchmark-provenance.yaml#benchmark_pin_classification
+    - outputs/A02/C01-object-benchmark-provenance.yaml#disjointness_review
+    - outputs/A02/C01-object-benchmark-provenance.yaml#answers_to_A01_questions
+    - outputs/A02/C01-object-benchmark-provenance.yaml#viable_candidate_identity
+    - outputs/A02/C01-object-benchmark-provenance.yaml#alternatives_viability
+    - outputs/A02/C01-object-benchmark-provenance.yaml#open_risks
+    - handoffs/C01-A02-to-A01.yaml#key_evidence_summary_for_A01
+
+# ===========================================================================
+# 2. RECORDS READ BY A01  (process facts; READ != VERIFIED)
+#    All reads used the Read/Glob tools only. No Bash, no remote access, no
+#    repository-wide discovery beyond the named refs.
+# ===========================================================================
+records_read:
+  - ref: simulation/pilot-20260813/outputs/A02/C01-object-benchmark-provenance.yaml
+    role: upstream A02 C01-S2 provenance (primary evidence for synthesis)
+  - ref: simulation/pilot-20260813/handoffs/C01-A02-to-A01.yaml
+    role: A02 -> A01 handoff (key evidence summary + constraints)
+  - ref: simulation/pilot-20260813/outputs/A01/C01-benchmark-decision-framing.yaml
+    role: A01 own C01-S1 framing (schema + alternatives + evidence request)
+  - ref: simulation/pilot-20260813/decisions/human-collaboration-C01.yaml
+    role: the C01 human decision file (AI side to populate; human fields untouched)
+  - ref: simulation/pilot-20260813/collaboration/ledger.yaml
+    role: primary cycle record (source of the upstream A02 commit sha; read-only)
+  - ref: simulation/pilot-20260813/handoffs/handoff-template.yaml
+    role: handoff schema for C01-A01-to-hf
+  - ref: research/R004/protocol.yaml
+    role: frozen comparison_protocol + final_adopt_rule + inputs (authority)
+  - ref: .specify/memory/constitution.md
+    role: rules 8 (No Leakage), 12 (Negative Results Are Assets), 13 (AI recommends; humans decide)
+  - ref: BRAIN.md
+    role: R004 status = READY (current research)
+  - ref: registry.json
+    role: research registry
+  - ref: simulation/pilot-20260813/workflow.yaml
+    role: phase/state + protocol_change_after_ready = research-revise-required
+
+# ===========================================================================
+# 3. FACTS  (cited from primary records; each carries an evidence ref)
+# ===========================================================================
+facts:
+  - id: F1
+    statement: >
+      The single Object target-domain benchmark recovered by A02 is
+      object_manip: Content 235 / Repetition 57 / total 292 unique_motion_ids,
+      manifest .../domain_text_benchmarks_20260811/object_manip/domain_manifest.json,
+      sha256 97d13dcc78016c66396faee8a59a0cd8f126c9552542e2ad94de914d4bf519a3
+      (all VERIFIED by A02 from the sanitized inventory).
+    evidence:
+      - outputs/A02/C01-object-benchmark-provenance.yaml#benchmark_pin_classification.splits
+      - outputs/A02/C01-object-benchmark-provenance.yaml#viable_candidate_identity
+  - id: F2
+    statement: >
+      Construction script build_domain_text_benchmark.py is VERIFIED present
+      and hashed (script_sha256
+      18a602ddf4922f42dad03a2478a9ac731607663d54460dee1472210e393d88f3; seed
+      20260811) under the approved root kimodo_seed_repro_train, but
+      script_commit_sha is MISSING (the construction root is not a git
+      repository) and construction_invocation_and_input_hashes are MISSING.
+    evidence:
+      - outputs/A02/C01-object-benchmark-provenance.yaml#benchmark_pin_classification.construction
+      - outputs/A02/C01-object-benchmark-provenance.yaml#answers_to_A01_questions[Q7-reproducibility]
+  - id: F3
+    statement: >
+      Target-train leakage is CONFIRMED, not UNKNOWN: 284 of 292 Object eval
+      cases (97.26%) appear in the target training manifest
+      cat_object_manip_fp32_20260811_0005.csv (sha256
+      95dcd9c7f1e73d99e5bce10abb6bf94d55f58a17e8eefc7b83fbdfe74597bbd5, 5810
+      ids). By split: Content 235/235 overlap (non_overlapping 0); Repetition
+      49/57 overlap (non_overlapping 8). (C01-RISK-02 RESOLVED to CONFIRMED.)
+    evidence:
+      - outputs/A02/C01-object-benchmark-provenance.yaml#disjointness_review.comparisons[object_eval_vs_target_train]
+      - outputs/A02/C01-object-benchmark-provenance.yaml#open_risks[C01-RISK-02]
+  - id: F4
+    statement: >
+      Holdout contamination is CONFIRMED, not UNKNOWN: the Object eval (292) is
+      an EXACT SUBSET of the SEED-test full holdout
+      (seed_text_test_full_20260813/domain_manifest.json, sha256
+      479f284385178ff323795a6b08a2458c7d161e148e8be6b626ef68fb82a47d20, 6938
+      ids); object_only_count = 0. (C01-RISK-03 RESOLVED to CONFIRMED.) Set
+      membership only; NO holdout metrics were inspected.
+    evidence:
+      - outputs/A02/C01-object-benchmark-provenance.yaml#disjointness_review.comparisons[object_eval_vs_full_holdout]
+      - outputs/A02/C01-object-benchmark-provenance.yaml#open_risks[C01-RISK-03]
+  - id: F5
+    statement: >
+      A third disjointness comparison (target_train vs full_holdout) also
+      returns CONFLICTING with intersection 284, an additional contamination
+      surface concentrated in the Object benchmark.
+    evidence:
+      - outputs/A02/C01-object-benchmark-provenance.yaml#disjointness_review.comparisons[target_train_vs_full_holdout]
+  - id: F6
+    statement: >
+      A02 determined alternative viability: ALT-A NOT_VIABLE_AS_IS (fails both
+      leakage_prevention intersections and construction.script_commit_sha
+      MISSING); ALT-B (reconstruct disjoint, no GPU, no holdout) VIABLE; ALT-C
+      (reject/escalate) VIABLE; a02_selection = NONE. A02 did NOT choose.
+    evidence:
+      - outputs/A02/C01-object-benchmark-provenance.yaml#alternatives_viability
+      - outputs/A02/C01-object-benchmark-provenance.yaml#viable_candidate_identity.accept_ready
+  - id: F7
+    statement: >
+      R004 is FROZEN (sha256 1f911559b69c5a7d3b68cf269c746c76ad1384f96a23963d533560eb83e8f0e5).
+      final_adopt_rule.all_required lists target_Content_PASS and
+      target_Repetition_PASS as DISTINCT from holdout_Content_PASS and
+      holdout_Repetition_PASS. R004.inputs enumerates baseline, candidate, the
+      two SEED-test holdout benchmarks, remote-output, and human-gate-1; it
+      does NOT enumerate any Object target benchmark.
+    evidence:
+      - research/R004/protocol.yaml#freeze
+      - research/R004/protocol.yaml#evaluation.final_adopt_rule
+      - research/R004/protocol.yaml#inputs
+  - id: F8
+    statement: >
+      workflow.yaml execution_policy.protocol_change_after_ready =
+      research-revise-required. Pinning the target benchmark after hf's C01-H1
+      decision is therefore an additive research-revise (R004.inputs entry +
+      benchmark snapshot) and must NOT alter any frozen evaluation rule.
+    evidence:
+      - simulation/pilot-20260813/workflow.yaml#execution_policy.protocol_change_after_ready
+  - id: F9
+    statement: >
+      Constitution rule 8 (No Leakage): SEED holdout and evaluation prompts
+      cannot enter training data. Rule 12: failed and inconclusive runs remain
+      visible. Rule 13: AI may recommend; humans approve final claims.
+    evidence:
+      - .specify/memory/constitution.md
+
+# ===========================================================================
+# 4. OBSERVATIONS  (derived; not primary decisions)
+# ===========================================================================
+observations:
+  - id: OBS-S3-1
+    kind: feasibility-collapse
+    statement: >
+      A02's by_split data imply a NAIVE train-disjoint Object eval is
+      degenerate: Content would collapse to 0 cases (235/235 overlap,
+      non_overlapping 0) and Repetition to 8 (49/57 overlap, non_overlapping
+      8). Removing train-overlapping cases from the EXISTING eval therefore
+      cannot yield a viable target_Content_PASS eval. A viable disjoint
+      benchmark would have to draw Object-Manipulation cases from OUTSIDE the
+      current eval (and outside both the training manifest and the holdout);
+      whether such a pool exists is UNSURVEYED.
+    basis:
+      - outputs/A02/C01-object-benchmark-provenance.yaml#disjointness_review.comparisons[object_eval_vs_target_train].by_split
+  - id: OBS-S3-2
+    kind: holdout-structural-subset
+    statement: >
+      The Object eval is a 100% subset of the SEED-test holdout
+      (object_only_count 0). Zero current Object eval cases are
+      holdout-disjoint. A holdout-disjoint Object eval requires Object cases
+      absent from the 6938-case holdout; that pool is UNSURVEYED.
+    basis:
+      - outputs/A02/C01-object-benchmark-provenance.yaml#disjointness_review.comparisons[object_eval_vs_full_holdout]
+  - id: OBS-S3-3
+    kind: leakage-finding-rests-on-declared-linkage
+    statement: >
+      The 284-case train-overlap is computed against
+      cat_object_manip_fp32_20260811_0005.csv, which is DECLARED-as-the-
+      candidate's-training-manifest by naming + source summary, not VERIFIED
+      by A02 (C01-RISK-09). If A03/A04 later show that manifest did NOT train
+      abl_object_lr1e7_s3000_20260811, the leakage finding weakens and the
+      decision frame changes.
+    basis:
+      - outputs/A02/C01-object-benchmark-provenance.yaml#disjointness_review.comparisons[object_eval_vs_target_train].linkage_caveat
+      - outputs/A02/C01-object-benchmark-provenance.yaml#open_risks[C01-RISK-09]
+  - id: OBS-S3-4
+    kind: additive-not-threshold-change
+    statement: >
+      Resolving the C01 gap adds a pinned target benchmark to R004.inputs and
+      does NOT alter any frozen threshold, count, statistical rule, foot-skate
+      rule, aggregation rule, or comparison-protocol field. Any viable pin is
+      recorded by research-revise AFTER C01-H1.
+    basis:
+      - simulation/pilot-20260813/workflow.yaml#execution_policy.protocol_change_after_ready
+      - research/R004/protocol.yaml#freeze
+
+# ===========================================================================
+# 5. THREE MUTUALLY EXCLUSIVE CHOICES  (acceptance criterion 2)
+#    Each carries impact + residual risk. A01 does NOT select; hf selects at
+#    C01-H1.
+# ===========================================================================
+choices:
+  - id: ALT-A
+    name: ACCEPT the existing Object benchmark as-is
+    decision_type_if_chosen: ACCEPT
+    mutually_exclusive_with: [ALT-B, ALT-C]
+    impact: >
+      Pins object_manip (Content 235 / Repetition 57 / 292, manifest
+      97d13dcc...) as the target benchmark. Formalizes train-on-eval leakage
+      (284/292 = 97.26%) and holdout non-independence (292/292 exact subset)
+      into the frozen contract. target_success would be inflated by training
+      overlap, and target-domain evidence would be non-independent of the
+      SEED-test holdout non-regression evidence. Construction is not
+      commit-pinned (script_commit_sha MISSING).
+    residual_risk:
+      severity: SEVERE
+      detail: >
+        Directly violates constitution rule 8 (No Leakage) and A01's own C01-S1
+        acceptance_rule ("any non-zero intersection forces MODIFY or REJECT").
+        A02 classified ALT-A NOT_VIABLE_AS_IS. This is the only choice that
+        contradicts the frozen leakage rule. NOT recommended.
+  - id: ALT-B
+    name: MODIFY via disjoint reconstruction (set assembly only; no GPU, no holdout)
+    decision_type_if_chosen: MODIFY
+    mutually_exclusive_with: [ALT-A, ALT-C]
+    impact: >
+      Re-run (or extend) build_domain_text_benchmark.py to construct an Object
+      target eval that is VERIFIED-disjoint from BOTH the candidate training
+      manifest and the SEED-test holdout, then pin it. Set-assembly only: NO
+      GPU training, NO final holdout, NO holdout metric inspection. Resolves
+      C01-RISK-02 and C01-RISK-03 to VERIFIED-disjoint without retraining and
+      without touching any frozen threshold/count/comparison-protocol field.
+      The reconstruction is also the opportunity to close C01-RISK-07
+      (commit-pin in a git-backed environment), C01-RISK-08 (attest protocol
+      conformance), and C01-RISK-10 (produce per-split manifests + record
+      invocation hashes).
+    residual_risk:
+      severity: HIGH
+      detail: >
+        FEASIBILITY UNKNOWN. A02's by_split data show a naive train-disjoint
+        eval collapses Content to 0 and Repetition to 8 (OBS-S3-1), and zero
+        current Object eval cases are holdout-disjoint (OBS-S3-2). Whether a
+        sufficient disjoint Object-Manipulation pool exists is UNSURVEYED.
+        Requires (a) a non-degenerate disjoint pool, (b) C01-RISK-09 linkage
+        verification by A03/A04, (c) C01-RISK-07 commit-pinning, (d) C01-RISK-08
+        protocol conformance attestation by A05, (e) C01-RISK-10 per-split
+        manifests, and (f) C01-RISK-06 clean re-collection. If the disjoint
+        pool is degenerate, ALT-B is infeasible and ALT-C is forced.
+  - id: ALT-C
+    name: REJECT pinning / escalate
+    decision_type_if_chosen: REJECT
+    mutually_exclusive_with: [ALT-A, ALT-B]
+    impact: >
+      Refuses to pin a contaminated target benchmark. target_Content_PASS and
+      target_Repetition_PASS cannot be evaluated against a fixed,
+      leakage-free artifact, so final_adopt_rule cannot reach ADOPT at Human
+      Gate 2. R004 stays FROZEN; no rule changes. Surfaces the confirmed
+      contamination as a material finding (constitution rule 12: negative
+      results are assets).
+    residual_risk:
+      severity: MEDIUM
+      detail: >
+        Leaves R004's confirmatory question unanswerable as framed. Does NOT
+        by itself fix the underlying contamination; it refuses to formalize
+        it. May require a later research-revise to (i) drop the target_*
+        requirements, (ii) redefine the target benchmark from a disjoint pool
+        if one exists, or (iii) retrain a candidate on a disjoint set (GPU,
+        outside the C01 cycle). Conservative and leakage-honoring, but
+        premature if a disjoint pool exists (hence the evidence request below).
+
+# ===========================================================================
+# 6. RECOMMENDATION  (non-binding; acceptance criterion 3)
+# ===========================================================================
+recommendation:
+  binding: false
+  by: A01
+  choice: REQUEST_MORE_EVIDENCE
+  reason: >
+    A02's C01-S2 evidence is decisive on ONE point: the existing Object
+    benchmark is contaminated (train-eval 284/292 = 97.26%; eval is an exact
+    subset of the SEED-test holdout 292/292), so ALT-A (ACCEPT as-is) is NOT
+    viable and is NOT recommended. The remaining choice between MODIFY
+    (ALT-B) and REJECT (ALT-C) hinges on TWO unknowns A02 did NOT survey, and
+    A01 cannot infer either from filenames or prose (forbidden_action):
+      (1) FEASIBILITY: whether a non-degenerate Object-Manipulation pool
+          exists that is disjoint from BOTH the candidate training manifest
+          (5810 ids) AND the SEED-test full holdout (6938 ids). A02's data
+          show the current eval is 100% inside the holdout and 97.26% inside
+          training, and a naive train-disjoint eval collapses Content to 0
+          (OBS-S3-1). Without surveying the disjoint pool, A01 cannot tell hf
+          whether ALT-B is constructable or whether ALT-C is forced.
+      (2) LINKAGE (C01-RISK-09): whether
+          cat_object_manip_fp32_20260811_0005.csv actually trained
+          abl_object_lr1e7_s3000_20260811. The 284-case leakage is computed
+          against a manifest that is DECLARED-as-the-candidate's-training-set,
+          not VERIFIED (OBS-S3-3). If that linkage is false, the leakage
+          finding weakens and the frame changes.
+    Both gaps are closable with a bounded, no-GPU, no-holdout set-membership
+    evidence pass (A02 for the disjoint-pool survey; A03/A04 for the
+    training-manifest linkage) before hf must decide at C01-H1. Requesting
+    this evidence is proportionate (cheap, decisive) and avoids either
+    over-optimistic MODIFY or premature REJECT.
+  secondary_preference_if_evidence_closes_positive:
+    choice: ALT-B
+    statement: >
+      If (a) a non-degenerate disjoint Object pool exists AND (b) the
+      training-manifest linkage is confirmed, prefer ALT-B: reconstruct a
+      VERIFIED-disjoint target benchmark (set assembly only) and pin it via
+      research-revise, changing no frozen rule.
+  secondary_preference_if_evidence_closes_negative:
+    choice: ALT-C
+    statement: >
+      If the disjoint pool is degenerate (e.g., Content would be 0) OR the
+      construction cannot be commit-pinned to hf's standard OR the linkage
+      cannot be confirmed, prefer ALT-C: REJECT pinning and escalate; do not
+      formalize a contaminated or unverifiable benchmark.
+  not_a_selection: >
+    A01 does NOT select the benchmark, counts, or manifests, and does NOT
+    decide for hf. hf may override and ACCEPT / MODIFY / REJECT now on the
+    existing evidence. REQUEST_MORE_EVIDENCE is a non-binding AI
+    recommendation and one of the four allowed_responses.
+  forbidden_respected: >
+    A01 did NOT infer provenance from filenames (it cites A02's VERIFIED
+    digests/counts/intersections), did NOT inspect final holdout metrics
+    (set membership only), did NOT modify or refreeze R004, and did NOT fill
+    hf's response.
+
+# ===========================================================================
+# 7. EVIDENCE REQUEST (the bounded C01-S2b pass REQUEST_MORE_EVIDENCE authorizes)
+#    Owner mapping preserves the C01 cycle constraints (no GPU, no holdout, no
+#    holdout metric inspection, set membership only).
+# ===========================================================================
+evidence_request:
+  scope: bounded set-membership + linkage verification; NO GPU, NO final holdout, NO holdout metric inspection
+  items:
+    - id: ER-1
+      to_agent: A02
+      question: >
+        Survey the Object-Manipulation case population available in the
+        approved roots and compute the pool disjoint from BOTH the candidate
+        training manifest (cat_object_manip_fp32_20260811_0005.csv, 5810 ids)
+        AND the SEED-test full holdout (6938 ids): report |Object ∩ ¬train ∩
+        ¬holdout| by split (Content, Repetition), and whether each split is
+        non-degenerate (count > a usable minimum). Set membership only.
+      gates: ALT-B feasibility vs ALT-C.
+    - id: ER-2
+      to_agent: A03
+      to_agent_secondary: A04
+      question: >
+        Verify whether cat_object_manip_fp32_20260811_0005.csv actually trained
+        abl_object_lr1e7_s3000_20260811 (C01-RISK-09). Confirm or refute the
+        DECLARED training-manifest-to-candidate linkage.
+      gates: whether the 284-case train-overlap is real leakage.
+    - id: ER-3
+      to_agent: A05
+      question: >
+        Attest (or plan to attest) evaluation_protocol scalar conformance
+        (batch 1 / postprocess false / fp32) and paired ordered case identity
+        for the target run (C01-RISK-08); inspect the combined manifest's
+        per-case split label (C01-RISK-10).
+      gates: ACCEPT-readiness of any reconstructed pin.
+    - id: ER-4
+      to_agent: hf_or_orchestrator
+      question: >
+        Re-collect the inventory over a clean transport (C01-RISK-06 SSH bad
+        RSA signature) or attest the warning is benign; and decide whether
+        construction must be commit-pinned (C01-RISK-07) or hash-pinning
+        (script_sha256 + seed) is acceptable.
+      gates: construction provenance standard for the pin.
+
+# ===========================================================================
+# 8. OPEN RISKS  (synthesized from A02 C01-S2 + A01 C01-S3 additions)
+# ===========================================================================
+open_risks:
+  - id: C01-RISK-02
+    severity: high
+    state: CONFIRMED (by A02 C01-S2)
+    statement: Target-train leakage CONFIRMED (284/292 = 97.26%).
+    owner: hf (C01-H1); A02 (disjoint-pool survey ER-1); A03/A04 (linkage ER-2)
+  - id: C01-RISK-03
+    severity: high
+    state: CONFIRMED (by A02 C01-S2)
+    statement: Holdout contamination CONFIRMED (Object eval is an exact subset of the 6938-case holdout).
+    owner: hf (C01-H1); A02 (disjoint-pool survey ER-1)
+  - id: C01-RISK-11
+    severity: high
+    state: NEW (opened by A01 C01-S3)
+    statement: >
+      ALT-B feasibility UNKNOWN: a naive train-disjoint Object eval collapses
+      Content to 0 and Repetition to 8 (OBS-S3-1), and zero current Object eval
+      cases are holdout-disjoint (OBS-S3-2). Without the disjoint-pool survey
+      (ER-1), A01 cannot confirm a viable disjoint benchmark is constructable;
+      ALT-C may be forced.
+    owner: A02 (ER-1); hf (C01-H1) to act on the result
+  - id: C01-RISK-09
+    severity: medium
+    state: NEW (by A02 C01-S2)
+    statement: Candidate-to-training-manifest linkage DECLARED, not VERIFIED.
+    owner: A03 / A04 (ER-2)
+  - id: C01-RISK-07
+    severity: medium
+    state: NEW (by A02 C01-S2)
+    statement: construction.script_commit_sha MISSING (non-git construction root).
+    owner: hf (C01-H1) / orchestrator (ER-4)
+  - id: C01-RISK-08
+    severity: medium
+    state: NEW (by A02 C01-S2)
+    statement: Paired ordered identity + evaluation_protocol scalar conformance MISSING.
+    owner: A05 (ER-3)
+  - id: C01-RISK-10
+    severity: low
+    state: NEW (by A02 C01-S2)
+    statement: Per-split separate manifest artifacts MISSING; per-case split-label encoding uninspected.
+    owner: A05 (ER-3)
+  - id: C01-RISK-06
+    severity: medium
+    state: NEW (by A02 C01-S2)
+    statement: Transport warning (SSH bad RSA signature) during inventory collection; residual provenance risk.
+    owner: hf / orchestrator (ER-4)
+  - id: C01-RISK-01
+    severity: high
+    state: PARTIALLY_RESOLVED (target benchmark identity now recovered by A02; pin still pending hf)
+    statement: Target benchmark not yet pinned; target_*_PASS could be applied to an unfrozen/substituted benchmark.
+    owner: hf (C01-H1)
+  - id: C01-RISK-05
+    severity: low
+    state: OPEN
+    statement: >
+      collaboration/ledger.yaml is outside A01 write-allowed paths; A01 cannot
+      advance the C01-S3 state field in the ledger. A01 read it read-only for
+      the upstream commit sha.
+    owner: orchestrator (advance ledger C01-S3 DONE, C01-H1 unblocked)
+
+# ===========================================================================
+# 9. PROTOCOL DEVIATIONS
+# ===========================================================================
+protocol_deviations:
+  - item: 'No R004 Protocol field was modified or refrozen. (forbidden_action respected)'
+  - item: 'No benchmark was selected on behalf of hf; recommendation is REQUEST_MORE_EVIDENCE, non-binding. (forbidden_action respected)'
+  - item: 'No final holdout metric was inspected; only A02 set-membership intersection counts were cited. (forbidden_action respected)'
+  - item: 'No provenance inferred from filenames alone; every carried value cites an A02 VERIFIED digest/count/intersection or a frozen-R004 identity. (forbidden_action respected)'
+  - item: 'No Bash, no remote access, no GPU training, no repository-wide discovery. (task envelope + C01 cycle respected)'
+  - item: >
+      ledger.yaml read read-only for the upstream A02 commit sha (it is the
+      primary cycle record); A01 did NOT modify it (C01-RISK-05 stands for the
+      orchestrator).
+
+# ===========================================================================
+# 10. FORBIDDEN-ACTION COMPLIANCE
+# ===========================================================================
+forbidden_action_compliance:
+  revise_or_refreeze_R004: NOT_PERFORMED
+  fill_hf_response: NOT_PERFORMED
+  infer_benchmark_provenance_from_filenames_alone: NOT_PERFORMED
+  inspect_final_holdout_metrics: NOT_PERFORMED
+  use_bash: NOT_PERFORMED
+  remote_compute: NOT_PERFORMED
+  repository_wide_discovery: NOT_PERFORMED
+  operated_within_allowed_paths: true
+  allowed_paths_used:
+    - research/R004/protocol.yaml
+    - simulation/pilot-20260813/outputs/A01/C01-benchmark-decision-framing.yaml
+    - simulation/pilot-20260813/outputs/A02/C01-object-benchmark-provenance.yaml
+    - simulation/pilot-20260813/decisions/human-collaboration-C01.yaml
+    - simulation/pilot-20260813/collaboration/ledger.yaml (read-only)
+    - simulation/pilot-20260813/handoffs/C01-A02-to-A01.yaml
+    - simulation/pilot-20260813/handoffs/handoff-template.yaml
+    - simulation/pilot-20260813/outputs/A01/ (this output)
+    - simulation/pilot-20260813/handoffs/ (C01-A01-to-hf handoff)
+    - BRAIN.md
+    - registry.json
+    - .specify/memory/constitution.md
+    - simulation/pilot-20260813/workflow.yaml
+  outputs_written:
+    - simulation/pilot-20260813/outputs/A01/C01-benchmark-recommendation.yaml
+    - simulation/pilot-20260813/decisions/human-collaboration-C01.yaml (AI side only; human fields untouched)
+    - simulation/pilot-20260813/handoffs/C01-A01-to-hf.yaml
+
+# ===========================================================================
+# 11. ACCEPTANCE-CRITERIA SELF-CHECK
+# ===========================================================================
+acceptance_criteria_self_check:
+  - criterion: Cite the exact upstream A02 commit and evidence refs consumed.
+    status: MET
+    where: section 1 upstream_A02_consumed (commit fcdd2a4a49f97be40bcae9ce3fd700407557eee3; evidence_refs_consumed; ledger + gitStatus corroboration)
+  - criterion: Present two or three mutually exclusive choices with impact and residual risk.
+    status: MET
+    where: section 5 choices (ALT-A / ALT-B / ALT-C; mutually_exclusive_with; impact + residual_risk each)
+  - criterion: Recommend one choice or REQUEST_MORE_EVIDENCE with a concrete reason.
+    status: MET
+    where: "section 6 recommendation (choice REQUEST_MORE_EVIDENCE; two concrete gaps: disjoint-pool feasibility + C01-RISK-09 linkage; secondary preferences ALT-B/ALT-C)"
+  - criterion: Leave human_response, response_reason, human_modification, and decided_at untouched.
+    status: MET
+    where: decisions/human-collaboration-C01.yaml (AI side populated; the four human fields remain null)
+  - criterion: Do not revise/refreeze R004, fill hf's response, infer provenance from filenames, or inspect final holdout metrics.
+    status: MET
+    where: section 10 forbidden_action_compliance (all NOT_PERFORMED)
+
+# ===========================================================================
+# 12. HANDOFF POINTER
+# ===========================================================================
+handoff:
+  to_agent: hf
+  handoff_path: simulation/pilot-20260813/handoffs/C01-A01-to-hf.yaml
+  cycle_step: C01-S3 -> C01-H1
+  next_action_for_hf: >
+    At C01-H1, choose ACCEPT / MODIFY / REJECT / REQUEST_MORE_EVIDENCE for
+    the Object target-domain benchmark pin. A01's non-binding recommendation
+    is REQUEST_MORE_EVIDENCE (bounded disjoint-pool survey ER-1 + linkage
+    verification ER-2) before MODIFY (ALT-B) vs REJECT (ALT-C); ALT-A (ACCEPT
+    as-is) is not recommended. If hf ACCEPTs or MODIFYs a pin, A01 records it
+    via research-revise AFTER C01-H1, adding only an R004.inputs entry + a
+    benchmark snapshot and changing no frozen rule. Adoption authority stays
+    with Human Gate 2.
+  forbidden_for_hf_reminder: >
+    Changing any frozen threshold/statistical/foot-skate/aggregation rule or
+    the holdout counts 3510/3428/6938 is out of scope (frozen, not on the
+    table); approving candidate success is reserved for Human Gate 2.

@@ -1,0 +1,25 @@
+* text=auto eol=lf
+
+*.md text diff=markdown
+*.html text
+*.css text
+*.js text
+*.json text
+*.yml text
+*.yaml text
+*.txt text
+
+*.pdf binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.mp4 binary
+*.mov binary
+*.npy binary
+*.npz binary
+*.pt binary
+*.pth binary
+*.ckpt binary
+*.safetensors binary

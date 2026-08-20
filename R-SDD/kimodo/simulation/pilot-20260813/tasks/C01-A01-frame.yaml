@@ -1,0 +1,30 @@
+schema_version: "1.0"
+task_id: C01-A01-object-benchmark-framing
+run_id: pilot-20260813
+mode: VERIFY
+agent_id: A01
+research_id: R004
+experiment_id: null
+objective: Convert A05's target-benchmark risk into one precise human decision, a benchmark-pin acceptance schema, and an evidence request for A02.
+input_refs:
+- kimodo/simulation/pilot-20260813/collaboration/ledger.yaml
+- kimodo/simulation/pilot-20260813/outputs/A05/benchmark-integrity-review.yaml
+- kimodo/simulation/pilot-20260813/outputs/A02/provenance-report.yaml
+- kimodo/research/R004/protocol.yaml
+- kimodo/source/phase1_ai_native_project_brain_20260813.md
+allowed_output_refs:
+- kimodo/simulation/pilot-20260813/outputs/A01/C01-benchmark-decision-framing.yaml
+- kimodo/simulation/pilot-20260813/handoffs/C01-A01-to-A02.yaml
+acceptance_criteria:
+- Write the decision-framing output before optional validation.
+- State why the current frozen Protocol is insufficient without claiming it is invalid.
+- Define every field required to pin a benchmark and prevent target-train leakage.
+- Ask A02 only evidence questions that can change hf's decision.
+- Separate facts, inferences, alternatives, recommendation, and human authority.
+forbidden_actions:
+- modify or revise R004
+- select the benchmark on behalf of hf
+- inspect final holdout metrics
+- use Bash or perform repository-wide discovery
+time_or_cost_limit: 10 turns; no remote compute
+required_handoff_to: A02

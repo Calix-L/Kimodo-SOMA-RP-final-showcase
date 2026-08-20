@@ -1,0 +1,35 @@
+schema_version: '1.0'
+id: R002
+title: Kimodo target-domain candidate selection
+type: exploratory
+status: DRAFT
+owner: A01
+profile: kimodo-posttraining
+created_at: '2026-08-13T07:53:15+00:00'
+updated_at: '2026-08-13T07:53:15+00:00'
+question: Which of G+C, Dancing, and Object Manipulation provides the most stable
+  target-domain improvement under the shared Phase 1 setup?
+motivation: Reconstruct the domain-selection decision without hiding unstable or negative target-domain evidence.
+scope:
+  in:
+  - G+C, Dancing, and Object Manipulation 4000-step runs
+  - Content and Repetition target-domain evaluations
+  - retrieval, similarity, FID, contact, and foot-skate metrics
+  out:
+  - lower-intensity 2000/3000-step ablations
+  - SEED full-test non-regression conclusion
+  - final production acceptance
+hypothesis: null
+evaluation:
+  answer_criteria:
+  - Content and Repetition evidence is reported for all three domains without cherry-picking
+  - Metric regressions and foot-skate risks remain visible in the decision
+references:
+- ../../source/phase1_ai_native_project_brain_20260813.md
+- ../../simulation/pilot-20260813/evidence-map.yaml
+provenance:
+  mode: REPLAY_VERIFY
+  historical_work_completed_before_rsdd: true
+  integrity_rule: The selection decision is reconstructed from all three domains and must retain negative evidence.
+protocol_amendments: []
+decision: null

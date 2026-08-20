@@ -1,0 +1,44 @@
+schema_version: "1.0"
+run_id: pilot-20260813
+title: Kimodo Phase 1 six-agent R-SDD replay and live closure
+status: P01_COMPLETE_WITH_OPEN_RISKS
+objective: Reconstruct and verify the complete Phase 1 workflow with six isolated KSCC roles, then close the candidate decision with live evidence and two human gates.
+integrity:
+  allowed_modes: [REPLAY, VERIFY, LIVE]
+  replay_rule: A historical step may be reconstructed from real artifacts but must not be represented as original six-agent execution.
+  live_rule: LIVE requires an actual command, timestamp, owner, environment, output, and artifact reference.
+  single_source_of_truth: research/
+orchestration:
+  topology: one-non-decision-orchestrator-plus-six-role-agents
+  schedule: staged-parallel
+  integration_branch: pilot/pilot-20260813
+  worktree_manager: kscc-built-in
+  worktree_name_template: pilot-20260813-{agent_id}
+  worktree_rule: Launch from the committed R-SDD repository and let KSCC --worktree create isolated branches; never share a writable working tree.
+  orchestrator_authority:
+  - launch agents
+  - deliver role-scoped inputs
+  - validate handoffs
+  - merge approved outputs
+  - refresh generated R-SDD views
+  forbidden:
+  - approve READY
+  - alter primary evidence
+  - issue a scientific decision
+agents: [A01, A02, A03, A04, A05, A06]
+human_gates:
+  ready: decisions/human-gate-1.yaml
+  final_decision: decisions/human-gate-2.yaml
+audit:
+  required_per_agent:
+  - kscc_session_id
+  - model
+  - prompt_version
+  - started_at
+  - completed_at
+  - token_usage
+  - cost
+  - output_refs
+  - commit_sha
+  - transcript_sha256
+  secret_policy: Store hashes and sanitized transcripts only; never record credentials or private data.

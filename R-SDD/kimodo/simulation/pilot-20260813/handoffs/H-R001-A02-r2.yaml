@@ -1,0 +1,51 @@
+schema_version: "1.0"
+handoff_id: H-R001-A02-r2
+run_id: pilot-20260813
+mode: VERIFY
+from_agent: A02
+to_agent: A03
+research_id: R001
+experiment_id: null
+owner: A02
+input_refs:
+  - kimodo/research/R001/protocol.yaml
+  - kimodo/source/phase1_ai_native_project_brain_20260813.md
+  - kimodo/simulation/pilot-20260813/evidence-map.yaml
+  - kimodo/simulation/pilot-20260813/decisions/human-gate-1.yaml
+output_refs:
+  - kimodo/simulation/pilot-20260813/outputs/A02/provenance-report.yaml
+  - kimodo/simulation/pilot-20260813/outputs/A02/missing-evidence-register.yaml
+verified_actions:
+  - "VERIFY: Read all four task-envelope input records (protocol.yaml, source summary, evidence-map.yaml, human-gate-1.yaml) via the Read tool; no Bash, no remote, no repository-wide discovery."
+  - "VERIFY: Confirmed source snapshot source/phase1_ai_native_project_brain_20260813.md present and readable within allowed path source/."
+  - "VERIFY: Carried source snapshot sha256 b71b202fc07b743e3d39869b81e5700cb5251d14637cb7e6b1d6d021a0877c17 from evidence-map.yaml (not recomputed; Bash forbidden)."
+  - "VERIFY: Classified every evidence-map asset/run into VERIFIED/DECLARED/MISSING; only SRC-PHASE1-BRAIN digest is VERIFIED."
+  - "VERIFY: Recorded human-gate-1 R004 threshold provenance as RETROSPECTIVE (blinding NOT_ATTESTED); declared protocol_sha256 is DECLARED, not VERIFIED."
+  - "VERIFY: Confirmed A02 preserved private-data, credential, external-upload, and approved-path boundaries; no Bash, no remote, no final-holdout access."
+gate_result: PARTIAL
+gate_result_note: "Task deliverable PASS (both outputs written; separation correct; boundaries preserved). Provenance verdict PARTIAL: 1 VERIFIED, 15 DECLARED, 11 MISSING; no DECLARED item could be promoted to VERIFIED within A02's frozen scope."
+open_risks:
+  - "Base model Kimodo-SOMA-RP-v1.1 has no version/path/hash in the four records (MISSING); finetune lineage rests on an unverifiable base."
+  - "SEED dataset version + Content/Repetition split manifests MISSING; train/eval overlap cannot be ruled out (A02 escalation trigger)."
+  - "All 7 codex_pipeline scripts DECLARED but not content-verified (outside A02 allowed paths; discovery forbidden); SCRIPT-MANIFEST is owned by A02 but unverified."
+  - "All 7 training/ablation runs have DECLARED identity but MISSING checkpoint/cache/manifest/eval artifacts; candidate abl_object_lr1e7_s3000_20260811 checkpoint MISSING."
+  - "Candidate hyperparameters DECLARED from source summary section 6.3; backing training-config artifact MISSING."
+  - "Final holdout results (seed_text_test_full_eval_20260813) MISSING and out of scope/forbidden to A02; expected_counts DECLARED not verified."
+  - "R001 protocol is DRAFT and unfrozen; human-gate-1 APPROVES R004 (holdout), not R001 provenance."
+  - "Threshold provenance is retrospective (result blinding NOT_ATTESTED); thresholds are not preregistered."
+  - "No recomputed digests for protocol.yaml/evidence-map.yaml/human-gate-1.yaml (Bash forbidden); only carried digests available."
+  - "kscc_session_id not exposed to A02 in its provided context; handoff field uses a documented placeholder."
+next_owner: A03
+next_state: VERIFY
+next_action: "A03 verifies target/replay/combined manifest+cache composition and training configuration semantics for SCRIPT-TRAIN (run_category_domain_finetune.sh) and the candidate run abl_object_lr1e7_s3000_20260811, treating every A02 DECLARED/MISSING item as unverified. In particular: confirm base-model provenance (MISSING-BASE-MODEL), confirm SEED split boundaries and rule out train/eval overlap (MISSING-SEED-DATASET-AND-SPLITS), and confirm the declared candidate hyperparameters match a config artifact (MISSING-TRAINING-CONFIG-ARTIFACT). Do not promote DECLARED to VERIFIED without primary material."
+commit_sha: d4705b5
+commit_sha_precision: "short sha from session gitStatus; full sha not obtainable without Bash"
+kscc_session_id: "not-exposed-in-a02-context"
+kscc_session_id_note: "A02 has no session id in its provided context and no Bash to query it; placeholder used and disclosed here rather than fabricated."
+timestamp: "2026-08-13"
+timestamp_precision: "date_only_subday_time_unavailable_bash_forbidden"
+attestation:
+  historical_work_not_misrepresented: true
+  historical_work_not_misrepresented_note: "A02 operated in VERIFY mode. All historical runs and scripts are marked DECLARED (not VERIFIED). No DECLARED historical work is described as original or as verified six-agent output. The candidate and historical observations are recorded as declared claims only; model quality was not assessed by A02 (forbidden)."
+  secrets_removed: true
+  secrets_removed_note: "A02 outputs contain no credentials or private data. Remote roots are referenced as approved boundaries only and were not accessed."

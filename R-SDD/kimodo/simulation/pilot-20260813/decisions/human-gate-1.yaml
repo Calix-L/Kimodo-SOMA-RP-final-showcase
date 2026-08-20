@@ -1,0 +1,108 @@
+schema_version: "1.0"
+id: human-gate-1
+type: READY
+human_owned: true
+status: APPROVED
+research_id: R004
+reviewer_name: hf
+reviewed_at: '2026-08-13T08:20:17Z'
+approval_context:
+  result_visibility_at_approval: NOT_ATTESTED
+  policy_classification: RETROSPECTIVE_ACCEPTANCE_POLICY_UNLESS_BLINDING_ATTESTED
+  approver_statement: The approver is uncertain whether the final holdout result was visible before threshold approval.
+  note: The thresholds may not be described as preregistered because result blinding is not attested.
+launch_authorization:
+  status: APPROVED
+  approved_by: hf
+  approved_at: '2026-08-13T08:20:17Z'
+  agent_count: 6
+  runtime: KSCC
+  scope: Start six isolated role-scoped sessions under the frozen resource and data boundary.
+blocking_inputs:
+- id: target_success_rule
+  value:
+    required_splits: [Content, Repetition]
+    minimum_improved_primary_metrics_per_split: 2
+    thresholds:
+      TMR_R_at_3_improvement_pp: 1.0
+      TMR_t2m_similarity_improvement_abs: 0.005
+      TMR_FID_gen_text_relative_reduction: 0.05
+    one_required_metric: [TMR_R_at_3, TMR_FID_gen_text]
+    all_other_primary_metrics_must_pass_non_regression: true
+    foot_skate_gate_must_pass: true
+  description: Metrics and minimum target-domain improvement required for success.
+- id: general_capability_tolerance
+  value:
+    evaluate_splits_separately: true
+    TMR_R_at_3_max_drop_pp: 1.0
+    TMR_t2m_similarity_max_drop_abs: 0.005
+    TMR_FID_gen_text_max_increase_abs: 0.005
+    TMR_FID_gen_text_max_increase_relative: 0.10
+    foot_contact_consistency_max_drop_abs: 0.005
+    statistical_rule:
+      comparison: paired_same_cases_same_prompts_same_seeds
+      effect_direction: positive_is_candidate_better
+      bootstrap_iterations: 2000
+      confidence: one_sided_95_percent
+      pass_condition: lower_confidence_bound_greater_than_or_equal_to_negative_margin
+  description: Maximum allowed SEED full-test regression, including aggregation policy.
+- id: foot_skate_tolerance
+  value:
+    foot_skate_from_height_max_increase_mps: 0.002
+    foot_skate_from_height_max_relative_increase: 0.05
+    foot_skate_ratio_max_increase_abs: 0.01
+    foot_contact_consistency_max_drop_abs: 0.005
+    foot_skate_from_pred_contacts:
+      usable_only_if_contact_consistency_drop_max: 0.005
+    foot_skate_max_vel_warning_relative_increase: 0.10
+    foot_skate_max_vel_hard_fail_relative_increase: 0.20
+    qualitative_review:
+      sample_count: 50
+      selection_frozen_before_review: true
+      blind_randomized_AB: true
+      reviewer_count: 2
+      third_reviewer_on_disagreement: true
+      major_defect_rate_max_increase_pp: 5
+  description: Maximum allowed foot-skate regression and any mandatory qualitative review.
+- id: split_policy
+  value:
+    content_and_repetition_must_pass_separately: true
+    cross_split_compensation: false
+    macro_average_for_display_only: true
+    macro_weights:
+      Content: 0.5
+      Repetition: 0.5
+    macro_average_can_determine_pass: false
+    missing_or_invalid_metric: INCONCLUSIVE
+  description: Whether Content and Repetition must pass separately or by a declared aggregate.
+- id: metric_priority
+  value:
+    hard:
+    - TMR/t2m_R/R03
+    - TMR/t2m_sim
+    - TMR/FID/gen_text
+    - foot_skate_from_height
+    - foot_skate_ratio
+    - foot_contact_consistency
+    diagnostic:
+    - TMR/t2m_R/R01
+    - TMR/t2m_R/R05
+    - TMR/t2m_R/MedR
+    - foot_skate_from_pred_contacts
+    - foot_skate_max_vel
+  description: Hard gates versus diagnostic metrics for TMR, retrieval, FID, contact, and foot-skate.
+- id: resource_and_data_boundary
+  value:
+    approved_host: lintrain
+    approved_gpu_count: 2
+    approved_remote_roots:
+    - /home/share/user/zyc/kimodo
+    - /home/share/user/zyc/kimodo_seed_repro_train
+    private_data_allowed: false
+    raw_credentials_in_transcript: false
+    external_artifact_upload: false
+  description: Approved remote host, GPU, data, transcript, and artifact access.
+decision: APPROVE_READY
+rationale: Content and Repetition are judged separately; semantic gains cannot compensate for a hard foot-skate failure; all final claims require paired evidence, independent checks, and Human Gate 2.
+protocol_sha256: 1f911559b69c5a7d3b68cf269c746c76ad1384f96a23963d533560eb83e8f0e5
+instructions: The evaluation policy is approved. Freeze the embedded R004 Protocol contract before using final holdout evidence for a decision.

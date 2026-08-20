@@ -1,0 +1,18 @@
+schema_version: "1.0"
+id: algorithm-reproduction
+name: Algorithm Reproduction
+description: Reproduce a published or internal algorithm claim from pinned sources.
+required_fields:
+  research:
+    - references
+  protocol:
+    - inputs
+    - method
+    - artifacts
+  experiment:
+    - run.code_ref
+    - run.environment
+    - evidence.artifacts
+additional_gates:
+  - source-version-frozen
+  - independent-reproduction

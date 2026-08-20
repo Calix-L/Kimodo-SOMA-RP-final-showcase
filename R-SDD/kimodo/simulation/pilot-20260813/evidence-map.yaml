@@ -1,0 +1,130 @@
+schema_version: "1.0"
+source_snapshot: ../../source/phase1_ai_native_project_brain_20260813.md
+verification_states: [DECLARED, VERIFIED, MISSING, INVALID]
+integrity_note: DECLARED means referenced by the supplied Phase 1 summary but not yet independently checked by this pilot.
+assets:
+- id: SRC-PHASE1-BRAIN
+  kind: project-summary
+  mode: VERIFY
+  owner: A01
+  ref: source/phase1_ai_native_project_brain_20260813.md
+  sha256: b71b202fc07b743e3d39869b81e5700cb5251d14637cb7e6b1d6d021a0877c17
+  state: VERIFIED
+- id: SCRIPT-MANIFEST
+  kind: script
+  mode: VERIFY
+  owner: A02
+  ref: work/codex_pipeline/build_training_subset_manifest.py
+  state: DECLARED
+- id: SCRIPT-DOMAIN-BENCHMARK
+  kind: script
+  mode: VERIFY
+  owner: A05
+  ref: work/codex_pipeline/build_domain_text_benchmark.py
+  state: DECLARED
+- id: SCRIPT-SEED-HOLDOUT
+  kind: script
+  mode: VERIFY
+  owner: A05
+  ref: work/codex_pipeline/build_seed_text_test_benchmark.py
+  state: DECLARED
+- id: SCRIPT-TRAIN
+  kind: script
+  mode: VERIFY
+  owner: A03
+  ref: work/codex_pipeline/run_category_domain_finetune.sh
+  state: DECLARED
+- id: SCRIPT-DOMAIN-EVAL
+  kind: script
+  mode: VERIFY
+  owner: A05
+  ref: work/codex_pipeline/run_domain_text_eval.sh
+  state: DECLARED
+- id: SCRIPT-FULL-HOLDOUT
+  kind: script
+  mode: LIVE
+  owner: A04
+  reviewer: A05
+  ref: work/codex_pipeline/run_seed_full_text_holdout_eval.sh
+  state: DECLARED
+- id: SCRIPT-SUMMARY
+  kind: script
+  mode: VERIFY
+  owner: A05
+  ref: work/codex_pipeline/summarize_domain_text_ablation.py
+  state: DECLARED
+runs:
+- id: gc_safe_fp32_20260810_2045
+  research_id: R002
+  planned_experiment_id: E001
+  mode: REPLAY
+  owner: A04
+  evaluator: A05
+  domain: Gestures-and-Communication
+  state: DECLARED
+  historical_observation: Content has several gains; Repetition is unstable or regresses.
+- id: cat_dancing_fp32_20260811_0005
+  research_id: R002
+  planned_experiment_id: E002
+  mode: REPLAY
+  owner: A04
+  evaluator: A05
+  domain: Dancing
+  state: DECLARED
+  historical_observation: Some Repetition gains with visible foot-skate side effects.
+- id: cat_object_manip_fp32_20260811_0005
+  research_id: R002
+  planned_experiment_id: E003
+  mode: REPLAY
+  owner: A04
+  evaluator: A05
+  domain: Object-Manipulation
+  state: DECLARED
+  historical_observation: Promising target evidence; requires lower-intensity ablation.
+- id: abl_dancing_lr1e7_s2000_20260811
+  research_id: R003
+  planned_experiment_id: E001
+  mode: REPLAY
+  owner: A04
+  evaluator: A05
+  domain: Dancing
+  state: DECLARED
+- id: abl_dancing_lr1e7_s3000_20260811
+  research_id: R003
+  planned_experiment_id: E002
+  mode: REPLAY
+  owner: A04
+  evaluator: A05
+  domain: Dancing
+  state: DECLARED
+- id: abl_object_lr1e7_s2000_20260811
+  research_id: R003
+  planned_experiment_id: E003
+  mode: REPLAY
+  owner: A04
+  evaluator: A05
+  domain: Object-Manipulation
+  state: DECLARED
+- id: abl_object_lr1e7_s3000_20260811
+  research_id: R003
+  planned_experiment_id: E004
+  mode: REPLAY
+  owner: A04
+  evaluator: A05
+  domain: Object-Manipulation
+  state: DECLARED
+  historical_observation: Current provisional candidate; target gains coexist with foot-skate risk.
+- id: seed_text_test_full_eval_20260813
+  research_id: R004
+  planned_experiment_id: E001
+  mode: LIVE
+  owner: A04
+  evaluator: A05
+  reviewer: A06
+  ref: /home/share/user/zyc/kimodo/eval_work/seed_text_test_full_eval_20260813
+  expected_counts:
+    content: 3510
+    repetition: 3428
+    total: 6938
+  state: DECLARED
+  historical_observation: Evaluation was still running when the source snapshot was supplied.

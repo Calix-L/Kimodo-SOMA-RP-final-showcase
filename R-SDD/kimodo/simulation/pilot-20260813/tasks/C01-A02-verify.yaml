@@ -1,0 +1,28 @@
+schema_version: "1.0"
+task_id: C01-A02-object-benchmark-provenance
+run_id: pilot-20260813
+mode: VERIFY
+agent_id: A02
+research_id: R004
+experiment_id: null
+objective: Consume A01's committed decision framing and verify the available Object benchmark identity without promoting unverified evidence.
+input_refs:
+- kimodo/simulation/pilot-20260813/outputs/A01/C01-benchmark-decision-framing.yaml
+- kimodo/simulation/pilot-20260813/evidence/remote-object-benchmark-inventory.yaml
+- kimodo/simulation/pilot-20260813/outputs/A02/provenance-report.yaml
+- kimodo/research/R004/protocol.yaml
+allowed_output_refs:
+- kimodo/simulation/pilot-20260813/outputs/A02/C01-object-benchmark-provenance.yaml
+- kimodo/simulation/pilot-20260813/handoffs/C01-A02-to-A01.yaml
+acceptance_criteria:
+- Cite the exact upstream A01 commit and output ref consumed.
+- Classify each requested pin field as VERIFIED, DECLARED, MISSING, or CONFLICTING.
+- Check whether target training and target evaluation manifests can be shown disjoint.
+- Produce only evidence and viable candidate identities; do not choose for hf.
+forbidden_actions:
+- access paths outside the approved remote roots
+- expose credentials, private data, or raw final holdout metrics
+- edit R004 or choose the final benchmark
+- promote names or prose summaries to VERIFIED without primary evidence
+time_or_cost_limit: 10 turns; consume sanitized read-only inventory; no GPU compute
+required_handoff_to: A01

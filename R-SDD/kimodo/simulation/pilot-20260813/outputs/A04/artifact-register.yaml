@@ -1,0 +1,168 @@
+schema_version: '1.0'
+task_id: P01-A04-execution-readiness
+run_id: pilot-20260813
+mode: VERIFY
+agent_id: A04
+research_id: R004
+prepared_at: '2026-08-13'  # date-only; time-of-day unavailable (no clock/Bash); not fabricated
+register_scope: >-
+  Artifacts examined during the P01-A04 execution-readiness VERIFY task. States follow
+  evidence-map verification_states: [DECLARED, VERIFIED, MISSING, INVALID]. No artifact
+  state was upgraded to VERIFIED without reading primary material. Remote/approved-path
+  artifacts are referenced, not accessed, from this read-only worktree.
+
+primary_records_read:
+  - id: REC-PROTOCOL-R004
+    ref: research/R004/protocol.yaml
+    state: VERIFIED
+    note: FROZEN at 2026-08-13T08:21:58+00:00; freeze.sha256 = 1f911559...e8f0e5
+  - id: REC-PROTOCOL-SNAPSHOT-R004
+    ref: .specify/rsdd/protocols/R004/1f911559b69c5a7d3b68cf269c746c76ad1384f96a23963d533560eb83e8f0e5.yaml
+    state: VERIFIED  # present locally; content identity to protocol.yaml confirmed
+    byte_hash_recompute: MISSING  # shasum unavailable (Bash disabled)
+  - id: REC-HUMANGATE1
+    ref: simulation/pilot-20260813/decisions/human-gate-1.yaml
+    state: VERIFIED
+    note: status APPROVED; protocol_sha256 matches protocol freeze.sha256
+  - id: REC-EVIDENCE-MAP
+    ref: simulation/pilot-20260813/evidence-map.yaml
+    state: VERIFIED
+  - id: REC-SOURCE-BRAIN
+    ref: source/phase1_ai_native_project_brain_20260813.md
+    state: VERIFIED
+    declared_sha256: b71b202fc07b743e3d39869b81e5700cb5251d14637cb7e6b1d6d021a0877c17  # from evidence-map
+    byte_hash_recompute: MISSING
+  - id: REC-WORKFLOW
+    ref: simulation/pilot-20260813/workflow.yaml
+    state: VERIFIED
+  - id: REC-MANIFEST
+    ref: simulation/pilot-20260813/manifest.yaml
+    state: VERIFIED
+  - id: REC-RESEARCH-R004
+    ref: research/R004/research.yaml
+    state: VERIFIED
+    note: status READY; protocol_amendments[0].to_sha256 matches frozen digest
+  - id: REC-AGENT-A04
+    ref: simulation/pilot-20260813/agents/A04.yaml
+    state: VERIFIED
+  - id: REC-AGENT-CONTRACT
+    ref: simulation/pilot-20260813/prompts/agent-contract.md
+    state: VERIFIED
+  - id: REC-HANDOFF-TEMPLATE
+    ref: simulation/pilot-20260813/handoffs/handoff-template.yaml
+    state: VERIFIED
+  - id: REC-TASK-A04
+    ref: simulation/pilot-20260813/tasks/P01-A04.yaml
+    state: VERIFIED
+  - id: REC-TASK-A02
+    ref: simulation/pilot-20260813/tasks/P01-A02.yaml
+    state: VERIFIED
+    note: read for A02 provenance context (required_context)
+  - id: REC-TASK-A03
+    ref: simulation/pilot-20260813/tasks/P01-A03.yaml
+    state: VERIFIED
+    note: read for A03 configuration context (required_context)
+  - id: REC-AUDIT-SESSION-INDEX
+    ref: simulation/pilot-20260813/audit/session-index.yaml
+    state: VERIFIED
+    note: "status NOT_STARTED, sessions: [] -> kscc_session_id MISSING"
+
+scripts_declared_not_locally_present:
+  - id: SCRIPT-FULL-HOLDOUT
+    ref: work/codex_pipeline/run_seed_full_text_holdout_eval.sh
+    mode: LIVE
+    owner: A04
+    reviewer: A05
+    state: DECLARED  # evidence-map state; not present in this worktree
+    locally_readable: false
+    byte_hash: MISSING
+  - id: SCRIPT-SEED-HOLDOUT
+    ref: work/codex_pipeline/build_seed_text_test_benchmark.py
+    mode: VERIFY
+    owner: A05
+    state: DECLARED
+    locally_readable: false
+    byte_hash: MISSING
+  - id: SCRIPT-SUMMARY
+    ref: work/codex_pipeline/generate_phase1_current_summary.py
+    mode: VERIFY
+    owner: A05
+    state: DECLARED
+    locally_readable: false
+    byte_hash: MISSING
+  - id: SCRIPT-MANIFEST  # A02 provenance script, cross-referenced
+    ref: work/codex_pipeline/build_training_subset_manifest.py
+    mode: VERIFY
+    owner: A02
+    state: DECLARED
+    locally_readable: false
+    byte_hash: MISSING
+
+models_and_data_declared:
+  - id: MODEL-BASELINE
+    kind: baseline
+    ref: nvidia/Kimodo-SOMA-RP-v1.1
+    state: DECLARED
+    remote_path: MISSING
+  - id: MODEL-CANDIDATE
+    kind: candidate
+    ref: abl_object_lr1e7_s3000_20260811
+    state: DECLARED
+    remote_path: MISSING
+    training_root_declared: /home/share/user/zyc/kimodo_seed_repro_train
+  - id: BENCH-CONTENT
+    kind: benchmark
+    ref: SEED-test-Content-3510
+    expected_count: 3510
+    state: DECLARED
+    file_path: MISSING
+  - id: BENCH-REPETITION
+    kind: benchmark
+    ref: SEED-test-Repetition-3428
+    expected_count: 3428
+    state: DECLARED
+    file_path: MISSING
+
+remote_run_declared:
+  - id: RUN-SEED-FULL-EVAL
+    run_id: seed_text_test_full_eval_20260813
+    research_id: R004
+    planned_experiment_id: E001
+    mode: LIVE
+    owner: A04
+    evaluator: A05
+    reviewer: A06
+    ref: /home/share/user/zyc/kimodo/eval_work/seed_text_test_full_eval_20260813
+    expected_counts: {content: 3510, repetition: 3428, total: 6938}
+    state: DECLARED  # evidence-map state; not accessed from this worktree
+    historical_observation: Evaluation was still running when the source snapshot was supplied.
+    accessed: false  # read-only VERIFY; remote path outside local boundary; not accessed
+
+produced_outputs:
+  - id: OUT-EXEC-READINESS
+    ref: simulation/pilot-20260813/outputs/A04/execution-readiness.yaml
+    state: PRODUCED
+    in_allowed_output_refs: true
+  - id: OUT-ARTIFACT-REGISTER
+    ref: simulation/pilot-20260813/outputs/A04/artifact-register.yaml
+    state: PRODUCED
+    in_allowed_output_refs: true
+
+deferred_outputs_not_in_task_scope:
+  - id: OUT-RUN-CARD
+    ref: simulation/pilot-20260813/outputs/R004/holdout-run-card.yaml
+    state: NOT_PRODUCED
+    reason: belongs to R004-holdout-live (LIVE); not in this task's allowed_output_refs
+  - id: OUT-EXEC-LOG-INDEX
+    ref: simulation/pilot-20260813/outputs/A04/execution-log-index.yaml
+    state: NOT_PRODUCED
+    reason: >-
+      profile required_output but not in this VERIFY task's allowed_output_refs;
+      deferred to R004-holdout-live (LIVE)
+
+integrity_attestation:
+  no_artifact_state_upgraded_without_primary_check: true
+  no_missing_evidence_invented: true
+  no_pass_fail_or_adoption_interpretation: true
+  no_out_of_boundary_access: true
+  no_credentials_or_private_transcripts: true

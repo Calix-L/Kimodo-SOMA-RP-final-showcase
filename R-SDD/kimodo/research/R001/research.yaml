@@ -1,0 +1,37 @@
+schema_version: '1.0'
+id: R001
+title: Kimodo post-training pipeline feasibility
+type: reproduction
+status: DRAFT
+owner: A01
+profile: kimodo-posttraining
+created_at: '2026-08-13T07:53:15+00:00'
+updated_at: '2026-08-13T07:53:15+00:00'
+question: Can the open Kimodo weights and SEED data support a traceable end-to-end
+  post-training pipeline without the official training code?
+motivation: Establish whether the reconstructed open-source pipeline is sufficiently traceable for target-domain research and team handoff.
+scope:
+  in:
+  - Kimodo-SOMA-RP-v1.1 open weights
+  - SEED open dataset metadata
+  - manifest, feature-cache, replay-mix, finetune, checkpoint, and evaluation scripts
+  - historical Phase 1 pipeline artifacts referenced by the evidence map
+  out:
+  - commercial bones-rigplay 700h data
+  - Phase 2 game-motion data
+  - claims of target-domain improvement
+hypothesis: null
+evaluation:
+  answer_criteria:
+  - The manifest, cache, finetune, checkpoint, and evaluation chain can be reconstructed
+    from versioned inputs and artifacts
+  - An independent reviewer can identify every unresolved provenance gap
+references:
+- ../../source/phase1_ai_native_project_brain_20260813.md
+- ../../simulation/pilot-20260813/evidence-map.yaml
+provenance:
+  mode: REPLAY_VERIFY
+  historical_work_completed_before_rsdd: true
+  integrity_rule: Historical evidence may be reconstructed or checked, but not represented as original six-agent execution.
+protocol_amendments: []
+decision: null

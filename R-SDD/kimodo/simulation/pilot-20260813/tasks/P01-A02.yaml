@@ -1,0 +1,26 @@
+schema_version: "1.0"
+task_id: P01-A02-provenance-recovery
+run_id: pilot-20260813
+mode: VERIFY
+agent_id: A02
+research_id: R001
+experiment_id: null
+objective: Verify the declared repository, data, manifest, cache, model, checkpoint, and script provenance and mark missing evidence without inventing replacements.
+input_refs:
+- kimodo/research/R001/
+- kimodo/source/phase1_ai_native_project_brain_20260813.md
+- kimodo/simulation/pilot-20260813/evidence-map.yaml
+allowed_output_refs:
+- kimodo/simulation/pilot-20260813/outputs/A02/provenance-report.yaml
+- kimodo/simulation/pilot-20260813/outputs/A02/missing-evidence-register.yaml
+acceptance_criteria:
+- Every checked claim has a path, version, hash, count, or explicit MISSING state.
+- Data-boundary and leakage risks are visible.
+- No conclusion relies only on a filename or summary statement.
+forbidden_actions:
+- access or upload private data
+- decide model quality
+- change evidence state to VERIFIED without checking primary material
+time_or_cost_limit: 12 turns; read-only remote checks only
+required_handoff_to: A03
+

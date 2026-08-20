@@ -1,0 +1,142 @@
+schema_version: '1.0'
+handoff_id: C01-A01-to-A02
+run_id: pilot-20260813
+mode: VERIFY
+from_agent: A01
+to_agent: A02
+research_id: R004
+experiment_id: null
+owner: A01
+input_refs:
+- kimodo/simulation/pilot-20260813/collaboration/ledger.yaml
+- kimodo/simulation/pilot-20260813/outputs/A05/benchmark-integrity-review.yaml
+- kimodo/simulation/pilot-20260813/outputs/A02/provenance-report.yaml
+- kimodo/research/R004/protocol.yaml
+- kimodo/source/phase1_ai_native_project_brain_20260813.md
+- kimodo/BRAIN.md
+- kimodo/registry.json
+- kimodo/.specify/memory/constitution.md
+- kimodo/simulation/pilot-20260813/workflow.yaml
+- kimodo/simulation/pilot-20260813/outputs/A01/project-state-snapshot.yaml
+- kimodo/simulation/pilot-20260813/outputs/A01/dependency-and-risk-log.yaml
+output_refs:
+- kimodo/simulation/pilot-20260813/outputs/A01/C01-benchmark-decision-framing.yaml
+- kimodo/simulation/pilot-20260813/handoffs/C01-A01-to-A02.yaml
+verified_actions:
+- mode: VERIFY
+  action: >-
+    Recovered the C01 cycle state from collaboration/ledger.yaml (cycle
+    C01-object-target-benchmark-pin, status AI_DISCOVERY, step C01-S1 PLANNED,
+    hf intent = continue staged loop without GPU training or final holdout,
+    return a concrete evidence-backed choice before revising R004).
+- mode: VERIFY
+  action: >-
+    Confirmed A05's target-benchmark finding: the frozen R004 threshold
+    contract and holdout count contract are valid and traced clean (A05
+    threshold_trace PASS, holdout count PASS), but the Object target-domain
+    benchmark is NOT pinned in R004.inputs; target_Content_PASS and
+    target_Repetition_PASS have no frozen benchmark, counts, manifests, or
+    disjointness (A05 RISK-01, target_domain_benchmark_pin INCONCLUSIVE).
+- mode: VERIFY
+  action: >-
+    Confirmed A02's prior provenance verdict: target-domain construction
+    script build_domain_text_benchmark.py is DECLARED (work/ absent);
+    split manifests, case-count sources, and train/eval overlap check are
+    MISSING / NOT_PERFORMED; target-train leakage cannot be ruled out.
+- mode: VERIFY
+  action: >-
+    Stated why the frozen Protocol is insufficient WITHOUT claiming it is
+    invalid: it is a valid threshold + holdout-count contract, insufficient
+    only for target-side adoption because R004.inputs lacks the target
+    benchmark entry; resolution is additive (pin the target benchmark via
+    research-revise after hf decides) and changes no frozen evaluation rule.
+- mode: VERIFY
+  action: >-
+    Defined the benchmark-pin acceptance schema with every field required to
+    pin a benchmark and prevent target-train leakage: identity, splits with
+    frozen counts + hashed manifests, construction provenance, evaluation
+    protocol consistency with R004.comparison_protocol, leakage_prevention
+    (target-train disjointness + holdout disjointness + paired prompt reuse),
+    and freeze metadata. A01 set fields only; no values.
+- mode: VERIFY
+  action: >-
+    Authored the one precise human decision (C01-H1): pin the Object
+    target-domain benchmark, decided by hf as ACCEPT / MODIFY / REJECT.
+    A01 framed it and explicitly did NOT select the benchmark on behalf of hf.
+- mode: VERIFY
+  action: >-
+    Authored the C01-S2 evidence request for A02 with seven questions, each
+    mapped to schema fields and to an ACCEPT / MODIFY / REJECT branch, and
+    constrained to provenance + disjointness only (no GPU training, no final
+    holdout, no holdout metric inspection).
+gate_result: PASS-C01-S1-framing-complete
+gate_result_note: >-
+  C01-S1 framing is complete and internally consistent. This is NOT an
+  adoption pass: no benchmark is selected and no target_* outcome is claimed.
+  C01-S2 (A02 evidence) and C01-S3 (A01 synthesis) remain before hf's C01-H1
+  decision. Adoption authority stays with Human Gate 2.
+open_risks:
+- id: C01-RISK-01
+  severity: high
+  description: >-
+    Target benchmark not pinned; target_Content_PASS / target_Repetition_PASS
+    could be evaluated against an unfrozen or substituted benchmark.
+  owner: hf (C01-H1); A02 (C01-S2) supplies evidence
+- id: C01-RISK-02
+  severity: high
+  description: >-
+    Target-train leakage status UNKNOWN; candidate finetuned on Object
+    training data; overlap would inflate target_success. Primary leakage risk.
+  owner: A02 (C01-S2) computes train/eval intersection (Q4)
+- id: C01-RISK-03
+  severity: medium
+  description: >-
+    Target-eval vs SEED-test holdout disjointness UNKNOWN; shared cases would
+    make target improvement and holdout non-regression non-independent.
+  owner: A02 (C01-S2) computes intersection (Q5)
+- id: C01-RISK-04
+  severity: medium
+  description: >-
+    Construction script DECLARED, not VERIFIED; work/ absent from worktree;
+    counts / manifests may be unverifiable from this worktree alone.
+  owner: A02 (C01-S2) verifies against repo or approved remote roots (Q1-Q3)
+- id: C01-RISK-05
+  severity: low
+  description: >-
+    collaboration/ledger.yaml is outside A01 allowed_paths; A01 cannot
+    advance the C01-S1 state field in the ledger.
+  owner: orchestrator
+next_owner: A02
+next_state: C01-S2 (A02 verify Object target-domain benchmark provenance)
+next_action: >-
+  A02 consumes outputs/A01/C01-benchmark-decision-framing.yaml, answers
+  questions Q1-Q7 in evidence_request_for_A02, populates the
+  benchmark_pin_schema fields with VERIFIED / DECLARED / MISSING values and
+  refs, and returns a C01-S2 provenance report for the Object target-domain
+  benchmark. A02 must NOT start GPU training, the final holdout, or inspect
+  final holdout metrics; set-membership disjointness only, never scores.
+  After A02 returns, A01 runs C01-S3 to synthesize ALT-A / ALT-B / ALT-C
+  with a non-binding recommendation and hands to hf for C01-H1.
+commit_sha: 046ed3e
+commit_sha_note: >-
+  Short sha from the session-start gitStatus snapshot (most recent commit
+  046ed3e "Start benchmark pin collaboration cycle"); full 40-char sha not
+  re-confirmed because Bash is forbidden by the task envelope.
+kscc_session_id: MISSING
+kscc_session_id_note: >-
+  audit/session-index.yaml is NOT_STARTED (sessions: []); backfill the
+  official session id when the launcher populates the audit index.
+timestamp: '2026-08-13T09:36:00Z'
+timestamp_note: >-
+  Approximate; exact wall-clock unavailable because Bash is disabled in
+  this context. Date is 2026-08-13.
+attestation:
+  historical_work_not_misrepresented: true
+  historical_work_not_misrepresented_note: >-
+    VERIFY mode only. A05/A02 prior findings are cited as evidence, not
+    re-described as original six-agent work. No historical step is claimed as
+    new execution.
+  secrets_removed: true
+  secrets_removed_note: >-
+    No credentials, private data, or A04 private transcript referenced. No
+    final holdout metrics inspected. No remote access performed.

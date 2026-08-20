@@ -1,0 +1,18 @@
+schema_version: "1.0"
+id: benchmark-development
+name: Benchmark Development
+description: Build or revise a measurement system with explicit construct and version boundaries.
+required_fields:
+  research:
+    - scope.in
+    - scope.out
+  protocol:
+    - inputs
+    - method
+    - evaluation.criteria
+  experiment:
+    - evidence.metrics
+    - evidence.artifacts
+additional_gates:
+  - construct-validity-review
+  - benchmark-version-frozen

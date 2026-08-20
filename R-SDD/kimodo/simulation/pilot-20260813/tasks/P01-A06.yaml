@@ -1,0 +1,28 @@
+schema_version: "1.0"
+task_id: P01-A06-cold-start-red-team
+run_id: pilot-20260813
+mode: VERIFY
+agent_id: A06
+research_id: R004
+experiment_id: null
+objective: Cold-start from shared R-SDD records, challenge protocol validity and evidence boundaries, and report whether the pilot is ready to enter staged execution.
+input_refs:
+- kimodo/.specify/memory/constitution.md
+- kimodo/BRAIN.md
+- kimodo/registry.json
+- kimodo/research/R004/
+- kimodo/simulation/pilot-20260813/decisions/human-gate-1.yaml
+- kimodo/simulation/pilot-20260813/evidence-map.yaml
+allowed_output_refs:
+- kimodo/simulation/pilot-20260813/outputs/A06/ready-red-team-review.yaml
+- kimodo/simulation/pilot-20260813/outputs/A06/cold-start-cognition.yaml
+acceptance_criteria:
+- The current R004 state, frozen digest, claim limits, and next valid transition are recovered without private execution chat.
+- Retrospective-policy status and missing evidence are explicitly preserved.
+- Findings distinguish validity, evidence assessment, recommendation, and human decision authority.
+forbidden_actions:
+- read A04 raw transcript or private execution conversation
+- approve R004 or make the final adoption decision
+- infer candidate success from summaries or filenames
+time_or_cost_limit: 12 turns; no remote compute
+required_handoff_to: A01

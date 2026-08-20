@@ -1,0 +1,376 @@
+schema_version: "1.0"
+artifact: project-state-snapshot
+run_id: pilot-20260813
+task_id: P01-A01-project-cognition
+agent_id: A01
+mode: VERIFY
+generated_at: 2026-08-13T08:28:07Z
+base_commit_sha: cd67942b718e92d1fc5961572063c30f11772bb7
+kscc_session_handle: worktree-pilot-20260813-A01
+audit_registration_state: NOT_STARTED  # simulation/pilot-20260813/audit/session-index.yaml is empty; official session ID not yet recorded by launcher
+source_records_read:
+  - .specify/memory/constitution.md
+  - BRAIN.md
+  - registry.json
+  - README.md
+  - RUNBOOK.md
+  - simulation/pilot-20260813/workflow.yaml
+  - simulation/pilot-20260813/manifest.yaml
+  - simulation/pilot-20260813/evidence-map.yaml
+  - simulation/pilot-20260813/decisions/human-gate-1.yaml
+  - simulation/pilot-20260813/decisions/human-gate-2.yaml
+  - simulation/pilot-20260813/assessment/evidence-matrix.md
+  - simulation/pilot-20260813/agents/A01.yaml
+  - simulation/pilot-20260813/agents/A03.yaml
+  - simulation/pilot-20260813/tasks/P01-A01.yaml
+  - simulation/pilot-20260813/tasks/P01-A03.yaml
+  - research/R001/research.yaml
+  - research/R001/protocol.yaml
+  - research/R002/research.yaml
+  - research/R002/protocol.yaml
+  - research/R003/research.yaml
+  - research/R003/protocol.yaml
+  - research/R004/research.yaml
+  - research/R004/protocol.yaml
+  - .specify/rsdd/protocols/R004/1f911559b69c5a7d3b68cf269c746c76ad1384f96a23963d533560eb83e8f0e5.yaml
+  - .specify/rsdd/protocols/R004/37bbff58a5f60d38ffd8a3a1d0c47b54e42c9d9c81e9a707b7b6a187ed68ce1a.yaml
+  - source/phase1_ai_native_project_brain_20260813.md
+  - .specify/project.yaml
+
+# ---------------------------------------------------------------------------
+# 1. PROJECT IDENTITY  (Fact — cited from manifest.yaml, README.md, source brain)
+# ---------------------------------------------------------------------------
+project:
+  id: kimodo-phase1-six-agent-pilot
+  run_id: pilot-20260813
+  workflow_state: PLANNED                 # manifest.yaml: state = PLANNED
+  title: Kimodo Phase 1 six-agent R-SDD replay and live closure
+  objective: Reconstruct and verify the complete Phase 1 workflow with six
+    isolated KSCC roles, then close the candidate decision with live evidence
+    and two human gates. (manifest.yaml)
+  underlying_research: Can the open Kimodo weights (Kimodo-SOMA-RP-v1.1) and
+    open SEED data support a traceable end-to-end post-training pipeline
+    without the official training code, achieving target-domain improvement
+    without overall capability regression? (source brain sec.1; R001 question)
+  single_source_of_truth: research/        # constitution rule 4; manifest.integrity
+
+# ---------------------------------------------------------------------------
+# 2. INTEGRITY MODES  (Fact — README.md, manifest.yaml, constitution rule 16)
+# ---------------------------------------------------------------------------
+integrity:
+  allowed_modes: [REPLAY, VERIFY, LIVE]
+  replay_rule: A historical step may be reconstructed from real artifacts but
+    must NOT be represented as original six-agent execution.
+  verify_rule: Independently check a historical claim or artifact.
+  live_rule: LIVE requires an actual command, timestamp, owner, environment,
+    output, and artifact reference.
+  this_task_mode: VERIFY                   # P01-A01 task envelope
+  replay_not_original: true                # explicit acceptance criterion
+  historical_work_completed_before_rsdd: true   # R001-R004 research.yaml provenance
+
+# ---------------------------------------------------------------------------
+# 3. ROLES AND AUTHORITY  (Fact — README.md, agents/*.yaml, manifest.yaml)
+# ---------------------------------------------------------------------------
+roles:
+  A01:
+    display_name: Lin — Research Lead and Brain Owner
+    authority: recover cognition, decompose, coordinate, track handoffs, record AI recommendations
+    forbidden: [approve READY, approve final scientific decisions, hide negative results, alter raw evidence]
+  A02:
+    role: Repository and Data Engineer
+    authority: code/model/data/artifact provenance
+  A03:
+    display_name: Shen — Training Pipeline Engineer
+    authority: target+replay training semantics, ablation boundaries
+    forbidden: [modify frozen eval contract, tune against holdout after READY, multi-variable changes]
+  A04:
+    role: Experiment Operators
+    authority: run cards, holdout registration (LIVE)
+  A05:
+    role: Evaluation Auditor
+    authority: gate tables, metric recomputation, evaluation integrity
+  A06:
+    role: Independent Reviewer
+    authority: cold-start red-team; must NOT see A04 private transcript before cold-start completion
+  orchestrator:
+    authority: [launch agents, deliver inputs, validate handoffs, merge outputs, refresh generated views]
+    forbidden: [approve READY, alter primary evidence, issue a scientific decision]
+  human_gate_1:
+    type: READY
+    owns: freeze the final evaluation contract
+    status: APPROVED
+  human_gate_2:
+    type: FINAL_DECISION
+    owns: final scientific decision (ADOPT/REJECT/REVISE/REPRODUCE/STOP)
+    status: PENDING
+
+# ---------------------------------------------------------------------------
+# 4. RESEARCH CHAIN STATE  (Fact — registry.json, research/*/research.yaml)
+# ---------------------------------------------------------------------------
+research:
+  R001:
+    title: Kimodo post-training pipeline feasibility
+    type: reproduction
+    status: DRAFT
+    owner: A01                         # research owner
+    protocol_owner_agent: A02          # protocol.yaml collaboration
+    evaluator: A05
+    reviewer: A06
+    supporting: [A01, A03, A04]
+    decision: null
+    experiments: {}                   # registry.json experiments = {}
+    provenance_mode: REPLAY_VERIFY
+    next_phase: R001-pipeline-replay (REPLAY; owners A02,A03,A04)
+    next_handoff_to: A06
+  R002:
+    title: Kimodo target-domain candidate selection
+    type: exploratory
+    status: DRAFT
+    owner: A01
+    protocol_owner_agent: A04
+    evaluator: A05
+    reviewer: A06
+    supporting: [A01, A02, A03]
+    decision: null
+    experiments: {}
+    provenance_mode: REPLAY_VERIFY
+    next_phase: R002-main-domain-replay (REPLAY) then R002-main-domain-evaluation (VERIFY; A05,A06,A01)
+    next_handoff_to: A05
+    a01_output_in_eval_phase: outputs/A01/decision-trace.yaml   # produced later, NOT in P01
+  R003:
+    title: Kimodo training-strength ablation
+    type: confirmatory
+    status: DRAFT
+    owner: A03                         # research owner is A03 (only non-A01 research owner)
+    protocol_owner_agent: A03
+    evaluator: A05
+    reviewer: A06
+    supporting: [A01, A04]
+    decision: null
+    experiments: {}
+    provenance_mode: REPLAY_VERIFY
+    next_phase: R003-ablation-replay (REPLAY; A03,A04) then R003-candidate-review (VERIFY)
+    next_handoff_to: A05
+  R004:
+    title: Kimodo Phase 1 candidate closure
+    type: confirmatory
+    status: READY                      # research.yaml status; registry.json status = READY
+    protocol_status: FROZEN            # protocol.yaml status = FROZEN
+    owner: A01                         # research/coordinator owner
+    protocol_owner_agent: A04
+    coordinator: A01
+    evaluator: A05
+    reviewer: A06
+    decision: null                     # awaits Human Gate 2
+    experiments: {}                    # no Experiment Records created yet
+    provenance_mode: MIXED             # historical + live closure
+    live_work: [holdout result verification and closure, A06 cold-start reproduction, two human decisions]
+    frozen_protocol_sha256: 1f911559b69c5a7d3b68cf269c746c76ad1384f96a23963d533560eb83e8f0e5
+    next_phase: R004-holdout-live (LIVE; A04)
+    next_handoff_to: A05
+
+# ---------------------------------------------------------------------------
+# 5. CANDIDATE AND HOLDOUT STATE  (Fact — source brain sec.6/9; evidence-map.yaml)
+# ---------------------------------------------------------------------------
+candidate:
+  id: abl_object_lr1e7_s3000_20260811
+  domain: Object-Manipulation
+  base_model: nvidia/Kimodo-SOMA-RP-v1.1
+  hyperparams:                           # source brain sec.6.3 "best hyperparams"
+    dtype: fp32
+    lr: 1e-7
+    steps: 3000
+    warmup: 200
+    batch: 4
+    grad_accum: 8
+    target_repeat: 2
+    replay_size: 4000
+    replay_repeat: 1
+    text_dropout: 0.10
+    max_grad_norm: 0.5
+  status: PROVISIONAL                    # explicit in R003/R004 protocols; NOT closed
+  known_side_effect: foot-skate degradation persists (source brain sec.6.3; R003 risks)
+  declared_success: false                # forbidden action for A01; final_adopt_rule unmet
+holdout:
+  run_id: seed_text_test_full_eval_20260813
+  benchmark_splits:
+    Content: 3510
+    Repetition: 3428
+    total: 6938
+  baseline: Kimodo-SOMA-RP-v1.1
+  candidate: abl_object_lr1e7_s3000_20260811
+  remote_output: /home/share/user/zyc/kimodo/eval_work/seed_text_test_full_eval_20260813
+  evidence_map_state: DECLARED           # evidence-map.yaml; not yet independently checked
+  historical_observation: Evaluation was still running when the source snapshot was supplied.
+  owner_for_live_registration: A04
+
+# ---------------------------------------------------------------------------
+# 6. HUMAN GATES  (Fact — decisions/human-gate-1.yaml, human-gate-2.yaml)
+# ---------------------------------------------------------------------------
+human_gate_1:
+  status: APPROVED
+  reviewer: hf
+  reviewed_at: 2026-08-13T08:20:17Z
+  decision: APPROVE_READY
+  protocol_sha256: 1f911559b69c5a7d3b68cf269c746c76ad1384f96a23963d533560eb83e8f0e5
+  result_visibility_at_approval: NOT_ATTESTED
+  policy_classification: RETROSPECTIVE_ACCEPTANCE_POLICY_UNLESS_BLINDING_ATTESTED
+  approver_statement: The approver is uncertain whether the final holdout result was visible before threshold approval.
+  note: Thresholds may NOT be described as preregistered because result blinding is not attested.
+  protocol_amendment_recorded:
+    from_sha256: 37bbff58a5f60d38ffd8a3a1d0c47b54e42c9d9c81e9a707b7b6a187ed68ce1a
+    from_reviewer: project-owner
+    from_approved_at: 2026-08-13T08:10:14+00:00
+    to_sha256: 1f911559b69c5a7d3b68cf269c746c76ad1384f96a23963d533560eb83e8f0e5
+    to_reviewer: hf
+    to_approved_at: 2026-08-13T08:21:58+00:00
+    reason: Record formal Human Gate 1 approver hf and explicit NOT_ATTESTED result visibility before six-agent launch.
+    owner: A01                       # research revise amendment (R004 research.yaml protocol_amendments)
+human_gate_2:
+  status: PENDING
+  decision: null
+  allowed_decisions: [ADOPT, REJECT, REVISE, REPRODUCE, STOP]
+  ai_recommendation_recorded: false   # A06 recommendation null; human_response null
+  rule: AI agents cannot approve this file; human-owned final decision.
+
+# ---------------------------------------------------------------------------
+# 7. RESOURCE AND DATA BOUNDARY  (Fact — human-gate-1.yaml resource_and_data_boundary)
+# ---------------------------------------------------------------------------
+boundary:
+  approved_host: lintrain
+  approved_gpu_count: 2
+  approved_remote_roots:
+    - /home/share/user/zyc/kimodo
+    - /home/share/user/zyc/kimodo_seed_repro_train
+  private_data_allowed: false
+  raw_credentials_in_transcript: false
+  external_artifact_upload: false
+  this_task_remote_compute: none      # task envelope: no remote compute
+
+# ---------------------------------------------------------------------------
+# 8. EVIDENCE VERIFICATION STATE  (Fact — evidence-map.yaml)
+# ---------------------------------------------------------------------------
+evidence_verification:
+  states: [DECLARED, VERIFIED, MISSING, INVALID]
+  declared_meaning: Referenced by the supplied Phase 1 summary but not yet independently checked by this pilot.
+  verified_assets:
+    - id: SRC-PHASE1-BRAIN
+      ref: source/phase1_ai_native_project_brain_20260813.md
+      sha256: b71b202fc07b743e3d39869b81e5700cb5251d14637cb7e6b1d6d021a0877c17
+      state: VERIFIED
+  declared_count: 8 assets + 8 runs     # all scripts/runs DECLARED; verification is the pending pilot work
+  note: DECLARED is not failure; it is the expected starting state for the REPLAY/VERIFY phases.
+
+# ---------------------------------------------------------------------------
+# 9. SEPARATED EPISTEMIC LAYERS  (contract rule 4)
+# ---------------------------------------------------------------------------
+facts:
+  - R004 is READY and its Protocol is FROZEN under sha256 1f9115... (research/R004/research.yaml, protocol.yaml).
+  - Human Gate 1 is APPROVED by reviewer hf at 2026-08-13T08:20:17Z (decisions/human-gate-1.yaml).
+  - Human Gate 2 is PENDING with decision null (decisions/human-gate-2.yaml).
+  - R001, R002, R003 are DRAFT with decision null and no Experiment Records (registry.json).
+  - The current candidate is abl_object_lr1e7_s3000_20260811 and is explicitly provisional (source brain sec.6.3, sec.9; R003/R004 protocols).
+  - The holdout evaluation seed_text_test_full_eval_20260813 was still running when the source snapshot was supplied (evidence-map.yaml; source brain sec.9).
+  - Result visibility at Gate 1 approval is NOT_ATTESTED (human-gate-1.yaml).
+  - BRAIN.md and registry.json are generated views; primary state lives in research/ (RUNBOOK, constitution rule 4).
+  - The historical Phase 1 work was completed before this R-SDD pilot (research.yaml provenance.historical_work_completed_before_rsdd = true for all four).
+hypotheses:
+  - R003 hypothesis: Lower-intensity Object Manipulation finetuning (lr=1e-7, 2000/3000-step) can preserve target gains with less regression than the 4000-step main experiment. (research/R003/research.yaml; NOT yet confirmed)
+  - R004 hypothesis: The Object 3000-step checkpoint improves the target domain without exceeding Human Gate 1-approved general-capability and foot-skate tolerances. (research/R004/research.yaml; NOT yet confirmed)
+  - source-brain self-assessment claims Phase 1 closure score 10/10 contingent on the still-running holdout (source brain sec.10) — this is an unverified self-assessment, NOT pilot evidence.
+observations:
+  - id: OBS-WORKFLOW-STATE-DIVERGENCE
+    kind: process-consistency
+    text: >
+      workflow.yaml declares G01-ready-human-gate depends_on [R003-candidate-review],
+      implying R001-R003 replay/verify phases complete before Gate 1. But primary
+      records show Gate 1 already APPROVED and R004 FROZEN while R001-R003 remain
+      DRAFT with no experiment records and no phase outputs. Reconciliation: the
+      historical Phase 1 work was completed pre-R-SDD (historical_work_completed_before_rsdd
+      = true), so Gate 1 could be approved from that history; the pilot's own
+      REPLAY/VERIFY evidence for R001-R003 is still owed. Net effect: R004 live
+      closure is unblocked now, but R001-R003 reconstruction evidence remains PLANNED.
+  - id: OBS-BRAIN-STALE-VS-REGISTRY
+    kind: generated-view-consistency
+    text: >
+      BRAIN.md and registry.json both mark R004 status READY and R001-R003 DRAFT,
+      consistent with each other and with research/R004/research.yaml. BRAIN.md
+      "Latest Decisions: No reviewed decisions yet" is consistent with Gate 2
+      PENDING. No conflict found between generated views and primary records.
+  - id: OBS-AUDIT-NOT-STARTED
+    kind: audit-gap
+    text: >
+      audit/session-index.yaml status = NOT_STARTED and sessions = []. The launcher
+      has not yet recorded kscc_session_id, model, started_at, token_usage,
+      transcript_sha256 for this session. This is an audit-registration gap, not
+      a research-state gap.
+evidence:
+  - ref: source/phase1_ai_native_project_brain_20260813.md
+    state: VERIFIED
+    sha256: b71b202fc07b743e3d39869b81e5700cb5251d14637cb7e6b1d6d021a0877c17
+  - ref: decisions/human-gate-1.yaml
+    state: VERIFIED (read; gate file is the authority, not re-hashed here)
+  - ref: .specify/rsdd/protocols/R004/1f911559b69c5a7d3b68cf269c746c76ad1384f96a23963d533560eb83e8f0e5.yaml
+    state: VERIFIED (read; matches Gate 1 protocol_sha256 and R004 freeze.sha256)
+recommendations:
+  - Keep R004 candidate explicitly PROVISIONAL; do not describe it as successful until all seven final_adopt_rule conditions are met and Human Gate 2 records a decision.
+  - Treat Human Gate 1 as a retrospective acceptance policy in all downstream artifacts unless the project owner separately records a blinding attestation.
+  - Populate audit/session-index.yaml before any LIVE holdout registration so A04's live evidence is traceable to a registered session.
+human_decisions:
+  - gate: Human Gate 1
+    decision: APPROVE_READY
+    by: hf
+    at: 2026-08-13T08:20:17Z
+  - gate: Human Gate 2
+    decision: null  # PENDING — no human decision recorded yet; AI cannot approve
+
+# ---------------------------------------------------------------------------
+# 10. OPEN ITEMS — each with owner and next valid transition
+# ---------------------------------------------------------------------------
+open_items:
+  - id: OI-R001-REPLAY
+    item: R001 pipeline replay/verify evidence (provenance, run operability, independent gap report)
+    owner: A02 (provenance), A03 (training semantics), A04 (smoke), A06 (review)
+    next_state: R001-pipeline-replay (REPLAY)
+    next_action: A01 assigns first evidence-map item; owners locate real config/log/metric and move state DECLARED -> VERIFIED/MISSING/INVALID
+  - id: OI-R002-REPLAY-EVAL
+    item: R002 three-domain run cards + independent comparison + A01 decision-trace
+    owner: A04 (cards), A05 (comparison), A06 (cherry-pick challenge), A01 (decision-trace)
+    next_state: R002-main-domain-replay then R002-main-domain-evaluation
+    next_action: reconstruct G+C/Dancing/Object 4000-step run cards preserving negative/foot-skate evidence
+  - id: OI-R003-ABLATION
+    item: R003 four ablation run cards (Dancing/Object x 2000/3000-step) + candidate review
+    owner: A03 (design), A04 (cards), A05 (verify), A06 (review)
+    next_state: R003-ablation-replay then R003-candidate-review
+    next_action: verify each comparison changes only training duration; keep candidate provisional
+  - id: OI-R004-HOLDOUT-LIVE
+    item: Register baseline + candidate SEED full-test holdout evidence as LIVE
+    owner: A04
+    next_state: R004-holdout-live (LIVE)
+    next_action: confirm holdout run completed; register Content 3510 / Repetition 3428 counts, commands, env, logs, artifacts WITHOUT success interpretation
+    blocker: holdout was still running at snapshot time; completion must be confirmed
+  - id: OI-R004-INDEPENDENT-CHECKS
+    item: A05 independent gate-table recomputation; A06 cold-start reproduction without A04 private transcript
+    owner: A05, A06
+    next_state: R004-independent-checks (LIVE)
+    next_action: compute frozen gate table from primary evidence; A06 cold-starts from shared records only
+  - id: OI-HUMAN-GATE-2
+    item: Final scientific decision (ADOPT/REJECT/REVISE/REPRODUCE/STOP)
+    owner: human-gate-2
+    next_state: G02-final-human-gate
+    next_action: human inspects primary artifacts + AI recommendations; AI cannot approve
+  - id: OI-BLINDING-ATTESTATION
+    item: Result-visibility blinding attestation MISSING
+    owner: project-owner (human)
+    next_state: record attestation OR keep Gate 1 classified as retrospective policy
+    next_action: project owner records a truthful blinding attestation or explicitly accepts retrospective classification
+  - id: OI-AUDIT-SESSION
+    item: kscc session not registered in audit/session-index.yaml
+    owner: orchestrator / launcher
+    next_state: populate session-index.yaml
+    next_action: record kscc_session_id, model, started_at, token_usage, transcript_sha256 for A01
+  - id: OI-A01-DECISION-TRACE
+    item: outputs/A01/decision-trace.yaml
+    owner: A01
+    next_state: produced in R002-main-domain-evaluation phase (NOT P01)
+    next_action: defer; outside this task's allowed_output_refs

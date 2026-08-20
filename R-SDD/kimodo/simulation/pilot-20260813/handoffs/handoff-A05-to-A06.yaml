@@ -1,0 +1,134 @@
+schema_version: '1.0'
+handoff_id: handoff-A05-to-A06-P01-evaluation-recovery
+run_id: pilot-20260813
+mode: VERIFY
+from_agent: A05
+to_agent: A06
+research_id: R004
+experiment_id: null
+owner: A05
+task_id: P01-A05-evaluation-recovery
+
+input_refs:
+  - kimodo/research/R002/protocol.yaml
+  - kimodo/research/R003/protocol.yaml
+  - kimodo/research/R004/protocol.yaml
+  - kimodo/source/phase1_ai_native_project_brain_20260813.md
+  - kimodo/simulation/pilot-20260813/decisions/human-gate-1.yaml
+  - kimodo/simulation/pilot-20260813/decisions/human-gate-2.yaml
+  - kimodo/simulation/pilot-20260813/evidence-map.yaml
+  - kimodo/simulation/pilot-20260813/workflow.yaml
+  - kimodo/simulation/pilot-20260813/tasks/P01-A05.yaml
+  - kimodo/simulation/pilot-20260813/agents/A05.yaml
+  - kimodo/.specify/rsdd/protocols/R004/1f911559b69c5a7d3b68cf269c746c76ad1384f96a23963d533560eb83e8f0e5.yaml
+
+output_refs:
+  - kimodo/simulation/pilot-20260813/outputs/A05/benchmark-integrity-review.yaml
+  - kimodo/simulation/pilot-20260813/outputs/A05/unresolved-evaluation-contract.yaml
+
+verified_actions:
+  - mode: VERIFY
+    action: 'Read frozen R004 protocol and confirmed status FROZEN, freeze.sha256 1f9115..e8f0e5, frozen_at 2026-08-13T08:21:58Z by hf.'
+    evidence: kimodo/research/R004/protocol.yaml
+  - mode: VERIFY
+    action: 'Read Human Gate 1 and confirmed status APPROVED, decision APPROVE_READY, protocol_sha256 matches R004 freeze digest.'
+    evidence: kimodo/simulation/pilot-20260813/decisions/human-gate-1.yaml
+  - mode: VERIFY
+    action: 'Read frozen snapshot and confirmed content byte-for-byte identical to live research/R004/protocol.yaml.'
+    evidence: kimodo/.specify/rsdd/protocols/R004/1f911559b69c5a7d3b68cf269c746c76ad1384f96a23963d533560eb83e8f0e5.yaml
+  - mode: VERIFY
+    action: 'Traced every threshold field-by-field between Gate1 and frozen R004 (target_success, non_regression, statistical_rule, foot_skate, aggregation, metric_priority); no mismatch found.'
+    evidence: outputs/A05/benchmark-integrity-review.yaml#threshold_trace
+  - mode: VERIFY
+    action: 'Verified holdout count contract Content 3510 / Repetition 3428 / total 6938 (3510+3428=6938); confirmed consistent across R004, evidence-map, workflow, source brain, R004 research.yaml; grep found no contradicting count.'
+    evidence: outputs/A05/benchmark-integrity-review.yaml#benchmark_integrity.holdout_count_contract
+  - mode: VERIFY
+    action: 'Separated meanings of Content, Repetition, target, holdout, and foot-skate; flagged that target-domain (Object) benchmark is not pinned in R004.inputs while final_adopt_rule requires target_*_PASS.'
+    evidence: outputs/A05/benchmark-integrity-review.yaml#meaning_separation
+  - mode: VERIFY
+    action: 'Confirmed early constraint/no-postprocess small suite is not treated as full holdout evidence (source brain section 5; grep).'
+    evidence: outputs/A05/benchmark-integrity-review.yaml#benchmark_integrity.early_constraint_suite_separation
+  - mode: VERIFY
+    action: 'Confirmed Human Gate 2 is PENDING and not modified by A05.'
+    evidence: kimodo/simulation/pilot-20260813/decisions/human-gate-2.yaml
+  - mode: VERIFY
+    action: 'Confirmed A04 holdout-run-card is MISSING (outputs/R004/ absent) and benchmark construction code (work/) is absent from this worktree (DECLARED only).'
+    evidence: outputs/A05/unresolved-evaluation-contract.yaml#items UNRES-02, UNRES-03
+  - mode: VERIFY
+    action: 'Confirmed result_visibility_at_approval = NOT_ATTESTED (retrospective acceptance policy); thresholds not described as preregistered.'
+    evidence: kimodo/simulation/pilot-20260813/decisions/human-gate-1.yaml#approval_context
+  - mode: VERIFY
+    action: 'Confirmed no candidate metrics exist; A05 performed no candidate-success interpretation.'
+    evidence: outputs/A05/benchmark-integrity-review.yaml#benchmark_integrity.candidate_success_interpretation
+
+gate_result: PARTIAL
+gate_result_summary: >
+  Frozen THRESHOLD contract and frozen holdout COUNT contract VERIFIED and
+  internally consistent with zero threshold mismatches between Gate1 and the
+  frozen R004 digest. Construction-level and run-level benchmark evidence are
+  MISSING; the Object target-domain benchmark is under-specified in R004.inputs;
+  an independent sha256 recompute was not executed. independent-comparison.yaml
+  and gate-table.yaml are BLOCKED on MISSING A04 raw evidence and deferred to
+  the R004 LIVE phase. No candidate success was interpreted.
+
+open_risks:
+  - id: RISK-01
+    severity: high
+    statement: 'Target-domain (Object) benchmark not pinned in R004.inputs; target_*_PASS could be evaluated against an unfrozen benchmark.'
+    owner: A01
+    blocks: [target_Content_PASS, target_Repetition_PASS]
+  - id: RISK-02
+    severity: high
+    statement: 'A04 holdout-run-card MISSING; independent gate-table recomputation blocked until raw evidence is registered.'
+    owner: A04
+    blocks: [independent-gate-table, A06-cold-start]
+  - id: RISK-03
+    severity: medium
+    statement: 'Independent sha256 recompute of frozen snapshot not executed; integrity rests on content identity + three-way string alignment.'
+    owner: A05
+    blocks: []
+  - id: RISK-04
+    severity: medium
+    statement: 'Train/holdout and target train/test leakage not verifiable (manifests absent).'
+    owner: A02
+    blocks: []
+  - id: RISK-05
+    severity: low
+    statement: 'Result visibility NOT_ATTESTED; thresholds are a retrospective acceptance policy unless blinding is later attested.'
+    owner: human-gate-2
+    blocks: []
+
+next_owner: A06
+next_state: R004-independent-checks (LIVE) cold-start review
+next_action: >
+  A06 performs a cold-start review WITHOUT A04 private transcript: (1) confirm
+  the frozen threshold/holdout-count contract in benchmark-integrity-review.yaml;
+  (2) attempt a low-cost reproduction or metric recomputation of the holdout
+  once A04 registers outputs/R004/holdout-run-card.yaml; (3) weigh UNRES-01
+  (target benchmark pin) and UNRES-07 (retrospective acceptance) in the Review
+  Proposal; (4) do NOT treat any early constraint-suite or domain-suite result
+  as holdout evidence; (5) submit outputs/R004/cold-start-review.yaml and a
+  Review Proposal to Human Gate 2.
+
+commit_sha: cd67942
+commit_sha_note: 'session-start HEAD from gitStatus; worktree clean at start; no new commit by A05; outputs are uncommitted working-tree files'
+
+kscc_session_id: MISSING
+kscc_session_id_note: 'audit/session-index.yaml status NOT_STARTED, sessions: []; session id not yet registered'
+
+model: glm-5.2
+
+prompt_version: MISSING
+prompt_basis:
+  - kimodo/simulation/pilot-20260813/agents/A05.yaml
+  - kimodo/simulation/pilot-20260813/tasks/P01-A05.yaml
+
+timestamp: '2026-08-13'
+timestamp_precision: date_only
+timestamp_note: 'Bash/shell clock unavailable in this VERIFY worktree; wall-clock time not independently observed. Date from session context. Gate1 approved 2026-08-13T08:20:17Z; R004 frozen 2026-08-13T08:21:58Z; this handoff is later the same day.'
+
+attestation:
+  historical_work_not_misrepresented: true
+  historical_work_not_misrepresented_note: 'Historical Phase 1 work (training/eval runs) was reconstructed from real artifacts (protocol.yaml, evidence-map, source brain) and is NOT represented as original six-agent execution. This P01 task is a VERIFY recovery, not the historical live run.'
+  secrets_removed: true
+  secrets_removed_note: 'No credentials or private data recorded; only paths, hashes, counts, and thresholds. Remote root paths are already public in Gate1 resource_and_data_boundary.'

@@ -1,0 +1,281 @@
+schema_version: '1.0'
+task_id: P01-A06-cold-start-red-team
+run_id: pilot-20260813
+agent_id: A06
+research_id: R004
+experiment_id: null
+mode: VERIFY
+produced_at: '2026-08-13T08:30:00Z'  # approximate; exact wall-clock unavailable (Bash disabled in this context)
+recovery_basis: Shared primary R-SDD records only. No A04 private execution transcript or chat was read.
+
+# ---------------------------------------------------------------------------
+# Cold-start cognition recovery test.
+# Question: Can the R004 state, frozen digest, claim limits, and next valid
+# transition be recovered from shared records WITHOUT A04 private conversation?
+# Answer: YES (PASS). All four acceptance-criterion items recovered below.
+# ---------------------------------------------------------------------------
+
+recovered_state:
+  source_files_read:
+  - kimodo/BRAIN.md
+  - kimodo/registry.json
+  - kimodo/research/R004/research.yaml
+  - kimodo/research/R004/protocol.yaml
+  - kimodo/simulation/pilot-20260813/decisions/human-gate-1.yaml
+  - kimodo/simulation/pilot-20260813/decisions/human-gate-2.yaml
+  - kimodo/simulation/pilot-20260813/evidence-map.yaml
+  - kimodo/simulation/pilot-20260813/workflow.yaml
+  - kimodo/simulation/pilot-20260813/manifest.yaml
+  - kimodo/simulation/pilot-20260813/audit/session-index.yaml
+  - kimodo/source/phase1_ai_native_project_brain_20260813.md
+  - kimodo/simulation/pilot-20260813/agents/A04.yaml   # agent PROFILE only, not a private transcript
+  r004:
+    status: READY
+    owner: A01
+    profile: kimodo-posttraining
+    decision: null
+    updated_at: '2026-08-13T08:21:58+00:00'
+    question: >-
+      Does abl_object_lr1e7_s3000_20260811 improve the Object target domain while
+      satisfying the SEED full-test non-regression contract and acceptable
+      foot-skate risk?
+    hypothesis: >-
+      The Object 3000-step checkpoint improves the target domain without
+      exceeding Human Gate 1-approved general-capability and foot-skate tolerances.
+    provenance:
+      mode: MIXED
+      historical_work_completed_before_rsdd: true
+      live_work:
+      - holdout result verification and closure
+      - A06 cold-start reproduction
+      - two human decisions
+    registry_cross_check: 'registry.json R004 == {status: READY, owner: A01, decision: null, updated_at: 2026-08-13T08:21:58+00:00}'
+    brain_cross_check: 'BRAIN.md R004 row == READY / owner A01; BRAIN "Latest Decisions" == "No reviewed decisions yet."'
+
+frozen_digest:
+  protocol_sha256: 1f911559b69c5a7d3b68cf269c746c76ad1384f96a23963d533560eb83e8f0e5
+  declared_in:
+  - kimodo/research/R004/protocol.yaml (freeze.sha256)
+  - kimodo/simulation/pilot-20260813/decisions/human-gate-1.yaml (protocol_sha256)
+  - kimodo/simulation/pilot-20260813/workflow.yaml (G01 phase protocol_sha256)
+  snapshot_file: kimodo/.specify/rsdd/protocols/R004/1f911559b69c5a7d3b68cf269c746c76ad1384f96a23963d533560eb83e8f0e5.yaml
+  frozen_at: '2026-08-13T08:21:58+00:00'
+  reviewer: hf
+  content_identity_check: >-
+    The active kimodo/research/R004/protocol.yaml was read in full and is
+    content-identical to the snapshot file named by sha256 1f911559... (also read
+    in full). Independent sha256 recomputation was NOT performed because Bash is
+    disabled in this verification context; content identity is established by
+    reading both files. See open_risk DR-1.
+
+claim_limits:
+  integrity_rule: >-
+    Final acceptance can cite only artifacts checked under the frozen R004
+    Protocol. (research/R004/research.yaml provenance.integrity_rule)
+  final_adopt_rule_all_required:
+  - target_Content_PASS
+  - target_Repetition_PASS
+  - holdout_Content_PASS
+  - holdout_Repetition_PASS
+  - foot_skate_PASS
+  - A06_independent_reproduction_VALID
+  - human_gate_2_APPROVED
+  comparison_protocol:
+    pairing: same_cases_same_prompts_same_seeds
+    generation_batch_size: 1
+    postprocess: false
+    text_encoder_precision: fp32
+    effect_direction: positive_is_candidate_better
+    bootstrap: {paired: true, iterations: 2000, confidence: one_sided_95_percent}
+    pass_condition: lower_confidence_bound_greater_than_or_equal_to_negative_margin
+  scope_out:
+  - Phase 2 private game-motion data
+  - business prioritization of future action categories
+  - unapproved long-running follow-up ablations
+  anti_inflation_limits:
+  - REPLAY must not be presented as original six-agent execution.
+  - Agent count, command count, document count, and token spend are not scored as outcomes.
+  - AI summary / filename does not imply candidate success.
+
+next_valid_transition:
+  current_executed_phase: "G01-ready-human-gate (gate_status: APPROVED; protocol frozen)"
+  immediate_phase_context: P01-cognition-recovery (this task; mode VERIFY)
+  p01_exit_gate_expected: independent-recovery-findings-handed-to-A03-and-A06
+  task_envelope_handoff_to: A01
+  chain:
+  - id: R004-holdout-live
+    mode: LIVE
+    owner: A04
+    action: collect or complete baseline + candidate SEED full-test evaluation; register Content 3510 and Repetition 3428 counts; register commands, environment, logs, metrics, artifacts, deviations
+    output: kimodo/simulation/pilot-20260813/outputs/R004/holdout-run-card.yaml
+    handoff_to: A05
+    exit_gate: raw-holdout-evidence-registered-without-success-interpretation
+    status: NOT_STARTED (output file does not exist)
+  - id: R004-independent-checks
+    mode: LIVE
+    owners: [A05, A06]
+    parallel: true
+    actions:
+    - A05 independently recomputes the frozen gate table
+    - A06 cold-starts without A04 private transcript and reproduces a low-cost check
+    outputs:
+    - kimodo/simulation/pilot-20260813/outputs/R004/independent-gate-table.yaml
+    - kimodo/simulation/pilot-20260813/outputs/R004/cold-start-review.yaml
+    exit_gate: independent-evidence-review-proposal
+    status: NOT_STARTED (output files do not exist)
+  - id: G02-final-human-gate
+    mode: LIVE
+    owner: human-gate-2
+    action: inspect primary artifacts and AI recommendations; record ADOPT/REJECT/REVISE/REPRODUCE/STOP
+    output: kimodo/simulation/pilot-20260813/decisions/human-gate-2.yaml
+    status: "PENDING (decision: null, validity: null, evidence_assessment: null)"
+  - id: P99-sync-and-assess
+    mode: LIVE
+    owners: [A01, orchestrator]
+    status: NOT_STARTED
+
+# ---------------------------------------------------------------------------
+# Retrospective-policy status — PRESERVED, not resolved.
+# ---------------------------------------------------------------------------
+retrospective_policy_status:
+  preserved: true
+  human_gate_1:
+    status: APPROVED
+    reviewer: hf
+    reviewed_at: '2026-08-13T08:20:17Z'
+    result_visibility_at_approval: NOT_ATTESTED
+    policy_classification: RETROSPECTIVE_ACCEPTANCE_POLICY_UNLESS_BLINDING_ATTESTED
+    approver_statement: >-
+      The approver is uncertain whether the final holdout result was visible
+      before threshold approval.
+    note: >-
+      The thresholds may not be described as preregistered because result
+      blinding is not attested.
+    decision: APPROVE_READY
+  blinding_attestation_present: false   # no separate blinding attestation exists in shared records
+  implication: >-
+    The frozen numerical contract is valid as a RETROSPECTIVE acceptance
+    policy. It must NOT be represented as a preregistration. Human Gate 2 must
+    explicitly weigh this when recording the final decision.
+  reflected_in:
+  - decisions/human-gate-1.yaml (approval_context)
+  - research/R004/research.yaml (protocol_amendments reason + risks)
+  - research/R004/protocol.yaml (risks)
+  - README.md (start-here step 3)
+
+# ---------------------------------------------------------------------------
+# Missing evidence — PRESERVED as MISSING, not inferred.
+# ---------------------------------------------------------------------------
+missing_evidence:
+- item: Live holdout run seed_text_test_full_eval_20260813
+  evidence_map_state: DECLARED
+  historical_observation: Evaluation was still running when the source snapshot was supplied.
+  remote_ref: /home/share/user/zyc/kimodo/eval_work/seed_text_test_full_eval_20260813
+  reachable_from_worktree: false   # no remote compute; Bash/network unavailable in this context
+  expected_counts: {content: 3510, repetition: 3428, total: 6938}
+  status: MISSING as independently-verified evidence
+  blocks: holdout-run-card.yaml, independent-gate-table.yaml, any adoption claim
+- item: Holdout run card
+  path: kimodo/simulation/pilot-20260813/outputs/R004/holdout-run-card.yaml
+  status: NOT_CREATED (R004-holdout-live not executed)
+- item: Independent gate table
+  path: kimodo/simulation/pilot-20260813/outputs/R004/independent-gate-table.yaml
+  status: NOT_CREATED (R004-independent-checks not executed)
+- item: Cold-start review (R004-phase)
+  path: kimodo/simulation/pilot-20260813/outputs/R004/cold-start-review.yaml
+  status: NOT_CREATED (distinct from this P01 cold-start-cognition.yaml)
+- item: Human Gate 2 final decision
+  path: kimodo/simulation/pilot-20260813/decisions/human-gate-2.yaml
+  status: "PENDING (decision: null)"
+- item: All SCRIPT-* assets (build_seed_text_test_benchmark.py, run_seed_full_text_holdout_eval.sh, build_training_subset_manifest.py, build_domain_text_benchmark.py, run_category_domain_finetune.sh, run_domain_text_eval.sh, summarize_domain_text_ablation.py, generate_phase1_current_summary.py)
+  evidence_map_state: DECLARED
+  status: >-
+    Referenced by the source summary but not independently checked by this
+    pilot. The work/codex_pipeline/ tree is NOT present in this worktree (only
+    kimodo/ is), so script contents are not verifiable here.
+- item: Audit session index
+  path: kimodo/simulation/pilot-20260813/audit/session-index.yaml
+  status: "NOT_STARTED (sessions: [])"
+  impact: >-
+    Required per-agent audit fields (kscc_session_id, model, token_usage, cost,
+    commit_sha, transcript_sha256) are unrecorded. Expected at P01 stage; must be
+    populated before P99 assessment.
+- item: reports/R004.md
+  status: NOT_CREATED
+
+# ---------------------------------------------------------------------------
+# Low-cost reproduction — performed independently, no remote compute.
+# Two checks, both from shared records only.
+# ---------------------------------------------------------------------------
+low_cost_reproduction:
+  constraint_honored: no remote compute; no A04 private transcript; VERIFY mode only
+  check_1_frozen_contract_stability:
+    name: Pre/post Human-Gate-1 amendment numerical-stability check
+    type: VERIFY
+    method: >-
+      Read in full both frozen R004 protocol snapshots and compared them
+      field-by-field.
+    pre_amendment:
+      file: kimodo/.specify/rsdd/protocols/R004/37bbff58a5f60d38ffd8a3a1d0c47b54e42c9d9c81e9a707b7b6a187ed68ce1a.yaml
+      frozen_at: '2026-08-13T08:10:14+00:00'
+      reviewer: project-owner
+      sha256: 37bbff58a5f60d38ffd8a3a1d0c47b54e42c9d9c81e9a707b7b6a187ed68ce1a
+    post_amendment:
+      file: kimodo/.specify/rsdd/protocols/R004/1f911559b69c5a7d3b68cf269c746c76ad1384f96a23963d533560eb83e8f0e5.yaml
+      frozen_at: '2026-08-13T08:21:58+00:00'
+      reviewer: hf
+      sha256: 1f911559b69c5a7d3b68cf269c746c76ad1384f96a23963d533560eb83e8f0e5
+    fields_that_changed:
+    - updated_at (08:10:14 -> 08:21:58)
+    - ready_review.reviewer (project-owner -> hf)
+    - ready_review.approved_at (08:10:14 -> 08:21:58)
+    - freeze.frozen_at (08:10:14 -> 08:21:58)
+    - freeze.reviewer (project-owner -> hf)
+    - freeze.sha256 + freeze.snapshot path
+    - third risks bullet (generic blinding caveat -> explicit hf NOT_ATTESTED retrospective-policy statement)
+    fields_that_did_NOT_change:
+    - comparison_protocol (all fields)
+    - target_success (required_splits, minimum_improved_primary_metrics_per_split=2, all three thresholds, one_required_metric, foot_skate_gate_must_pass)
+    - non_regression (all five tolerances)
+    - foot_skate (all tolerances + qualitative_review block)
+    - aggregation (content_and_repetition_must_pass_separately=true, cross_split_compensation=false, macro_average_can_determine_pass=false, missing_or_invalid_metric=INCONCLUSIVE)
+    - metric_priority (hard + diagnostic lists)
+    - final_adopt_rule (all seven required items)
+    result: PASS
+    interpretation: >-
+      The post-gate amendment strengthened provenance specificity (named hf,
+      explicit NOT_ATTESTED) and did NOT weaken or alter any numerical
+      evaluation rule. The frozen contract numbers were not changed after
+      Human Gate 1. Validity-positive.
+  check_2_holdout_count_arithmetic:
+    name: Declared holdout split-count arithmetic
+    type: VERIFY
+    method: >-
+      Recomputed content + repetition and compared to the declared total across
+      two independent shared records.
+    inputs:
+    - "evidence-map.yaml run seed_text_test_full_eval_20260813 expected_counts {content: 3510, repetition: 3428, total: 6938}"
+    - "source snapshot section 9 {Content 3510, Repetition 3428, Total 6938}"
+    recompute: '3510 + 3428 = 6938'
+    declared_total: 6938
+    result: PASS (6938 == 6938)
+    interpretation: >-
+      The declared split counts are internally consistent across evidence-map
+      and the source snapshot. This does NOT verify the actual remote holdout
+      produced those counts (the run is DECLARED / MISSING) — only that the
+      declared numbers are arithmetically consistent.
+  not_performed_honestly:
+  - Independent sha256 recomputation of the active protocol.yaml against 1f911559... (Bash disabled; content-identity established by reading both files instead — see open_risk DR-1).
+  - Full frozen gate-table recomputation from real holdout metrics (requires remote artifacts that are MISSING; this is A05's R004-independent-checks job, not yet executable).
+  - Actual holdout metric reproduction (remote compute forbidden by task; live evidence MISSING).
+
+recovery_test_verdict:
+  cold_start_recovery: PASS
+  rationale: >-
+    All four acceptance-criterion items (R004 state, frozen digest, claim
+    limits, next valid transition) were recovered from shared primary records
+    with no A04 private execution chat. Retrospective-policy status and missing
+    evidence are explicitly preserved. Two low-cost independent checks pass.
+    The pilot is cognitively recoverable and structurally ready to enter staged
+    execution of the R004 LIVE phases, but is NOT ready to ADOPT the candidate
+    (live holdout evidence MISSING; final decision PENDING at Human Gate 2).
