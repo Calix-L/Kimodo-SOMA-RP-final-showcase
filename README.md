@@ -13,6 +13,7 @@
 - [`Kimodo-SOMA-RP-report.pdf`](./Kimodo-SOMA-RP-report.pdf)：48 页最终版 PDF 报告。
 - [`source-report.md`](./source-report.md)：Markdown 报告原文。
 - [`assets/final`](./assets/final)：实验图片、动图与 Blender 插件演示视频。
+- [`inference`](./inference)：可复现的 Kimodo 批量推理、overview 整理、结果校验及 TMR、物理质量、RTE/BPE 评测链路。
 
 ## 本地查看
 
