@@ -1,0 +1,1316 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh-CN" xml:lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Kimodo-SOMA-RP 后训练探索｜完整报告</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <link rel="stylesheet" href="report.css" />
+  <meta name="description" content="Kimodo-SOMA-RP 游戏动作后训练探索最终完整报告">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23191a23'/%3E%3Cpath d='M13 15h10v34H13zm14 0h10l14 17-14 17H27l14-17z' fill='%23c6f36b'/%3E%3C/svg%3E">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Kimodo-SOMA-RP 后训练探索｜完整报告</h1>
+</header>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#从开源方法验证到游戏动作域适配" id="toc-从开源方法验证到游戏动作域适配">从开源方法验证到游戏动作域适配</a></li>
+<li><a href="#一项目背景与业务需求" id="toc-一项目背景与业务需求">一、项目背景与业务需求</a></li>
+<li><a href="#二phase-1基于开源数据验证后训练方法" id="toc-二phase-1基于开源数据验证后训练方法">二、Phase 1：基于开源数据验证后训练方法</a></li>
+<li><a href="#三phase-2游戏动作数据转换与初步训练" id="toc-三phase-2游戏动作数据转换与初步训练">三、Phase 2：游戏动作数据转换与初步训练</a></li>
+<li><a href="#四structured-motion-loss-与两阶段训练探索" id="toc-四structured-motion-loss-与两阶段训练探索">四、Structured Motion Loss 与两阶段训练探索</a></li>
+<li><a href="#五关键转折从-ai-自动-prompt-转向人工-gold-数据" id="toc-五关键转折从-ai-自动-prompt-转向人工-gold-数据">五、关键转折：从 AI 自动 Prompt 转向人工 Gold 数据</a></li>
+<li><a href="#六三种训练策略及可视化结果" id="toc-六三种训练策略及可视化结果">六、三种训练策略及可视化结果</a></li>
+<li><a href="#七三维量化评测体系" id="toc-七三维量化评测体系">七、三维量化评测体系</a></li>
+<li><a href="#八blender-插件与工程演示" id="toc-八blender-插件与工程演示">八、Blender 插件与工程演示</a></li>
+<li><a href="#九最终结论" id="toc-九最终结论">九、最终结论</a></li>
+<li><a href="#附录一ai-native-实践与团队协作" id="toc-附录一ai-native-实践与团队协作">附录一：AI Native 实践与团队协作</a></li>
+<li><a href="#附录二核心交付物与复现情况" id="toc-附录二核心交付物与复现情况">附录二：核心交付物与复现情况</a></li>
+<li><a href="#附录三安全版权与可维护性" id="toc-附录三安全版权与可维护性">附录三：安全、版权与可维护性</a></li>
+</ul>
+</nav>
+<h2 id="从开源方法验证到游戏动作域适配">从开源方法验证到游戏动作域适配</h2>
+<p>本项目围绕 NVIDIA 开源的 Kimodo-SOMA-RP-v1.1 展开，目标是在原始商业训练数据和官方后训练代码均未开放的条件下，自主探索一套可复现的后训练方法，使模型更擅长生成游戏场景中的攻击、跳跃、浮空、击倒等动作，同时尽可能保留模型原有的通用动作生成能力。</p>
+<p>整个项目分为两个阶段。Phase 1 使用开源 SEED 数据的细分子集，重点验证 Kimodo 后训练链路是否可行，并分析学习率、训练步数和动作子集对微调效果的影响。Phase 2 将方法迁移到游戏动作数据，完成原始数据转换、自动 Prompt 生成、失败实验分析、人工标注平台建设、高质量 Gold 数据训练、自定义评测体系以及 Blender 插件原型。</p>
+<p>项目最终完成了从数据制备、Prompt 标注、模型训练、Checkpoint 推理到定量评测和 Blender 可视化的完整原型闭环，也获得了一个明确的阶段性结论：<strong>高质量游戏动作数据能够使 Kimodo 学会目标领域动作，但当前基于小规模 Gold 数据的全参数微调会造成明显的原始能力下降。因此，“模型能不能学会游戏动作”已经得到验证，而“如何在增强游戏动作能力的同时保持通用能力”仍是下一阶段需要重点解决的问题。</strong></p>
+<hr />
+<h2 id="一项目背景与业务需求">一、项目背景与业务需求</h2>
+<ol type="1">
+<li><h3 id="服务对象与具体场景">服务对象与具体场景</h3>
+<p>本项目主要服务于游戏动作制作人员和动作生成算法研发人员。</p>
+<p>在传统游戏动作生产过程中，一个动作通常需要经过需求设计、动作采集或关键帧制作、骨架绑定、动作清理和引擎验证等多个环节。对于攻击、受击、跳跃、浮空、倒地等高频动作，如果能够通过文本快速生成动作原型，就可以降低动作方案试错成本，并帮助动作设计人员更快完成前期创意验证。</p>
+<p>例如，当用户输入：</p>
+<blockquote>
+<p><strong>角色从自然站姿开始，双膝弯曲并下沉蓄力，随后双脚蹬地向上跃起，身体在空中短暂停留，最后双脚落地并恢复站立。</strong></p>
+</blockquote>
+<p>模型不应只生成一个模糊的抬腿动作，而应正确表达“站立—蓄力—离地—空中停留—落地”的完整时序，以及身体重心和根节点高度的变化。</p>
+<p>Kimodo-SOMA-RP-v1.1 已具备较好的通用文本到动作生成能力，但它主要基于未公开的约 700 小时 Bones-RigPlay 商业光捕数据训练。其开源内容包括模型权重、技术报告和部分推理代码，但没有开放完整的后训练代码和商业训练数据。因此，我们无法直接复用官方训练流程，只能根据开源代码和技术报告自行恢复数据格式、训练目标、微调方法与评测方式。</p>
+<p>游戏动作与一般人体动作还存在明显的领域差异。游戏动作往往具有更大的动作幅度、更明显的根节点位移、更夸张的受击反馈，以及连续三个以上动作阶段的切换。直接使用原始模型时，这些动作表达不足；直接使用游戏数据全参数微调，又可能破坏模型原有的动作生成能力。</p>
+<p>因此，本项目需要回答的核心问题是：</p>
+<blockquote>
+<p><strong>在缺少官方后训练代码的情况下，能否建立一套可复现的 Kimodo 后训练管线，使模型的游戏动作生成能力得到增强，并客观评估这种增强是否以牺牲原始能力为代价？</strong></p>
+</blockquote></li>
+<li><h3 id="项目范围与验收要求">项目范围与验收要求</h3>
+<p>项目开始时，我们将工作划分为两个阶段：</p>
+<table>
+<thead>
+<tr>
+<th><strong>阶段</strong></th>
+<th><strong>主要任务</strong></th>
+<th><strong>验收关注点</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Phase 1</td>
+<td>基于开源 SEED 子集验证训练管线，探索学习率、训练步数和动作子集的影响</td>
+<td>后训练链路可运行、可复现；目标子集效果有真实评测；能够分析对原始能力的影响</td>
+</tr>
+<tr>
+<td>Phase 2</td>
+<td>将训练方法迁移到游戏动作域，完成数据转换、Prompt 标注、模型训练和自定义评测</td>
+<td>模型能够学习游戏动作；结果可量化、可演示；失败原因和适用边界清楚</td>
+</tr>
+<tr>
+<td>工程交付</td>
+<td>整理数据、代码、模型、评测脚本、运行说明和演示工具</td>
+<td>核心链路没有明显缺口，其他成员可以按照说明复现和使用</td>
+</tr>
+</tbody>
+</table>
+<p>项目约定的核心产出包括：</p>
+<ol type="1">
+<li><p>可复现的训练报告和训练管线，包括数据制备脚本、训练代码、超参数、TMR 评测方法和实验结论；</p></li>
+<li><p>制备完成的训练数据集；</p></li>
+<li><p>训练完成的模型权重；</p></li>
+<li><p>能够直观展示生成结果的 Blender 插件原型；</p></li>
+<li><p>对有效方案、失败路线和下一阶段技术方向的明确判断。</p>
+<p>本项目是探索型课题。验收标准不是要求所有实验都必须得到正向结果，而是要求过程可复现、结论有证据，并能够帮助后续业务判断哪些路线值得继续、哪些路线不应再盲目投入。</p>
+<hr /></li>
+</ol></li>
+</ol>
+<h2 id="二phase-1基于开源数据验证后训练方法">二、Phase 1：基于开源数据验证后训练方法</h2>
+<ol type="1">
+<li><h3 id="phase-1-的目的">Phase 1 的目的</h3>
+<p>在使用内部游戏动作数据前，我们首先使用开源数据进行方法验证，这一安排是为了将风险前置。</p>
+<p>如果直接使用游戏数据训练，一旦结果不理想，很难判断问题来自数据转换、骨架映射、Prompt 标签、训练实现还是模型本身。Phase 1 使用已知格式的开源数据，主要验证三个问题：</p>
+<ol type="1">
+<li><p>Kimodo-SOMA-RP-v1.1 的开源权重能否继续训练；</p></li>
+<li><p>不同学习率和训练步数是否会带来可观测的能力变化；</p></li>
+<li><p>目标子集能力变化时，SEED 整体语义能力和动作物理质量是否保持。</p>
+<p>这一阶段我们打通了完整链路：</p>
+<blockquote>
+<p>开源动作数据 → Kimodo 特征制备 → Feature Cache → Domain Finetune → Checkpoint → Text-to-Motion 推理 → TMR 与动作质量评测</p>
+</blockquote>
+<p>在数据选择上，我们分别探索了 Dancing、Object Manipulation、G+C 等细分动作子集，并测试不同学习率与训练步数的组合。</p></li>
+</ol></li>
+<li><h3 id="学习率与训练步数实验">学习率与训练步数实验</h3>
+<p>Phase 1 证明了开源权重可以作为领域后训练的起点，但不同配置下的效果并不稳定，也不是训练步数越多越好。</p>
+<p>以学习率 <code>1e-7</code>、训练 <code>3,000 steps</code> 的一组代表性 repetition 结果为例：</p>
+<p><img src="assets/final/phase1-content.gif" alt="Phase 1 Content：Ground Truth、原始模型与微调模型" /></p>
+<p><img src="assets/final/phase1-repetition.gif" alt="Phase 1 Repetition：Ground Truth、原始模型与微调模型" /></p>
+<table>
+<thead>
+<tr>
+<th><strong>指标</strong></th>
+<th><strong>原始模型</strong></th>
+<th><strong>微调模型</strong></th>
+<th><strong>变化</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>T2M R@1</td>
+<td>78.720%</td>
+<td>79.150%</td>
+<td><strong>+0.430</strong></td>
+</tr>
+<tr>
+<td>T2M R@2</td>
+<td>80.430%</td>
+<td>85.530%</td>
+<td><strong>+5.100</strong></td>
+</tr>
+<tr>
+<td>T2M R@3</td>
+<td>90.210%</td>
+<td>91.910%</td>
+<td><strong>+1.700</strong></td>
+</tr>
+<tr>
+<td>T2M R@5</td>
+<td>93.190%</td>
+<td>96.600%</td>
+<td><strong>+3.410</strong></td>
+</tr>
+<tr>
+<td>Foot Skate Ratio</td>
+<td>0.036120</td>
+<td>0.042050</td>
+<td>-0.00593</td>
+</tr>
+<tr>
+<td>Height</td>
+<td>0.077078</td>
+<td>0.086261</td>
+<td>-0.005532</td>
+</tr>
+</tbody>
+</table>
+<p>从语义检索指标看，R@1 至 R@5 多数得到提升，其中 R@2 提升了 5.1 个百分点。这说明小学习率微调确实能够改变模型对目标动作子集的建模能力。</p>
+<p>但是，如果只展示语义指标，会得到过于乐观的结论。与此同时，Foot Skate Ratio 从 0.036120 上升至 0.042050，Height 也发生偏移，表明动作足底稳定性和高度分布出现了副作用。</p>
+<p>在 Object Manipulation 的 3,000-step 保持评估中，R@1 仅提高 0.120 个百分点，R@2 下降 0.700 个百分点，FID Gen-GT 增加 0.000222，Foot Skate Ratio 增加 0.011467。不同子集和不同 repetition 的结果也存在波动，Dancing、G+C 等子集上的收益不够稳定。</p></li>
+<li><h3 id="phase-1-的阶段结论">Phase 1 的阶段结论</h3>
+<p>Phase 1 得到了四点关键认识。</p>
+<p>第一，<strong>Kimodo 后训练在工程上是可行的。</strong> 我们成功完成数据制备、特征缓存、模型训练、Checkpoint 加载和评测，证明开源权重可以作为后续领域微调的基础。</p>
+<p>第二，<strong>Object Manipulation 是现有子集中更接近目标领域增强预期的验证对象，但其收益仍然有限。</strong> 因此不能只根据一次目标子集实验就宣称模型整体能力得到提升。</p>
+<p>第三，<strong>语义匹配指标与动作物理质量可能出现相反变化。</strong> R@K 提升并不意味着 foot-skate、根节点高度或动作自然度一定改善。模型选择必须联合语义、动作质量和保持指标，不能只看训练 loss 或某一个 TMR 指标。</p>
+<p>第四，<strong>学习率、训练步数和数据子集之间存在耦合。</strong> 增加 steps 并不保证持续改善，超参数不能从单次实验中直接确定。</p>
+<p>因此，Phase 1 的准确结论不是“已经实现目标能力提升且整体能力不掉”，而是：<strong>后训练链路已经得到验证，小学习率对部分目标能力有效，但整体能力保持需要通过 SEED 全集和动作质量指标单独评估。</strong></p>
+<p>这些结论直接影响了 Phase 2 的设计：在游戏动作域中，除了训练 loss 和文本匹配，还必须增加动作位移、关键身体部位、未见 Prompt 泛化和 SEED 原始能力保持评测。</p>
+<hr /></li>
+</ol>
+<h2 id="三phase-2游戏动作数据转换与初步训练">三、Phase 2：游戏动作数据转换与初步训练</h2>
+<ol type="1">
+<li><h3 id="游戏动作数据处理流程">游戏动作数据处理流程</h3>
+<p>Phase 2 的第一项工作不是训练模型，而是将游戏动画资产转换为 Kimodo 可以读取和训练的数据。</p>
+<p>原始数据处理过程如下：</p>
+<blockquote>
+<p>21,529 条原始动作 → 约 9,000 条单人动作 → 7,951 条 keep_human 样本 → 骨架重定向与中性手腕修复 → 统一为 30 fps → 提取 90×369 Kimodo 特征 → 划分训练集和验证集</p>
+</blockquote>
+<p>最终，7,951 条初筛样本被划分为 6,532 条训练数据和 1,419 条验证数据。</p>
+<p>这一过程需要解决以下问题：</p>
+<ul>
+<li><p>原始骨架与 SOMA 骨架定义不一致；</p></li>
+<li><p>不同动画的长度、帧率和坐标系不统一；</p></li>
+<li><p>手腕中立姿态和骨架重定向可能引入偏差；</p></li>
+<li><p>多人动作、异常骨架、无效文件和转换失败样本需要过滤；</p></li>
+<li><p>原始动作名称通常不能直接作为准确的文本监督。</p>
+<p>我们最终完成了从原始动画到 Kimodo 每帧 369 维动作特征的转换，并形成可重复执行的数据筛选、骨架重定向、特征提取和划分脚本。这个成果使后续训练失败能够被定位到训练或标签环节，而不需要每次从原始资产重新处理。</p></li>
+</ul></li>
+<li><h3 id="三次训练失败踩坑记录">三次训练失败踩坑记录</h3>
+<p>完成 7,951 条初筛数据转换后，我们<strong>首先</strong>采用 <code>batch=8</code>、<code>3,000 steps</code> 进行小批次训练，希望以较低成本观察模型是否能够快速适应游戏动作域。</p>
+<p><img src="assets/final/phase2-loss.png" alt="7,951 条游戏动作初步训练损失曲线" /></p>
+<p>实验中训练 loss 能够下降，模型权重也可以正常推理，但动作可视化没有达到预期。攻击、跳跃、浮空等目标动作并未得到稳定增强，尤其是需要明显根节点高度变化的动作，模型仍倾向于保持站立姿态。</p>
+<p><strong>随后</strong>，我们按照扩散模型的常见形式进行加噪，并使用 MSE 作为重建目标。该实验在数值上同样能够收敛，但可视化效果仍不理想。</p>
+<p><img src="assets/final/phase2-overfit-loss.png" alt="初步训练过拟合损失曲线" /></p>
+<p><img src="assets/final/phase2-hover-failure.gif" alt="Hover 脚钉地失败案例" /></p>
+<p><img src="assets/final/phase2-jump-failure.gif" alt="Jump 脚钉地失败案例" /></p>
+<p><img src="assets/final/phase2-ordinary-failure.gif" alt="普通动作失败案例" /></p>
+<p>**最后，**不做 normalized 会导致动作的位置、朝向、骨架尺度和各特征数值范围不统一，与 RP 预训练模型的数据分布及扩散噪声尺度不匹配。模型会浪费能力学习这些无关差异，structured loss 各项也会失衡。模型训练效果会有很大差异。</p>
+<p><img src="assets/final/noisy-reconstruction.gif" alt="加噪 MSE 动态重建结果" /></p>
+<p>三次失败实验出现了一个高度一致的现象：</p>
+<blockquote>
+<p>无论如何调整，角色的脚都像“钉在地板上”。即使 Prompt 表达跳跃、浮空或从地面进入空中，模型仍然倾向于保留站立和足底接触先验。</p>
+</blockquote>
+<p>这两个失败让我们认识到：</p>
+<ol type="1">
+<li><p>loss 下降只能说明特征距离在缩小，不能证明模型已经学会离地、浮空和落地；</p></li>
+<li><p>单纯增加训练步数无法自动解决问题；</p></li>
+<li><p>MSE 不一定能够充分表达 Kimodo 动作表征中的结构和时序要求；</p></li>
+<li><p>问题不能继续只从 batch size、学习率或优化器角度排查。</p>
+<p>这些失败并非无效工作。它们阻止我们继续在相同路线中盲目扩大训练规模，并促使我们重新检查原始训练目标和数据监督质量。</p>
+<hr /></li>
+</ol></li>
+</ol>
+<h2 id="四structured-motion-loss-与两阶段训练探索">四、Structured Motion Loss 与两阶段训练探索</h2>
+<p>在简单 MSE 训练没有解决“脚钉地”和强动态动作学习不足的问题后，我们进一步按照 Kimodo 的训练方式，对<strong>原始游戏数据进行全量训练，并将损失函数替换为 Structured Motion Loss</strong>。</p>
+<p>模型以加噪动作<span class="math inline"><em>x</em><sub><em>t</em></sub></span>及文本、初始朝向和运动学约束<span class="math inline"><em>C</em></span>为输入，预测对应的干净动作<span class="math inline"><em>x̂</em><sub>0</sub></span>。其中，约束特征通过掩码直接写入输入动作，使模型在生成自然运动的同时满足指定的姿态或轨迹控制。</p>
+<p>训练总损失为各分量重建损失和前向运动学一致性损失的加权和：</p>
+<p><span class="math inline">$\begin{matrix}L=&amp;{{\lambda }_{1}},\rho ({{\hat{{{r}_{0}^{p}}-r}}_{0}^{p}})+{{\lambda }_{2}},\rho ({{\hat{{{r}_{0}^{a}}-r}}_{0}^{a}})&amp;+{{\lambda }_{3}},\rho ({{\hat{{{j}_{0}^{p}}-j}}_{0}^{p}})+{{\lambda }_{4}},\rho ({{\hat{{{j}_{0}^{v}}-j}}_{0}^{v}})&amp;+{{\lambda }_{5}},\rho ({{\hat{{{j}_{0}^{a}}-j}}_{0}^{a}})+{{\lambda }_{6}},\rho (\hat{{{f}_{0}}-{{f}_{0}}})&amp;+{{\lambda }_{7}},\rho !\left ({FK(\hat{{{j}_{0}^{a}}})-{{j}_{0}^{p}}}\right ).\end{matrix}$</span></p>
+<p>其中<span class="math inline"><em>ρ</em>(⋅)</span>为 Smooth L1（Huber）损失；变长序列训练时，所有逐帧损失仅在有效帧掩码 (M) 内计算：</p>
+<p><span class="math inline">${{\rho }_{M}}(e)=\frac{\sum_{n,t}{{{M}_{n,t}}},\rho ({{e}_{n,t}})}{\sum_{n,t}{{{M}_{n,t}}}+\varepsilon }.$</span></p>
+<p>各项含义如下：</p>
+<ul>
+<li><p><span class="math inline"><em>L</em><sub><em>r</em><em>o</em><em>o</em><em>t</em> − <em>p</em><em>o</em><em>s</em></sub></span>：约束角色整体在场景中的平移轨迹；</p></li>
+<li><p><span class="math inline"><em>L</em><sub><em>r</em><em>o</em><em>o</em><em>t</em> − <em>h</em><em>e</em><em>a</em><em>d</em><em>i</em><em>n</em><em>g</em></sub></span>：约束行进或朝向方向；</p></li>
+<li><p><span class="math inline"><em>L</em><sub><em>j</em><em>o</em><em>i</em><em>n</em><em>t</em> − <em>p</em><em>o</em><em>s</em></sub></span>：保持人体各部位空间姿态；</p></li>
+<li><p><span class="math inline"><em>L</em><sub><em>j</em><em>o</em><em>i</em><em>n</em><em>t</em> − <em>v</em><em>e</em><em>l</em></sub></span>：提升相邻帧之间的时序连续性，缓解抖动；</p></li>
+<li><p><span class="math inline"><em>L</em><sub><em>j</em><em>o</em><em>i</em><em>n</em><em>t</em> − <em>r</em><em>o</em><em>t</em></sub></span>：保证关节旋转姿态正确；</p></li>
+<li><p><span class="math inline"><em>L</em><sub><em>c</em><em>o</em><em>n</em><em>t</em><em>a</em><em>c</em><em>t</em></sub></span>：学习足部接触状态，为后续脚锁定和减少滑步提供依据；</p></li>
+<li><p><span class="math inline"><em>L</em><sub><em>F</em><em>K</em></sub></span>：将预测旋转经正向运动学恢复为关节位置，并与真实位置对齐，保证旋转和骨骼结构的一致性。</p>
+<p>论文中的权重为：</p>
+<p><span class="math inline">(<em>λ</em><sub>1</sub>, <em>λ</em><sub>2</sub>, <em>λ</em><sub>3</sub>, <em>λ</em><sub>4</sub>, <em>λ</em><sub>5</sub>, <em>λ</em><sub>6</sub>, <em>λ</em><sub>7</sub>) = (10, 2, 10, 3, 10, 4, 5).</span></p>
+<p>在此基础上，进一步按照 Kimodo 的训练方式分别完成 Stage 1 和 Stage 2。</p>
+<hr /></li>
+</ul>
+<ol type="1">
+<li><h3 id="stage-1text-to-motion-全量训练">Stage 1：Text-to-Motion 全量训练</h3>
+<p>Stage 1 只使用文本 Prompt 作为条件，根据游戏动作数据训练完整的 Text-to-Motion 生成能力。</p>
+<p>这一阶段主要观察两个问题：</p>
+<ol type="1">
+<li><p>Structured Motion Loss 能否改善前期 Root 位移不足、动作幅度偏小的问题；</p></li>
+<li><p>模型能否根据现有自动生成 Prompt，学到对应的游戏动作。</p>
+<p>训练可以正常收敛，部分动作相比前面的 MSE 实验已经有明显改善，但实际检查生成结果后发现，不同样本之间差异很大。</p>
+<p><img src="assets/final/stage1-loss.png" alt="Structured Motion Loss Stage 1 训练曲线" /></p></li>
+</ol></li>
+</ol>
+<h4 id="prompt-错误示例">Prompt 错误示例</h4>
+<p>部分失败并不是模型完全没有学习，而是训练 Prompt 本身与 Motion 存在明显偏差。例如动作方向、动作顺序、左右肢体或者起止状态描述不准确，导致模型实际接收到的是错误的文本监督。</p>
+<blockquote>
+<p>[💡]<br />
+一个人以平静的待机姿势站立，<strong>左手向下伸展</strong>，上半身保持静止，整体只有极轻微的上下移动，动作节奏几乎处于静止状态。</p>
+</blockquote>
+<p><img src="assets/final/prompt-error.gif" alt="自动 Prompt 与动作错配案例" /></p>
+<hr />
+<h4 id="未充分学习到的示例">未充分学习到的示例</h4>
+<p>另一部分样本中，Prompt 本身基本正确，但模型仍然没有充分学到对应 Motion。</p>
+<p>这一类问题主要出现在：</p>
+<ul>
+<li><p>跳跃；</p></li>
+<li><p>浮空；</p></li>
+<li><p>大幅 Root 位移；</p></li>
+<li><p>下半身动态较强的动作。</p>
+<p>典型现象仍然是动作幅度被压缩，或者模型倾向于保持较强的站立和足底接触状态。</p>
+<blockquote>
+<p>[💡]<br />
+一个人一动不动地躺在地面上，<strong>一条腿弯曲，一只手臂蜷曲搭在躯干上方</strong>，身体几乎没有上下移动，整体动作节奏接近静止。</p>
+</blockquote>
+<p><img src="assets/final/underlearned.png" alt="Prompt 正确但模型未充分学习案例" /></p>
+<hr /></li>
+</ul>
+<h4 id="完成质量较好的示例">完成质量较好的示例</h4>
+<p>同时也能观察到一部分动作已经能够较好地完成 Prompt 中的主要语义和动作过程，例如攻击、原地动作以及部分击倒类动作。</p>
+<p>这说明 Structured Motion Loss 本身是有效的，模型也具备学习游戏动作的能力；但效果仍然高度依赖训练样本和 Prompt 的质量。</p>
+<blockquote>
+<p>[💡]<br />
+一个人从低位蹲姿起身至站立，同时双臂向外展开，随后恢复到平静的待机站姿，身体仅有轻微的上下移动，整体动作节奏接近静止。</p>
+</blockquote>
+<p><img src="assets/final/stage1-good-01.gif" alt="Structured Motion Loss 较好案例一" /></p>
+<blockquote>
+<p>[💡]<br />
+一个人以中等速度向前跑动，躯干略微前倾，身体随着每一步轻微摆动，整体上下起伏较小。</p>
+</blockquote>
+<p><img src="assets/final/stage1-good-02.gif" alt="Structured Motion Loss 较好案例二" /></p>
+<blockquote>
+<p>[💡]<br />
+一个人站立并向前倾，随后上半身猛地向后仰，同时双臂向两侧大幅展开，动作速度中等，整体上下移动幅度较小。</p>
+</blockquote>
+<p><img src="assets/final/stage1-good-03.gif" alt="Structured Motion Loss 较好案例三" /></p>
+<hr />
+<ol type="1">
+<li><h3 id="stage-2text--sparse-full-body-keyframe-constraints-约束训练">Stage 2：Text + Sparse Full-body Keyframe Constraints 约束训练</h3>
+<p>在 Stage 1 基础上，我们进一步尝试 Kimodo 的 Stage 2 训练。</p>
+<p>Stage 2 不再只有文本条件，而是在训练过程中同时加入<strong>稀疏 Full-body Keyframe Constraints</strong>。</p>
+<p>训练数据中混合两种任务：</p>
+<ul>
+<li><p>Text-to-Motion；</p></li>
+<li><p>Text + Sparse Full-body Keyframe Constraints。</p>
+<p>其中稀疏 Keyframe Constraint 直接从 GT Motion 中自动采样，不需要额外进行逐帧人工标注。</p>
+<p>这样做的目的，是希望模型在保留文本生成能力的同时，通过少量关键帧约束更准确地学习：</p></li>
+<li><p>Root 轨迹；</p></li>
+<li><p>身体关键姿态；</p></li>
+<li><p>动作阶段；</p></li>
+<li><p>强动态动作中的空间变化。</p>
+<p><img src="assets/final/stage2-loss.png" alt="Stage 2 稀疏关键帧约束训练曲线" /></p>
+<blockquote>
+<p>[💡]<br />
+一个人先蹲下蓄力，随后垂直向上跃起，身体有中等幅度的上升和下降，最后以屈膝姿势平稳落地。整个动作节奏非常快。</p>
+</blockquote>
+<p><img src="assets/final/stage2-case-01.gif" alt="Stage 1 与 Stage 2 动态对比一" /></p>
+<blockquote>
+<p>[💡]<br />
+一个人站立并向前倾，随后上半身猛地向后仰，同时双臂向两侧大幅展开，动作速度中等，整体上下移动幅度较小。</p>
+</blockquote>
+<p><img src="assets/final/stage2-case-02.gif" alt="Stage 1 与 Stage 2 动态对比二" /></p>
+<p>实际对比后发现，Stage 2 可以正常完成训练和推理，但在当前游戏数据上，<strong>相较 Stage 1 并没有出现非常明显、稳定的视觉提升</strong>。</p>
+<p>也就是说，仅仅增加 Sparse Keyframe Constraint，并没有直接解决当前最主要的问题。</p>
+<hr /></li>
+</ul></li>
+<li><h3 id="两阶段实验暴露出的两个主要问题">两阶段实验暴露出的两个主要问题</h3>
+<p>通过 Stage 1 和 Stage 2 的可视化检查，我们最终把问题进一步收敛到了两个方向。</p></li>
+</ol>
+<h4 id="问题一ai-自动转换-prompt-的质量影响很大">问题一：AI 自动转换 Prompt 的质量影响很大</h4>
+<p>逐条检查训练数据后发现，第一版 AI 自动转换 Prompt 中存在不少：</p>
+<ul>
+<li><p>动作信息缺失；</p></li>
+<li><p>动作顺序错误；</p></li>
+<li><p>左右方向错误；</p></li>
+<li><p>起始 / 结束状态不完整；</p></li>
+<li><p>对复杂动作过度简化；</p>
+<p>等问题。</p>
+<p>这种情况下，即使训练方式本身没有问题，模型也很难从错误文本中学习正确 Motion。</p>
+<p>因此下一步不再继续单纯扩大自动生成数据规模，而是转向：</p>
+<blockquote>
+<p><strong>构建人工审核的高质量 Gold Motion-Prompt 数据。</strong></p>
+</blockquote>
+<hr /></li>
+</ul>
+<h4 id="问题二游戏动作与原始-kimodo-动作分布存在明显-domain-gap">问题二：游戏动作与原始 Kimodo 动作分布存在明显 Domain Gap</h4>
+<p>另一个比较明显的现象是，原始 Kimodo 更偏向普通人体动作和稳定站立状态，而游戏数据中存在大量：</p>
+<ul>
+<li><p>Jump；</p></li>
+<li><p>Hover；</p></li>
+<li><p>击飞；</p></li>
+<li><p>倒地；</p></li>
+<li><p>大幅 Root 位移；</p>
+<p>等强动态动作。</p>
+<p>尤其是原有 Structured Motion Loss 中包含 Foot Contact 约束，而对于跳跃、浮空这类动作，<strong>长时间离地本身就是正确状态</strong>。因此原始训练目标和游戏动作分布之间可能存在一定冲突，模型容易保留较强的“脚接触地面”先验。</p>
+<p>这一现象也与前面反复出现的“脚钉地”问题一致。</p>
+<p>因此后续除了提高 Prompt 质量外，我们还进一步按照动作类别进行拆分和分析，并尝试：</p>
+<blockquote>
+<p><strong>针对 Attack、Jump、Hover、Knocked Down 等不同类别进行分类微调和条件建模。</strong></p>
+</blockquote>
+<p>这里的目标不是简单增加一个 Category 标签，而是先判断：</p>
+<blockquote>
+<p><strong>不同游戏动作类别的失败原因是否相同，以及是否需要采用不同的训练重点。</strong></p>
+</blockquote>
+<hr /></li>
+</ul>
+<h2 id="五关键转折从-ai-自动-prompt-转向人工-gold-数据">五、关键转折：从 AI 自动 Prompt 转向人工 Gold 数据</h2>
+<ol type="1">
+<li><h3 id="自动-prompt-的质量问题">自动 Prompt 的质量问题</h3>
+<blockquote>
+<p>A person drives the upper body and arms in a forceful upward slashing motion from behind while leaning slightly forward, then returns to a balanced combat stance with minimal vertical movement at an almost stationary pace.<br />
+一个人身体微微前倾，同时带动上半身和双臂从身后用力向上挥砍，随后恢复到平衡的战斗站姿。整体上下移动幅度很小，动作节奏接近静止。</p>
+</blockquote>
+<blockquote>
+<p>A person crouches low then leaps upward into a graceful midair flip, dominated by upward travel with low-range vertical movement, and lands softly with bent knees returning to a crouched ready position at a slow pace.<br />
+一个人先低身蹲下，随后向上跃起，在空中完成一次流畅的翻转。整个动作以上升移动为主，垂直位移幅度较小，最后屈膝轻柔落地，并回到低位蹲姿的准备状态，整体动作节奏较慢。</p>
+</blockquote>
+<p>通过失败案例复查，我们发现 AI 自动转换的 Prompt 存在以下典型问题：</p>
+<ul>
+<li><p>只保留动作类别名称，缺少身体部位、方向和幅度；</p></li>
+<li><p>忽略动作的起始姿态和结束姿态；</p></li>
+<li><p>多动作样本中的动作顺序被遗漏或改写；</p></li>
+<li><p>将模型推测的原因、情绪或意图写入 Prompt，但这些内容无法从动画中观察；</p></li>
+<li><p>同类动作的描述风格和粒度不统一，导致监督信号不稳定。</p>
+<p>例如，一段完整动作可能包括：</p>
+<blockquote>
+<p>站立 → 重心下沉 → 起跳 → 空中停留 → 落地 → 恢复站立。</p>
+</blockquote>
+<p>但自动 Prompt 可能只写成“角色做了一个跳跃动作”。这样的描述虽然类别没有错，却完全丢失了模型需要学习的离地过程、空中状态和落地阶段。</p>
+<p>游戏动作数据中存在大量三个动作阶段以上的连续切换。如果 Prompt 只保留一个类别词，即使模型完全拟合文本，也未必能生成正确的完整动作。因此，我们把项目重点从“继续扩大自动标注数据规模”转向“先构建一批动作与文本高度一致的 Gold 数据”。</p></li>
+</ul></li>
+<li><h3 id="llm2vec-动作顺序预实验">LLM2Vec 动作顺序预实验</h3>
+<p>在正式制定 Prompt 标签标准前，我们先验证文本表示是否能够感知动作顺序变化。</p>
+<p>预实验使用 LLM2Vec 比较原始顺序、全局倒序、大幅调整阶段顺序和局部步骤交换后的文本表示。结果表明，LLM2Vec 能够识别全局倒序和较大的动作顺序变化，但对长序列中的局部顺序交换不够敏感，严格判定通过率即正确顺序胜过所有乱序比例为 <strong>52.03%</strong>。</p>
+<table>
+<thead>
+<tr>
+<th><strong>变体</strong></th>
+<th><strong>平均 cosine</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>SWAP_LAST</code>：交换最后两个 Event</td>
+<td>0.99351</td>
+</tr>
+<tr>
+<td><code>PARAPHRASE</code>：保持正确顺序，仅替换时间连接词</td>
+<td>0.99253</td>
+</tr>
+<tr>
+<td><code>SWAP_FIRST</code>：交换前两个 Event</td>
+<td>0.97661</td>
+</tr>
+<tr>
+<td><code>ROTATE_LEFT</code>：将第一个 Event 移到末尾</td>
+<td>0.96615</td>
+</tr>
+<tr>
+<td><code>RANDOM_SHUFFLE</code>：固定随机种子的随机乱序</td>
+<td>0.96162</td>
+</tr>
+<tr>
+<td><code>REVERSE</code>：完全倒序</td>
+<td>0.95130</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th><strong>指标</strong></th>
+<th><strong>结果</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>正确顺序改写平均 cosine</td>
+<td>0.99253</td>
+</tr>
+<tr>
+<td>去除连接词平均 cosine</td>
+<td>0.98793</td>
+</tr>
+<tr>
+<td><code>order_margin_mean</code> 平均值</td>
+<td>0.02433</td>
+</tr>
+<tr>
+<td><code>order_margin_hardest</code> 平均值</td>
+<td>0.00438</td>
+</tr>
+<tr>
+<td><code>order_margin_hardest</code> 中位数</td>
+<td>0.00041</td>
+</tr>
+<tr>
+<td>正确顺序胜过所有乱序比例</td>
+<td>52.03%</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><p><code>order_margin_mean</code>：cos(GOLD, PARAPHRASE) − 所有错误顺序 cosine 的平均值，用于衡量正确顺序相对于错误顺序的平均优势。</p></li>
+<li><p><code>order_margin_hardest</code>：cos(GOLD, PARAPHRASE) − 最相似错误顺序的 cosine，用于衡量模型面对最难负样本时是否仍能识别正确顺序。</p>
+<blockquote>
+<p>文本编码能够感知明显的全局顺序变化，因此在 Prompt 中保留动作阶段是有价值的；但其对细粒度局部顺序的识别仍有限，不能假设仅靠文本编码就能完整解决复杂时序建模问题。</p>
+</blockquote>
+<p>这一结论直接影响了人工标签标准：Prompt 必须使用“开始、随后、接着、最后”等表达显式描述动作阶段，同时后续评测还需要单独检查动作时序，而不能只依赖整体文本相似度。</p></li>
+</ul></li>
+<li><h3 id="人工标注平台与标签标准">人工标注平台与标签标准</h3>
+<p>为了提高标注效率并保证标注结果可以直接进入训练流程，我们搭建了人工标注平台。平台支持动画逐帧或循环预览、原始名称与 AI Prompt 对照、人工 Prompt 编辑、动作类别选择、异常样本标记、标注保存、复查、去重和导出。</p>
+<p><img src="assets/final/annotation-platform.png" alt="Kimodo 游戏动作人工标注平台" /></p>
+<p>这个平台的意义不只是提高录入效率，而是建立一条可追溯的数据质量链路。每条进入 Gold 集的数据都能够追溯到原始动画、人工 Prompt、动作类别和异常处理结果。</p>
+<p>在预实验和失败案例分析的基础上，我们制定了 Kimodo Prompt 标签转换标准：</p>
+<ol type="1">
+<li><p>明确写出动作的起始姿态；</p></li>
+<li><p>按真实时间顺序描述动作，不随意重排阶段；</p></li>
+<li><p>写清主要身体部位、运动方向和动作幅度；</p></li>
+<li><p>对离地、落地、浮空、倒地等关键状态进行显式描述；</p></li>
+<li><p>写明结束姿态，或者说明动作是否持续；</p></li>
+<li><p>不加入动画中不可直接观察的情绪、原因和意图；</p></li>
+<li><p>多动作切换不能压缩成单一动作类别；</p></li>
+<li><p>同类动作尽量使用统一术语和相近描述粒度。</p>
+<p>中文模板：</p>
+<pre class="plaintext"><code>角色从[初始姿态]开始，[持物手和道具]。[准备动作]后，[主要动作]，身体向[方向/旋转方式]移动。[结束动作或最终姿态]。</code></pre>
+<p>例如，对于被击倒动作，Prompt 应描述受击后的身体后仰、失衡、倒地和最终姿态，而不是只写“角色被击倒”；对于浮空动作，则应明确区分“从地面进入浮空”“持续浮空”和“从浮空回到地面”。</p></li>
+</ol></li>
+<li><h3 id="gold-数据构成">Gold 数据构成</h3>
+<p>我们选取了 1,200 条候选样本进行人工处理。经过重复样本清理后剩余 842 条，再排除骨架异常和转换失败样本，最终得到 <strong>748 条成功转换的 Gold 数据</strong>。</p>
+<p>具体类别分布如下：</p>
+<table>
+<thead>
+<tr>
+<th><strong>类别</strong></th>
+<th><strong>数量</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>攻击</td>
+<td>140</td>
+</tr>
+<tr>
+<td>跳跃</td>
+<td>44</td>
+</tr>
+<tr>
+<td>浮空</td>
+<td>154</td>
+</tr>
+<tr>
+<td>被击倒</td>
+<td>243</td>
+</tr>
+<tr>
+<td>原地正常动作</td>
+<td>167</td>
+</tr>
+<tr>
+<td><strong>合计</strong></td>
+<td><strong>748</strong></td>
+</tr>
+</tbody>
+</table>
+<p>这批数据覆盖了当前最关注的游戏动作类型，但也存在明显的类别不均衡。其中“被击倒”有 243 条，“跳跃”只有 44 条。因此，748 条 Gold 数据适合验证模型是否具备领域学习能力，但还不足以代表完整业务分布，也不能直接视为最终生产训练集。</p>
+<hr /></li>
+</ol>
+<h2 id="六三种训练策略及可视化结果">六、三种训练策略及可视化结果</h2>
+<ol type="1">
+<li><h3 id="过拟合实验">过拟合实验</h3>
+<p><strong>为什么先做过拟合实验</strong></p>
+<p>Gold 数据完成后，我们没有立即追求测试集最优结果，而是先进行故意过拟合训练。</p>
+<p>这样做是因为，在训练代码自主恢复、数据量较小、标签刚完成的情况下，如果模型连训练样本都无法复现，就无法判断问题究竟来自模型训练实现、90×369 动作特征、Prompt 一致性、Structured Motion Loss、推理后处理还是模型表达能力。</p>
+<p>因此，过拟合实验相当于训练链路的单元测试。</p>
+<p>实验表明，高质量 Gold 数据可以被模型学习。攻击、击倒、跳跃等动作在训练样本上的表现明显改善，“脚钉地”也不再是所有样本上的绝对现象，部分离地和浮空动作能够被正确生成。</p>
+<p>这个结果证明：Kimodo 并非结构上无法生成游戏动作；前期 7,951 条数据实验的瓶颈至少部分来自 Prompt 质量和数据一致性；Gold 数据与当前训练代码已经形成有效的学习闭环。</p>
+<p><img src="assets/final/gold-annotated-attack.gif" alt="Gold 标注攻击动作学习结果" /></p>
+<p><img src="assets/final/gold-annotated-hover.gif" alt="Gold 标注浮空动作学习结果" /></p>
+<table>
+<thead>
+<tr>
+<th><strong>模型</strong></th>
+<th><strong>数据集</strong></th>
+<th><strong>RTE ↓</strong></th>
+<th><strong>RTE-XZ ↓</strong></th>
+<th><strong>RTE-Y ↓</strong></th>
+<th><strong>BPE ↓</strong></th>
+<th><strong>BPE-Upper ↓</strong></th>
+<th><strong>BPE-Lower ↓</strong></th>
+<th><strong>Contact ↑</strong></th>
+<th><strong>Foot Skate Ratio ↓</strong></th>
+<th><strong>Foot Skate Height ↓</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>原始Kimodo模型</strong></td>
+<td>748-games</td>
+<td>0.551939</td>
+<td>0.345670</td>
+<td>0.306518</td>
+<td>0.499431</td>
+<td>0.509166</td>
+<td>0.434206</td>
+<td><strong>0.957314</strong></td>
+<td><strong>0.095524</strong></td>
+<td><strong>0.110196</strong></td>
+</tr>
+<tr>
+<td>过拟合模型</td>
+<td>748-games</td>
+<td><strong>0.130128</strong></td>
+<td><strong>0.058020</strong></td>
+<td><strong>0.094977</strong></td>
+<td><strong>0.115420</strong></td>
+<td><strong>0.118436</strong></td>
+<td><strong>0.095209</strong></td>
+<td>0.906332</td>
+<td>0.466643</td>
+<td>1.997528</td>
+</tr>
+</tbody>
+</table></li>
+<li><h3 id="正式训练">正式训练</h3>
+<p>完成可学习性验证后，我们将 748 条数据按照类别分层划分为：</p>
+<ul>
+<li><p>训练集：598 条；</p></li>
+<li><p>验证集：75 条；</p></li>
+<li><p>测试集：75 条。</p>
+<p>正式 Gold 数据训练使用的配置为（更多见附件记录）：</p>
+<table>
+<thead>
+<tr>
+<th><strong>配置项</strong></th>
+<th><strong>设置</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>初始化权重</td>
+<td>nvidia/Kimodo-SOMA-RP-v1.1</td>
+</tr>
+<tr>
+<td>微调方式</td>
+<td>全参数 denoiser 微调</td>
+</tr>
+<tr>
+<td>训练阶段</td>
+<td>单阶段 Stage 1</td>
+</tr>
+<tr>
+<td>Loss</td>
+<td>Structured Motion Loss，masked Smooth L1，β=0.1</td>
+</tr>
+<tr>
+<td>Learning rate</td>
+<td>5e-5</td>
+</tr>
+<tr>
+<td>Steps</td>
+<td>3,000</td>
+</tr>
+<tr>
+<td>Batch size</td>
+<td>256</td>
+</tr>
+<tr>
+<td>Warmup</td>
+<td>50</td>
+</tr>
+</tbody>
+</table>
+<p>测试集表现：</p></li>
+<li><p>攻击效果</p>
+<p><img src="assets/final/gold-test-attack.gif" alt="Gold 测试集攻击动作" /></p>
+<p>飞行效果：</p>
+<p><img src="assets/final/gold-test-hover-01.gif" alt="Gold 测试集浮空动作一" /></p>
+<p><img src="assets/final/gold-test-hover-02.gif" alt="Gold 测试集浮空动作二" /></p></li>
+<li><p>跳跃效果：</p>
+<p><img src="assets/final/gold-test-jump.gif" alt="Gold 测试集跳跃动作" /></p></li>
+<li><p>站立效果：</p>
+<p><img src="assets/final/gold-test-stand-01.gif" alt="Gold 测试集原地动作一" /></p>
+<p><img src="assets/final/gold-test-stand-02.gif" alt="Gold 测试集原地动作二" /></p>
+<p><img src="assets/final/gold-test-stand-03.gif" alt="Gold 测试集原地动作三" /></p></li>
+<li><p>击倒：</p>
+<p><img src="assets/final/gold-test-knockdown-01.gif" alt="Gold 测试集击倒动作一" /></p>
+<p><img src="assets/final/gold-test-knockdown-02.gif" alt="Gold 测试集击倒动作二" /></p></li>
+</ul></li>
+<li><h3 id="混合训练">混合训练</h3>
+<p>混合训练在游戏动作数据中加入部分 SEED 原始样本，相当于在学习新领域时回放旧分布，目标是减轻灾难性遗忘。我们从seed的二十个小类中，每个小类随机抽取四十个样本（martial art 20个），跟我们标注的数据集进行混合，大约是1：1的比例，得到的训练效果不错。</p>
+<p><strong>可视化分析</strong></p>
+<p>在我们标注的游戏数据集上，混合训练的结果跟不混和训练的结果基本一致，跟Original GT也基本一致</p>
+<p><img src="assets/final/mixed-game-01.gif" alt="混合训练游戏动作对照一" /></p>
+<p><img src="assets/final/mixed-game-02.gif" alt="混合训练游戏动作对照二" /></p>
+<p><img src="assets/final/mixed-game-03.gif" alt="混合训练游戏动作对照三" /></p>
+<p><img src="assets/final/mixed-game-04.gif" alt="混合训练游戏动作对照四" /></p></li>
+</ol>
+<h2 id="七三维量化评测体系">七、三维量化评测体系</h2>
+<p>Kimodo 原始指标主要评价通用文本与动作的语义匹配，不能完整回答游戏动作是否正确完成离地、浮空、落地、击倒和连续阶段切换。因此，我们在保留原始评测的基础上，将结果划分为三个维度。</p>
+<p>三维评测分别回答三个不同问题：</p>
+<table>
+<thead>
+<tr>
+<th><strong>评测维度</strong></th>
+<th><strong>回答的问题</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RTE、BPE</td>
+<td>目标游戏动作有没有学会？</td>
+</tr>
+<tr>
+<td>Unseen Prompt</td>
+<td>模型是在记忆训练文本，还是具备一定泛化能力？</td>
+</tr>
+<tr>
+<td>SEED 保持评测</td>
+<td>游戏域增强是否以破坏原始能力为代价？</td>
+</tr>
+</tbody>
+</table>
+<ol type="1">
+<li><h3 id="领域拟合能力rte-与-bpe">领域拟合能力：RTE 与 BPE</h3></li>
+</ol>
+<h4 id="11-rte-与-bpe-指标说明">1.1 RTE 与 BPE 指标说明</h4>
+<p>RTE（Root Trajectory Error，根节点轨迹误差）用于评价角色整体运动轨迹是否与 Game GT 一致。它逐帧计算生成动作与 GT 根节点位置的欧氏距离，并在全部帧上取平均：</p>
+<p><span class="math inline">$RTE=\frac{1}{T}{{\sum_{t=1}^{T}{\left |{{{\hat{p}}_{t}}-{{p}_{t}}}\right |}}_{2}}$</span></p>
+<p>其中，RTE-XZ 表示水平面轨迹误差，反映角色前后、左右移动是否正确；RTE-Y 表示垂直方向误差，重点反映跳跃、浮空和下落高度是否准确。</p>
+<p>BPE（Body Pose Error，身体姿态误差）用于评价身体各关节的相对姿态是否正确。计算前，分别消除生成动作和 GT 的根节点位置与整体朝向，再计算对应关节的平均位置误差：</p>
+<p><span class="math inline">$BPE=\frac{1}{TJ}{{\sum_{t=1}^{T}{\sum_{j=1}^{J}{\left |{\hat{q}t,j-qt,j}\right |}}}_{2}}$</span></p>
+<p>BPE-Upper 表示上半身姿态误差，主要反映攻击、挥臂和躯干动作；BPE-Lower 表示下半身姿态误差，主要反映腿部、脚部和落地姿态。</p>
+<table>
+<thead>
+<tr>
+<th><strong>指标</strong></th>
+<th><strong>主要回答的问题</strong></th>
+<th><strong>单位</strong></th>
+<th><strong>方向</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RTE</td>
+<td>角色整体是否移动到正确位置</td>
+<td>米</td>
+<td>越低越好</td>
+</tr>
+<tr>
+<td>RTE-XZ</td>
+<td>水平移动轨迹是否正确</td>
+<td>米</td>
+<td>越低越好</td>
+</tr>
+<tr>
+<td>RTE-Y</td>
+<td>跳跃、浮空高度是否正确</td>
+<td>米</td>
+<td>越低越好</td>
+</tr>
+<tr>
+<td>BPE</td>
+<td>身体整体姿态是否正确</td>
+<td>米</td>
+<td>越低越好</td>
+</tr>
+<tr>
+<td>BPE-Upper</td>
+<td>上半身动作是否正确</td>
+<td>米</td>
+<td>越低越好</td>
+</tr>
+<tr>
+<td>BPE-Lower</td>
+<td>下半身动作是否正确</td>
+<td>米</td>
+<td>越低越好</td>
+</tr>
+</tbody>
+</table>
+<p>结果可以组合理解：</p>
+<ul>
+<li><p>RTE 低、BPE 高：移动轨迹正确，但身体姿态不准确。</p></li>
+<li><p>RTE 高、BPE 低：局部姿态接近 GT，但整体位置或移动方向错误。</p></li>
+<li><p>RTE 与 BPE 都低：整体轨迹和身体姿态均较好。</p>
+<p>当前脚本按 <code>motion_id</code> 精确配对并逐帧比较，取生成动作和 GT 的公共帧长，不使用 DTW。脚本目前没有内置“合格/不合格”阈值，只统计均值和中位数；正式阈值需要根据 RP 基线、GT 自一致误差或验证集分布另行确定。</p></li>
+</ul>
+<h4 id="12-全量游戏数据训练前后对比ai标注数据集">1.2 全量游戏数据训练前后对比(AI标注数据集)</h4>
+<table>
+<thead>
+<tr>
+<th><strong>模型</strong></th>
+<th><strong>RTE ↓</strong></th>
+<th><strong>RTE-XZ ↓</strong></th>
+<th><strong>RTE-Y ↓</strong></th>
+<th><strong>BPE ↓</strong></th>
+<th><strong>BPE-Upper ↓</strong></th>
+<th><strong>BPE-Lower ↓</strong></th>
+<th><strong>Contact ↑</strong></th>
+<th><strong>Foot Skate Ratio ↓</strong></th>
+<th><strong>Foot Skate Height ↓</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Kimodo 原始模型</strong></td>
+<td>0.599287</td>
+<td>0.474419</td>
+<td>0.233563</td>
+<td>0.394007</td>
+<td>0.418150</td>
+<td>0.232254</td>
+<td><strong>0.967434</strong></td>
+<td>0.126444</td>
+<td><strong>0.141272</strong></td>
+</tr>
+<tr>
+<td><strong>游戏全量数据微调模型</strong></td>
+<td><strong>0.254880</strong></td>
+<td><strong>0.226311</strong></td>
+<td><strong>0.053175</strong></td>
+<td><strong>0.179023</strong></td>
+<td><strong>0.193499</strong></td>
+<td><strong>0.082033</strong></td>
+<td>0.074873</td>
+<td><strong>0.126143</strong></td>
+<td>0.164242</td>
+</tr>
+</tbody>
+</table>
+<h4 id="13-gold-数据微调前后对比人工标注数据集">1.3 Gold 数据微调前后对比（人工标注数据集）</h4>
+<table>
+<thead>
+<tr>
+<th><strong>模型</strong></th>
+<th><strong>RTE ↓</strong></th>
+<th><strong>RTE-XZ ↓</strong></th>
+<th><strong>RTE-Y ↓</strong></th>
+<th><strong>BPE ↓</strong></th>
+<th><strong>BPE-Upper ↓</strong></th>
+<th><strong>BPE-Lower ↓</strong></th>
+<th><strong>Contact ↑</strong></th>
+<th><strong>Foot Skate Ratio ↓</strong></th>
+<th><strong>Foot Skate Height ↓</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Kimodo 原始模型</strong></td>
+<td>0.585655</td>
+<td>0.333570</td>
+<td>0.350617</td>
+<td>0.493341</td>
+<td>0.504325</td>
+<td>0.419748</td>
+<td><strong>0.955791</strong></td>
+<td><strong>0.137798</strong></td>
+<td><strong>0.130193</strong></td>
+</tr>
+<tr>
+<td><strong>Gold 数据微调模型</strong></td>
+<td><strong>0.315964</strong></td>
+<td><strong>0.143359</strong></td>
+<td><strong>0.222094</strong></td>
+<td><strong>0.324660</strong></td>
+<td><strong>0.336493</strong></td>
+<td><strong>0.245382</strong></td>
+<td>0.911493</td>
+<td>0.452807</td>
+<td>1.616363</td>
+</tr>
+</tbody>
+</table>
+<h4 id="14-混合训练人工标注数据集">1.4 混合训练（人工标注数据集）</h4>
+<table>
+<thead>
+<tr>
+<th><strong>模型</strong></th>
+<th><strong>RTE ↓</strong></th>
+<th><strong>RTE-XZ ↓</strong></th>
+<th><strong>RTE-Y ↓</strong></th>
+<th><strong>BPE ↓</strong></th>
+<th><strong>BPE-Upper ↓</strong></th>
+<th><strong>BPE-Lower ↓</strong></th>
+<th><strong>Contact ↑</strong></th>
+<th><strong>Foot Skate Ratio ↓</strong></th>
+<th><strong>Foot Skate Height ↓</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Kimodo 原始模型</strong></td>
+<td>0.585655</td>
+<td>0.333570</td>
+<td>0.350617</td>
+<td>0.493341</td>
+<td>0.504325</td>
+<td>0.419748</td>
+<td><strong>0.955791</strong></td>
+<td><strong>0.137798</strong></td>
+<td><strong>0.130193</strong></td>
+</tr>
+<tr>
+<td><strong>Gold 数据微调模型</strong></td>
+<td><strong>0.315964</strong></td>
+<td><strong>0.143359</strong></td>
+<td><strong>0.222094</strong></td>
+<td>0.324660</td>
+<td>0.336493</td>
+<td><strong>0.245382</strong></td>
+<td>0.911493</td>
+<td><strong>0.452807</strong></td>
+<td><strong>1.616363</strong></td>
+</tr>
+<tr>
+<td><strong>混合训练 + Plaintext</strong></td>
+<td>0.340868</td>
+<td>0.149795</td>
+<td>0.244208</td>
+<td><strong>0.322132</strong></td>
+<td><strong>0.331806</strong></td>
+<td>0.257315</td>
+<td><strong>0.932267</strong></td>
+<td>0.456818</td>
+<td>2.158598</td>
+</tr>
+</tbody>
+</table>
+<p>从现有结果看，Gold 模型在游戏域 RTE、BPE 和动作可视化上均明显优于原始模型，说明高质量数据能够有效增强目标领域能力。</p>
+<p>可以，这一节保留 <strong>Unseen Prompt 的测试目的、5 类案例、量化结果和后续判断</strong> 就够了，RTE/BPE 前面已经介绍过，这里直接拿来做辅助分析。</p>
+<hr />
+<ol type="1">
+<li><h3 id="可泛化性unseen-prompt">可泛化性：Unseen Prompt</h3>
+<p>为了判断模型是否只是记住训练文本，我们额外构造了一组<strong>训练集中没有出现过的 Prompt</strong>，覆盖 Inplace Normal、Knocked Down、Attack、Jump 和 Hover，观察模型在新的动作描述下能否保持正确的动作类别和主要运动过程。</p>
+<p>目前不同类别的表现差异比较明显。</p></li>
+</ol>
+<h4 id="21-inplace-normal--原地站立捂脸">2.1 Inplace Normal / 原地站立捂脸</h4>
+<p>Prompt 描述角色从自然站立开始，低头、双手抬起遮住面部，随后再恢复站立。</p>
+<p>模型能够较完整地生成<strong>站立 → 抬手捂脸 → 恢复站立</strong>的主要过程，说明普通原地动作已经具备较稳定的 Unseen Prompt 泛化。</p>
+<blockquote>
+<p>角色原地站立，双脚与肩同宽，身体保持放松。随后头部微微低下，双肩向前收拢，双手抬向面部。双掌覆盖住眼睛和脸颊，双肘自然朝下，同时保持站立姿势，上半身伴有轻微的颤动。最后，双手缓慢从面部放下，角色重新恢复安静、直立的站姿。</p>
+</blockquote>
+<p><img src="assets/final/unseen-inplace.gif" alt="Unseen Prompt：Inplace Normal" /></p>
+<h4 id="22-knocked-down--被击倒">2.2 Knocked Down / 被击倒</h4>
+<p>Prompt 包含<strong>防御站立 → 受击后仰 → 失衡 → 倒地 → 躺地</strong>等连续阶段。</p>
+<p>模型能够生成比较完整的受击和倒地过程，说明对于 Knocked Down 这类带 Root 位移和状态切换的动作，也已经出现较明显的泛化能力。</p>
+<blockquote>
+<p>角色开始时保持防御站姿，双膝弯曲，双臂抬起。随后躯干突然向后猛震，仿佛胸口受到强力击打，双臂向外甩开，双脚失去平衡。身体向侧方倒下，髋部随之旋转，最终背部和肩部撞击地面。落地后，双腿轻微滑动，一只手臂落在身体上方，角色继续躺在地面，仅伴有轻微的缓冲和稳定动作。</p>
+</blockquote>
+<p><img src="assets/final/unseen-knocked-down.gif" alt="Unseen Prompt：Knocked Down" /></p>
+<h4 id="23-attack--攻击">2.3 Attack / 攻击</h4>
+<p>Prompt 包含转体、蓄力、交叉迈步、旋转攻击和恢复站姿等多个阶段。</p>
+<p>模型已经能够生成主要攻击动作，并表现出一定的转体和蓄力过程，但下半身动作和完整旋转仍不够准确。</p>
+<blockquote>
+<p>角色从一个防御姿态开始，双膝微微弯曲，右手放在腰部附近。随后身体迅速向左扭转，同时右臂向后蓄力，左脚交叉迈步，身体重心下沉。接着，角色快速向前发起旋转攻击，右臂大幅度挥动划过一道弧线，左臂则配合伸展以维持身体平衡。最后，双脚稳稳落地，躯干回正，双臂恢复到稳定的准备姿态。</p>
+</blockquote>
+<p><img src="assets/final/unseen-attack.gif" alt="Unseen Prompt：Attack" /></p>
+<h4 id="24-hover--悬浮">2.4 Hover / 悬浮</h4>
+<p>Prompt 描述角色从站立开始，通过屈膝和身体后倾进入浮空，短暂悬停后重新落地。</p>
+<p>当前模型已经能够生成明显的<strong>离地和悬浮行为</strong>，说明已经学到 Hover 的基本运动模式，但浮空高度和垂直轨迹仍不稳定。</p>
+<blockquote>
+<p>角色开始时保持站立，双臂略微张开，与身体保持一定距离。随后双膝弯曲，躯干向后倾斜，仿佛受到一股向上的力量推动。接着，双脚离开地面，身体在原地悬浮，同时肩部缓慢旋转，双臂向外展开以维持平衡。在短暂悬停后，双腿向下伸展，双脚轻柔接触地面，身体通过缓冲动作逐渐恢复到稳定的站立姿态。</p>
+</blockquote>
+<p><img src="assets/final/unseen-hover.gif" alt="Unseen Prompt：Hover" /></p>
+<h4 id="25-jump--跳跃">2.5 Jump / 跳跃</h4>
+<p>Prompt 包含<strong>下蹲蓄力 → 起跳 → 腾空 → 前空翻 → 展体 → 落地</strong>等多个连续阶段。</p>
+<p>这一类动作目前仍没有稳定学到，主要表现为起跳高度不足、腾空和翻转过程不完整、下半身姿态和落地动作不准确。</p>
+<blockquote>
+<p>角色直立站立，双臂自然放松。随后双膝大幅弯曲，双臂向后摆动以积蓄动量。接着，双腿用力蹬地，使身体向上腾空，同时完成一个紧凑的前空翻，双臂收拢靠近胸前。之后，角色逐渐展开身体，双腿向地面伸展，以屈膝姿态落地，并最终恢复到平衡稳定的站立姿势。</p>
+</blockquote>
+<p><img src="assets/final/unseen-jump.gif" alt="Unseen Prompt：Jump" /></p>
+<hr />
+<h4 id="26-unseen-prompt-结果总结">2.6 Unseen Prompt 结果总结</h4>
+<table>
+<thead>
+<tr>
+<th><strong>类别</strong></th>
+<th><strong>当前表现</strong></th>
+<th><strong>主要问题</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Inplace Normal</td>
+<td>较稳定</td>
+<td>基本能够泛化</td>
+</tr>
+<tr>
+<td>Knocked Down</td>
+<td>较好</td>
+<td>倒地细节仍可优化</td>
+</tr>
+<tr>
+<td>Attack</td>
+<td>有一定泛化</td>
+<td>下半身动作不足</td>
+</tr>
+<tr>
+<td>Hover</td>
+<td>能够离地</td>
+<td>垂直 Root 轨迹不稳定</td>
+</tr>
+<tr>
+<td>Jump</td>
+<td><strong>仍未稳定学到</strong></td>
+<td><strong>Root-Y + 下半身姿态</strong></td>
+</tr>
+</tbody>
+</table>
+<p>结合 RTE / BPE 的分类结果，可以进一步看到：</p>
+<table>
+<thead>
+<tr>
+<th><strong>类别</strong></th>
+<th><strong>RTE</strong></th>
+<th><strong>RTE-Y</strong></th>
+<th><strong>BPE</strong></th>
+<th><strong>BPE-Lower</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Attack</td>
+<td>0.2891</td>
+<td>0.1418</td>
+<td>0.5026</td>
+<td><strong>0.5936</strong></td>
+</tr>
+<tr>
+<td>Hover</td>
+<td><strong>0.6029</strong></td>
+<td><strong>0.5778</strong></td>
+<td>0.3007</td>
+<td>0.3415</td>
+</tr>
+<tr>
+<td>Inplace Normal</td>
+<td><strong>0.0752</strong></td>
+<td><strong>0.0383</strong></td>
+<td><strong>0.1943</strong></td>
+<td><strong>0.2314</strong></td>
+</tr>
+<tr>
+<td>Jump</td>
+<td>0.3322</td>
+<td><strong>0.2846</strong></td>
+<td>0.4329</td>
+<td><strong>0.6481</strong></td>
+</tr>
+<tr>
+<td>Knocked Down</td>
+<td>0.3089</td>
+<td>0.1823</td>
+<td>0.3356</td>
+<td>0.3960</td>
+</tr>
+</tbody>
+</table>
+<p>结果和可视化基本一致：</p>
+<blockquote>
+<p><strong>模型已经能够较好处理普通原地动作，并在 Knocked Down、Attack、Hover 上出现一定 Unseen Prompt 泛化；当前最明显的瓶颈仍然集中在 Hover / Jump 的垂直 Root 轨迹，以及 Attack / Jump 的下半身动态。</strong></p>
+</blockquote>
+<ol type="1">
+<li><h3 id="原始能力保持seed-测试集">原始能力保持：SEED 测试集</h3>
+<p>第三维度用于判断游戏域增强是否破坏原始能力。我们使用 SEED 测试集作为保持集，比较原始模型与微调模型的 R@1、R@5、T2M Similarity 等指标，同时关注 Foot Skate Ratio 和 Height 等动作质量变化。</p>
+<p>最终结果显示，Gold 模型虽然在游戏域表现明显改善，但在 SEED 保持集上的 R@1、R@5 和 T2M Similarity 明显下降。这说明模型发生了灾难性遗忘，目前尚未达到“增强游戏能力且其它能力不掉”的最终目标。</p></li>
+</ol>
+<h4 id="31-量化指标结果">3.1 量化指标结果</h4>
+<h5 id="311-seed-content原始模型-vs-gold-微调模型vs混合模型">3.1.1 SEED Content：原始模型 vs Gold 微调模型vs混合模型</h5>
+<table>
+<thead>
+<tr>
+<th><strong>模型</strong></th>
+<th><strong>R@1 ↑</strong></th>
+<th><strong>R@5 ↑</strong></th>
+<th><strong>T2M Sim ↑</strong></th>
+<th><strong>Contact ↑</strong></th>
+<th><strong>Foot Skate Ratio ↓</strong></th>
+<th><strong>Foot Skate Height ↓</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Kimodo 原始模型</strong></td>
+<td><strong>97.4491%</strong></td>
+<td><strong>99.2019%</strong></td>
+<td><strong>0.927029</strong></td>
+<td><strong>0.983554</strong></td>
+<td><strong>0.105419</strong></td>
+<td>0.197719 m/s</td>
+</tr>
+<tr>
+<td><strong>Gold 游戏数据微调模型</strong></td>
+<td>38.8628%</td>
+<td>50.9762%</td>
+<td>0.600805</td>
+<td>0.901491</td>
+<td>0.128725</td>
+<td><strong>0.118240 m/s</strong></td>
+</tr>
+<tr>
+<td><strong>混合数据微调模型</strong></td>
+<td>95.3256%</td>
+<td>97.5061%</td>
+<td>0.899417</td>
+<td>0.911449</td>
+<td>0.181151</td>
+<td>0.222303 m/s</td>
+</tr>
+</tbody>
+</table>
+<h5 id="312-seed-repetition原始模型-vs-gold-微调模型vs混合模型">3.1.2 SEED Repetition：原始模型 vs Gold 微调模型vs混合模型</h5>
+<table>
+<thead>
+<tr>
+<th><strong>模型</strong></th>
+<th><strong>R@1 ↑</strong></th>
+<th><strong>R@5 ↑</strong></th>
+<th><strong>T2M Sim ↑</strong></th>
+<th><strong>Contact ↑</strong></th>
+<th><strong>Foot Skate Ratio ↓</strong></th>
+<th><strong>Foot Skate Height ↓</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Kimodo 原始模型</strong></td>
+<td><strong>85.7143%</strong></td>
+<td><strong>95.8624%</strong></td>
+<td><strong>0.937635</strong></td>
+<td><strong>0.982887</strong></td>
+<td><strong>0.092619</strong></td>
+<td>0.142594 m/s</td>
+</tr>
+<tr>
+<td><strong>Gold 游戏数据微调模型</strong></td>
+<td>18.8444%</td>
+<td>33.2462%</td>
+<td>0.604258</td>
+<td>0.913408</td>
+<td>0.123278</td>
+<td><strong>0.122588 m/s</strong></td>
+</tr>
+<tr>
+<td><strong>混合数据微调模型</strong></td>
+<td>79.5441%</td>
+<td>93.0604%</td>
+<td>0.914383</td>
+<td>0.924000</td>
+<td>0.167662</td>
+<td>0.183138 m/s</td>
+</tr>
+</tbody>
+</table>
+<h4 id="32-可视化结果">3.2 可视化结果</h4>
+<p><strong>3.2.1 Seed Ground Truth（左） vs Kimodo RP（中） vs 游戏数据微调模型（右）</strong></p>
+<p>在我们标注的数据集上训练过后，模型丧失了原本在seed数据集上的表现</p>
+<p><img src="assets/final/seed-gold-content.gif" alt="SEED Content：原始模型与 Gold 微调模型" /></p>
+<p><img src="assets/final/seed-gold-repetition.gif" alt="SEED Repetition：原始模型与 Gold 微调模型" /></p>
+<p><strong>3.2.2 Seed Ground Truth（左） vs 混合训练模型（中） vs 游戏数据微调模型（右）</strong></p>
+<p>运用混合数据训练之后，混合训练模型明显更加贴近seed ground truth，表现远好于只有游戏数据微调的模型</p>
+<p><img src="assets/final/seed-mixed-content.gif" alt="SEED Content：混合模型与游戏数据模型" /></p>
+<p><img src="assets/final/seed-mixed-repetition.gif" alt="SEED Repetition：混合模型与游戏数据模型" /></p>
+<hr />
+<h2 id="八blender-插件与工程演示">八、Blender 插件与工程演示</h2>
+<p>为了避免成果只停留在训练日志和离线动作文件层面，我们完成了 Blender 插件原型，将算法结果转换为动作人员可以直接理解和检查的形式。</p>
+<p>插件目前支持以下核心链路：</p>
+<ol type="1">
+<li><p>在 Blender 中输入或选择动作 Prompt；</p></li>
+<li><p>选择原始模型或指定微调权重；</p></li>
+<li><p>调用 Kimodo 推理流程生成动作；</p></li>
+<li><p>将生成结果导入或绑定到 Blender 角色；</p></li>
+<li><p>直接播放并观察动作；</p></li>
+<li><p>对原始模型和微调模型进行 A/B 对比。</p>
+<p>Blender 插件证明模型结果已经能够进入真实动作编辑环境，也降低了算法人员与动作美术沟通的门槛。当前插件尚不是完整生产工具，但已经覆盖从 Prompt 到动作预览的核心闭环，并为后续接入游戏动作制作流程提供了接口原型。</p>
+<hr /></li>
+</ol>
+<h2 id="九最终结论">九、最终结论</h2>
+<p>结合定量结果和动作可视化，本项目已经验证以下结论：</p>
+<ol type="1">
+<li><p><strong>Kimodo-SOMA-RP-v1.1 可以基于开源权重进行后训练。</strong> 数据处理、训练、推理、评测和 Blender 可视化链路已经打通，形成了完整的游戏动作域适配原型。</p></li>
+<li><p><strong>Kimodo 具备学习游戏动作域的能力。</strong> 高质量 Gold 数据训练后，游戏动作的 Root 轨迹和身体姿态误差明显下降，Attack、Knocked Down、Hover 等类别均表现出明显改善；但 Jump、Hover 的垂直轨迹和部分下半身动态仍是当前主要瓶颈。</p></li>
+<li><p><strong>Prompt 与 Motion 的对齐质量是影响领域学习效果的关键因素。</strong> 7,951 条自动标注数据虽然规模更大，但训练效果不稳定；转向 748 条人工审核 Gold 数据后，模型能够更有效地学习目标动作。现有实验说明，相比继续扩大低质量数据规模，优先提高监督数据的一致性更有效。</p></li>
+<li><p><strong>模型已经具备一定的 Unseen Prompt 泛化能力。</strong> Inplace Normal、Knocked Down、Attack 和 Hover 在未见描述上能够保持主要动作类别和部分时序结构，但 Jump 和复杂多阶段动作仍不稳定，说明模型并非只是在记忆训练文本，但细粒度时序建模能力仍有限。</p></li>
+<li><p><strong>单域全参数微调会造成明显的原始能力遗忘，但混合训练可以大幅缓解这一问题。</strong> Gold-only 模型在 SEED Content 和 Repetition 上的语义指标大幅下降；加入 SEED 原始数据进行混合训练后，SEED Content R@1 从 <strong>38.86% 恢复到 95.33%</strong>，Repetition R@1 从 <strong>18.84% 恢复到 79.54%</strong>，同时游戏域效果仍基本保持。说明“游戏域增强与原始语义能力保持”并非不可兼得。</p>
+<blockquote>
+<p><strong>本项目完成了可复现的 Kimodo 游戏动作后训练原型，验证了游戏动作域的可学习性，并通过 Gold 数据、Unseen Prompt、RTE/BPE 与 SEED 保持评测建立了完整的验证闭环。进一步的混合训练实验表明，单域微调造成的原始能力遗忘可以被显著缓解。当前主要问题已经从“模型能不能学会游戏动作、会不会严重遗忘”收敛为“如何在保持游戏域能力和 SEED 语义能力的同时，进一步改善 Jump / Hover、Contact 和 Foot Skate 等运动质量问题”。</strong></p>
+</blockquote></li>
+</ol>
+<h2 id="附录一ai-native-实践与团队协作">附录一：AI Native 实践与团队协作</h2>
+<ol type="1">
+<li><h3 id="ai-native-实践">AI Native 实践</h3>
+<p>本项目中，AI 主要用于辅助技术报告阅读、代码结构梳理、数据处理脚本初稿、实验记录整理、自动 Prompt 候选生成、运行日志归纳和阶段性结果对比。</p>
+<p>AI 提高了前期开发效率，但项目中最重要的一次转折也来自对 AI 输出边界的识别：自动 Prompt 在动作类别层面可能基本正确，却容易遗漏时序、幅度、起止状态、身体部位和根节点位移。直接把这些内容作为训练真值，会将生成错误转化为模型监督噪声。</p>
+<p>因此，本项目对 AI Native 的理解不是“将任务全部交给大模型”，而是：</p>
+<blockquote>
+<p>让 AI 承担高频、可验证、可批量的工作，把人工投入集中在标签标准、动作核验、异常判断、证据评审和关键技术决策上。</p>
+</blockquote>
+<p>AI 生成的 Prompt 被定位为人工标注候选，而不再被默认视为 Gold 标签；AI 生成的代码也需要经过实际运行和代码审查，实验结论则必须通过训练日志、量化指标、动作可视化和复现实验进行验证。</p>
+<p>对于训练失败、动作异常或评测指标冲突的情况，AI 可以协助整理现象、检查代码路径和提出排查方向，但不能仅根据训练损失下降或少量成功案例直接宣布模型能力得到提升。</p></li>
+<li><h3 id="由项目大脑r-sdd驱动的算法团队定制ai协作">由项目大脑+R-SDD驱动的算法团队定制AI协作</h3>
+<p>随着项目进入数据清洗、人工标注、模型训练、能力保持、推理评测、可视化和工具开发等并行阶段，仅依赖聊天记录和个人记忆、仓库已经难以完整表达项目当前状态。为此，项目中期开发并引入了“项目大脑”和研究规范驱动开发（即R-SDD）方法，用于沉淀现有工作并支持后续协作。</p>
+<p>R-SDD将一次研究过程拆分为：</p>
+<pre class="plaintext"><code>研究问题
+→ 实验方案
+→ 准备就绪审查
+→ 实验执行
+→ 原始证据登记
+→ 独立证据评审
+→ 团队决策
+→ 修订、复现、采纳或停止</code></pre>
+<p>其中，研究问题负责说明“需要回答什么”，实验方案负责说明“如何产生证据”，实验记录负责保存实际代码版本、运行环境、输入输出、指标、产物和方案偏差，证据评审负责区分“实验是否有效”“证据说明什么”和“团队下一步做什么”。</p>
+<p>项目设置两个关键人工审查环节（门控）：</p>
+<ul>
+<li><p>实验执行前，由明确的审查人检查研究问题、实验方案、评价标准、负责人、成本和风险，审查通过后冻结实验方案；</p></li>
+<li><p>实验完成后，由独立评审人员检查原始产物、方案偏差、指标和动作可视化，再决定证据是否有效以及是否采纳、拒绝、修订、复现或停止。</p>
+<p>项目大脑不替代原始实验记录，而是根据研究规范、实验方案、实验记录、评审结论和交接信息自动生成当前项目摘要，集中展示：</p></li>
+<li><p>当前研究和实验处于什么阶段；</p></li>
+<li><p>每项工作由谁负责；</p></li>
+<li><p>哪些实验正在运行或等待评审；</p></li>
+<li><p>当前有哪些风险和阻塞条件；</p></li>
+<li><p>最近形成了哪些经过评审的结论；</p></li>
+<li><p>下一位成员可以接手什么工作。</p>
+<p>新成员进入项目后，可以通过命令行工具先校验研究记录，再生成面向真人或 AI 的接手数据包。例如：</p>
+<pre class="plaintext"><code>research validate
+research onboard
+research onboard --role reviewer
+research onboard --json</code></pre>
+<p>其中，<code>research validate</code> 用于检查研究记录和冻结实验方案的一致性，<code>research onboard</code> 用于向真人展示当前状态、风险和可接任务，结构化输出则可以交给 Codex 等代码智能体读取。这样，新成员不需要恢复完整聊天记录，也不需要依赖某一位成员口头讲解全部上下文。</p>
+<p>项目同时使用六类智能体角色进行策略规划、研究负责、实验执行、能力保持、推理评测、证据整理和协作基础设施维护等过程，用于验证任务能否被明确交接。智能体角色可以由任何一名真人接手，也可以由多名成员共同承担；真实贡献以代码提交、训练日志、实验记录、标注记录、评测结果和交付物为准。</p>
+<p>一次完成的协作循环如下：</p>
+<p><img src="assets/final/rsdd-flow.png" alt="项目大脑与 R-SDD 协作流程" /></p></li>
+</ul></li>
+</ol>
+<h3 id="3-成员分工与贡献追溯">3. 成员分工与贡献追溯</h3>
+<p>本项目中的智能体角色主要用于协作流程演练，实际成果归属按照真人承担的工作和可追溯材料认定。成员可以同时承担多个角色，同一类工作也可以由多名成员共同完成。</p>
+<table>
+<thead>
+<tr>
+<th><strong>成员</strong></th>
+<th><strong>对应协作角色</strong></th>
+<th><strong>主要职责</strong></th>
+<th><strong>可追溯材料</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>邹（队长）</td>
+<td>研究负责人、核心实验负责人、审查组织者</td>
+<td>负责项目进程把控和任务协调，组织方案审查；承担第一阶段和第二阶段的大部分模型训练、微调、推理、测评和结果分析；参与游戏动作数据清洗与标注</td>
+<td>代码提交、训练配置、训练日志、模型权重、评测结果、实验记录、审查记录、标注记录</td>
+</tr>
+<tr>
+<td>林</td>
+<td>项目策略与成果表达</td>
+<td>提出项目整体策略，梳理阶段目标、结论边界和后续方向，负责结题汇报 HTML 制作与成果表达</td>
+<td>项目策略文档、汇报 HTML 及修改记录、阶段总结</td>
+</tr>
+<tr>
+<td>齐</td>
+<td>能力保持与对照实验负责人</td>
+<td>使用人工标注数据训练模型并验证效果；开展人工标注数据与部分原始数据的混合训练，评估游戏动作能力增强后能否保留模型原有能力；参与游戏动作数据清洗与标注</td>
+<td>训练脚本、混合数据配置、模型权重、训练日志、保持能力评测结果、实验对比记录、标注记录</td>
+</tr>
+<tr>
+<td>刘</td>
+<td>模型推理、量化评测与复现流程负责人</td>
+<td>负责 Kimodo 模型推理与评测流程开发，完成多版本模型的批量推理和量化指标计算，建立标准化评测基线；整理实验文档和可复现流程；参与游戏动作数据清洗与标注</td>
+<td>推理与批量评测脚本、多版本模型评测结果、量化指标记录、标准化评测基线、实验文档、复现流程说明、数据清洗与标注记录</td>
+</tr>
+<tr>
+<td>赵</td>
+<td>动作可视化、标注平台与时序语义实验负责人</td>
+<td>负责游戏动作可视化复现，搭建人工标注平台；开展文本编码器时序语义理解实验，分析实验结果，并沉淀数据处理规范与复现实验文档；参与游戏动作数据清洗与标注</td>
+<td>动作可视化代码与结果、标注平台代码、时序语义实验记录与分析结果、数据处理规范、复现实验文档、数据清洗与标注记录</td>
+</tr>
+<tr>
+<td>何</td>
+<td>项目大脑与协作基础设施负责人、业务演示开发者</td>
+<td>开发和维护项目大脑及研究规范驱动开发工具，建设研究状态校验、新成员接手和证据交接机制；负责 Blender 插件业务线开发；参与游戏动作数据清洗与标注</td>
+<td>研究协作工具代码、Git 提交和合并请求、命令行工具与设计文档、Blender 插件代码、演示材料、标注记录</td>
+</tr>
+</tbody>
+</table>
+<p>项目最终以版本控制记录、训练日志、模型权重、数据版本、人工标注记录、评测结果、动作可视化、实验文档和合并请求作为主要贡献证明。AI 生成内容、智能体模拟记录和聊天记录仅作为辅助过程材料，不能单独作为成员贡献或实验结论的依据。</p>
+<hr />
+<h2 id="附录二核心交付物与复现情况">附录二：核心交付物与复现情况</h2>
+<p>项目已经形成或需要在结题前完成最终整理的资产如下：</p>
+<table>
+<thead>
+<tr>
+<th><strong>类别</strong></th>
+<th><strong>交付内容</strong></th>
+<th><strong>当前状态</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>数据</td>
+<td>7,951 条初筛数据、748 条 Gold 数据及 598/75/75 划分</td>
+<td>已完成</td>
+</tr>
+<tr>
+<td>数据工具</td>
+<td>动作筛选、骨架重定向、特征提取、质检与数据划分脚本</td>
+<td>已完成</td>
+</tr>
+<tr>
+<td>标注工具</td>
+<td>人工标注平台、Kimodo Prompt 标签转换标准</td>
+<td>已完成</td>
+</tr>
+<tr>
+<td>训练</td>
+<td>Phase 1/Phase 2 训练代码、配置、超参数和 Checkpoint</td>
+<td>已完成</td>
+</tr>
+<tr>
+<td>评测</td>
+<td>TMR、RTE、BPE、unseen Prompt 和 SEED 保持评测</td>
+<td>已完成</td>
+</tr>
+<tr>
+<td>演示</td>
+<td>Blender 插件、典型案例和对比视频</td>
+<td>已完成</td>
+</tr>
+<tr>
+<td>文档</td>
+<td>环境依赖、数据准备、训练、推理、评测和已知问题说明</td>
+<td>已完成</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="附录三安全版权与可维护性">附录三：安全、版权与可维护性</h2>
+<p>本项目使用开源模型权重和开源数据时，需要遵守各自的 License 和使用范围。内部游戏动作数据只能在已有授权范围内用于研究和验证，不能将原始动作、Prompt、衍生数据集或训练权重擅自公开。</p>
+<p>在数据管理上，需要保存数据来源、筛选规则、版本号和人工标注记录。Gold 数据的任何修改都应产生新版本，避免数据变化后仍使用旧实验结果。</p>
+<p>在模型维护上，Checkpoint 必须与训练配置、数据版本和评测报告绑定，不能仅依靠文件名区分模型，也不能用未经验证的新权重覆盖已有结果。</p>
+<p>当前管线已经将数据转换、训练、评测和 Blender 展示拆分为独立模块。后续正式游戏动作数据到位后，可以沿用现有数据协议和评测方法，而不需要重新设计整套系统。</p>
+</body>
+</html>

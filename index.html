@@ -1,0 +1,491 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Kimodo-SOMA-RP 游戏动作后训练探索最终结题展示：43 个实验素材、完整训练数据与三维评测。">
+  <title>Kimodo-SOMA-RP 后训练探索｜最终结题展示</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23191a23'/%3E%3Cpath d='M13 15h10v34H13zm14 0h10l14 17-14 17H27l14-17z' fill='%23c6f36b'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="styles.css?v=10">
+</head>
+<body>
+  <a class="skip-link" href="#cover">跳到正文</a>
+  <header class="topbar">
+    <div class="brandmark"><span>Kimodo · SOMA-RP</span></div>
+    <div class="progress-track" aria-hidden="true"><div class="progress-bar"></div></div>
+    <div class="top-actions">
+      <span class="counter" aria-live="polite">01 / 14</span>
+      <button class="mini-button chapter-button" type="button" data-current-detail>展开本章</button>
+      <a class="mini-button" href="full-report.html" target="_blank" rel="noopener">完整原文</a>
+      <a class="mini-button" href="Kimodo-SOMA-RP-report.pdf" target="_blank" rel="noopener">最终 PDF</a>
+    </div>
+  </header>
+
+  <nav class="rail" aria-label="章节导航">
+    <a href="#demo-video" data-label="开场、Blender 插件演示"></a>
+    <a href="#cover" data-label="封面"></a>
+    <a href="#background" data-label="一、背景与需求"></a>
+    <a href="#phase1" data-label="二、Phase 1"></a>
+    <a href="#phase2" data-label="三、Phase 2"></a>
+    <a href="#structured" data-label="四、Structured Loss"></a>
+    <a href="#gold" data-label="五、人工 Gold"></a>
+    <a href="#strategies" data-label="六、三种训练策略"></a>
+    <a href="#evaluation" data-label="七、三维评测"></a>
+    <a href="#blender" data-label="八、Blender"></a>
+    <a href="#conclusion" data-label="九、最终结论"></a>
+    <a href="#ai-native" data-label="附录一、AI Native"></a>
+    <a href="#deliverables" data-label="附录二、交付复现"></a>
+    <a href="#safety" data-label="附录三、安全维护"></a>
+  </nav>
+
+  <main>
+    <section class="slide video-intro" id="demo-video" data-number="FILM" aria-labelledby="demo-video-title">
+      <div class="stage video-intro-stage">
+        <div class="video-intro-head">
+          <div>
+            <p class="eyebrow">Opening demo · Blender pipeline</p>
+            <h1 id="demo-video-title">Blender 插件演示</h1>
+          </div>
+          <div class="video-intro-copy">
+            <p>先看从 Prompt 到角色动画的实际闭环，再进入训练方法、实验数据与结论。</p>
+            <a class="primary-button" href="#cover">进入结题展示 ↓</a>
+          </div>
+        </div>
+        <div class="video-frame">
+          <video class="intro-video" controls autoplay muted playsinline preload="metadata">
+            <source src="assets/final/blender-plugin-demo.mp4" type="video/mp4">
+            您的浏览器不支持视频播放，请打开 assets/final/blender-plugin-demo.mp4。
+          </video>
+          <div class="video-caption"><span>01:47 · 720p · 本地离线视频</span><span>默认静音自动播放，可在播放器中开启声音</span></div>
+        </div>
+      </div>
+      <footer class="slide-footer"><span>Blender 插件 · 工程演示</span><span>↓ 视频后进入完整结题展示</span></footer>
+    </section>
+
+    <section class="slide" id="cover" data-number="00" aria-labelledby="cover-title">
+      <div class="stage hero-layout">
+        <div>
+          <p class="eyebrow">Post-training exploration · Final release</p>
+          <h1 id="cover-title">从开源验证到游戏动作域适配</h1>
+          <p class="lede">围绕 NVIDIA Kimodo-SOMA-RP-v1.1，自主恢复数据、训练、评测与 Blender 链路。高质量 Gold 数据验证了游戏动作可学习性；进一步的混合训练，在基本保持游戏域效果的同时显著恢复 SEED 语义能力。</p>
+          <div class="evidence-band" aria-label="项目证据总览"><span>最终版 48 页 PDF</span><span>43 个实验 / 动态 Case</span><span>18 张完整数据表</span><span>成功、失败与代价同时展示</span></div>
+          <div class="button-row">
+            <a class="primary-button" href="#background">开始展示 ↓</a>
+            <button class="ghost-button" data-dialog="detail-overview">查看项目摘要</button>
+            <button class="ghost-button motion-cta" data-dialog="detail-case-index">播放 43 个实验 / Case</button>
+            <a class="ghost-button" href="full-report.html" target="_blank" rel="noopener">逐章完整原文</a>
+          </div>
+          <div class="hero-meta">
+            <div><span>Source</span><strong>21,529 动作</strong></div>
+            <div><span>Gold set</span><strong>748 条</strong></div>
+            <div><span>Replay</span><strong>约 1 : 1</strong></div>
+          </div>
+        </div>
+        <div class="hero-visual" aria-label="最终动态实验预览">
+          <div class="hero-visual-head"><span>Motion evidence</span><strong>43 assets</strong></div>
+          <button class="case-card motion-card hero-case-wide" data-caption="混合训练游戏动作对照一"><img src="assets/final/mixed-game-01.gif" alt="混合训练游戏动作对照一" loading="lazy"><span>Mixed game · 01</span></button>
+          <button class="case-card motion-card" data-caption="Unseen Prompt：Hover"><img src="assets/final/unseen-hover.gif" alt="Unseen Prompt：Hover" loading="lazy"><span>Unseen · Hover</span></button>
+          <button class="case-card motion-card" data-caption="SEED Content：混合模型与游戏数据模型"><img src="assets/final/seed-mixed-content.gif" alt="SEED Content：混合模型与游戏数据模型" loading="lazy"><span>SEED Mixed · Content</span></button>
+        </div>
+      </div>
+      <footer class="slide-footer"><span>最终结题展示 · 2026</span><span>↓ 滚动或按方向键</span></footer>
+    </section>
+
+    <section class="slide" id="background" data-number="01" aria-labelledby="background-title">
+      <div class="stage split">
+        <div>
+          <p class="eyebrow">一、项目背景与业务需求</p>
+          <h2 id="background-title">模型要理解完整动作过程</h2>
+          <p class="lede">服务游戏动作制作人员与动作生成算法研发人员。模型不能只生成模糊抬腿，而要表达站立、蓄力、离地、空中停留、落地及恢复的连续时序、重心和根节点高度变化。</p>
+          <div class="evidence-band"><span>约 700 小时商业预训练数据</span><span>官方后训练代码未开放</span><span>游戏动作 Domain Gap 明显</span></div>
+          <div class="button-row"><button class="detail-button" data-dialog="detail-background">范围、验收与业务场景</button></div>
+        </div>
+        <div>
+          <div class="statement"><span class="status-pill partial">核心研究问题</span><h3>能否增强游戏动作能力，并客观判断原始能力代价？</h3><p>项目需要同时恢复工程链路、建立领域数据，并用目标域、Unseen Prompt 和 SEED 保持三类证据回答问题。</p></div>
+          <ol class="steps">
+            <li><b>01</b><span>Phase 1：开源 SEED 子集验证后训练链路。</span></li>
+            <li><b>02</b><span>Phase 2：游戏数据转换、Prompt、训练与评测。</span></li>
+            <li><b>03</b><span>工程交付：数据、权重、脚本、文档与 Blender 原型。</span></li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" id="phase1" data-number="02" aria-labelledby="phase1-title">
+      <div class="stage case-layout">
+        <div>
+          <p class="eyebrow">二、Phase 1 · 开源验证</p>
+          <h2 id="phase1-title">后训练可行，但单指标会说谎</h2>
+          <p class="lede">Dancing、Object Manipulation、G+C 子集用于验证学习率、步数和动作分布的耦合。代表性实验提升多数 T2M R@K，但动作足底稳定性同步变差。</p>
+          <div class="evidence-band"><span>R@1：78.720% → 79.150%</span><span>R@3：90.210% → 91.910%</span><span>Height：0.077078 → 0.086261</span></div>
+          <div class="metric-strip">
+            <div class="metric good"><span>T2M R@2</span><strong>+5.10</strong><small>百分点</small></div>
+            <div class="metric good"><span>T2M R@5</span><strong>+3.41</strong><small>百分点</small></div>
+            <div class="metric warn"><span>Foot skate</span><strong>↑</strong><small>0.036120 → 0.042050</small></div>
+            <div class="metric"><span>Config</span><strong>1e-7</strong><small>3,000 steps</small></div>
+          </div>
+          <div class="button-row"><button class="detail-button" data-dialog="detail-phase1">完整指标与阶段结论</button></div>
+        </div>
+        <div class="case-grid"><button class="case-card motion-card" data-caption="Phase 1 Content：Ground Truth、原始模型与微调模型"><img src="assets/final/phase1-content.gif" alt="Phase 1 Content：Ground Truth、原始模型与微调模型" loading="lazy"><span>Phase 1 · Content</span></button><button class="case-card motion-card" data-caption="Phase 1 Repetition：Ground Truth、原始模型与微调模型"><img src="assets/final/phase1-repetition.gif" alt="Phase 1 Repetition：Ground Truth、原始模型与微调模型" loading="lazy"><span>Phase 1 · Repetition</span></button></div>
+      </div>
+    </section>
+
+    <section class="slide" id="phase2" data-number="03" aria-labelledby="phase2-title">
+      <div class="stage split">
+        <div>
+          <p class="eyebrow">三、Phase 2 · 数据转换与初步训练</p>
+          <h2 id="phase2-title">三条路线收敛，动作仍“脚钉地”</h2>
+          <p class="lede">从 21,529 条原始动作筛到 7,951 条训练样本。小批次训练、加噪 MSE 和未规范化路线都能看到数值变化，却没有稳定学会攻击、跳跃与浮空。</p>
+          <div class="evidence-band"><span>30 fps</span><span>90×369 Kimodo 特征</span><span>重定向 + 中性手腕修复</span><span>失败路线完整保留</span></div>
+          <div class="metric-strip">
+            <div class="metric"><span>Raw</span><strong>21,529</strong></div>
+            <div class="metric"><span>Single actor</span><strong>≈9,000</strong></div>
+            <div class="metric good"><span>Keep human</span><strong>7,951</strong></div>
+            <div class="metric"><span>Split</span><strong class="compact-number">6,532 / 1,419</strong></div>
+          </div>
+          <div class="button-row"><button class="detail-button" data-dialog="detail-phase2">数据流程与三次失败</button></div>
+        </div>
+        <div class="case-grid"><button class="case-card" data-caption="7,951 条游戏动作初步训练损失曲线"><img src="assets/final/phase2-loss.png" alt="7,951 条游戏动作初步训练损失曲线" loading="lazy"><span>Phase 2 · Loss</span></button><button class="case-card motion-card" data-caption="Hover 脚钉地失败案例"><img src="assets/final/phase2-hover-failure.gif" alt="Hover 脚钉地失败案例" loading="lazy"><span>Failure · Hover</span></button><button class="case-card motion-card" data-caption="Jump 脚钉地失败案例"><img src="assets/final/phase2-jump-failure.gif" alt="Jump 脚钉地失败案例" loading="lazy"><span>Failure · Jump</span></button><button class="case-card motion-card" data-caption="加噪 MSE 动态重建结果"><img src="assets/final/noisy-reconstruction.gif" alt="加噪 MSE 动态重建结果" loading="lazy"><span>Noisy reconstruction</span></button></div>
+      </div>
+    </section>
+
+    <section class="slide" id="structured" data-number="04" aria-labelledby="structured-title">
+      <div class="stage case-layout">
+        <div>
+          <p class="eyebrow">四、Structured Motion Loss 与两阶段训练</p>
+          <h2 id="structured-title">损失有效，监督质量成为主瓶颈</h2>
+          <p class="lede">训练目标由单一 MSE 扩展为 Root、关节、速度、接触和 FK 的 7 项 masked Smooth L1。Stage 1 出现可用案例；Stage 2 加入稀疏全身关键帧后没有形成稳定视觉增益。</p>
+          <div class="evidence-band"><span>预测目标：x₀</span><span>权重：10 / 2 / 10 / 3 / 10 / 4 / 5</span><span>变长序列 masked</span></div>
+          <ul class="findings">
+            <li><b>Stage 1</b><span>攻击、原地和部分击倒改善；Jump、Hover 和大 Root 位移仍弱。</span></li>
+            <li><b>Stage 2</b><span>Text 与 Sparse Full-body Keyframe Constraints 混合，可训练可推理，提升不稳定。</span></li>
+            <li><b>定位</b><span>主要问题收敛到自动 Prompt 质量与游戏动作 Domain Gap。</span></li>
+          </ul>
+          <div class="button-row"><button class="detail-button" data-dialog="detail-structured">损失定义、两阶段与问题定位</button></div>
+        </div>
+        <div class="case-grid"><button class="case-card motion-card" data-caption="自动 Prompt 与动作错配案例"><img src="assets/final/prompt-error.gif" alt="自动 Prompt 与动作错配案例" loading="lazy"><span>Prompt error</span></button><button class="case-card" data-caption="Prompt 正确但模型未充分学习案例"><img src="assets/final/underlearned.png" alt="Prompt 正确但模型未充分学习案例" loading="lazy"><span>Underlearned</span></button><button class="case-card motion-card" data-caption="Structured Motion Loss 较好案例二"><img src="assets/final/stage1-good-02.gif" alt="Structured Motion Loss 较好案例二" loading="lazy"><span>Stage 1 · Good 02</span></button><button class="case-card motion-card" data-caption="Stage 1 与 Stage 2 动态对比一"><img src="assets/final/stage2-case-01.gif" alt="Stage 1 与 Stage 2 动态对比一" loading="lazy"><span>Stage 1 vs Stage 2 · 01</span></button></div>
+      </div>
+    </section>
+
+    <section class="slide" id="gold" data-number="05" aria-labelledby="gold-title">
+      <div class="stage split">
+        <div>
+          <p class="eyebrow">五、关键转折 · AI Prompt → 人工 Gold</p>
+          <h2 id="gold-title">数据质量，比继续扩规模更重要</h2>
+          <p class="lede">自动 Prompt 容易遗漏动作顺序、幅度、起止姿态和身体部位。项目转向人工审核 Motion-Prompt，并通过标注平台建立可追溯的数据质量链路。</p>
+          <div class="evidence-band"><span>LLM2Vec strict pass：52.03%</span><span>8 条人工标签标准</span><span>逐帧预览 + 复查 + 导出</span></div>
+          <div class="metric-strip">
+            <div class="metric"><span>Candidate</span><strong>1,200</strong></div>
+            <div class="metric"><span>Deduplicated</span><strong>842</strong></div>
+            <div class="metric good"><span>Gold</span><strong>748</strong></div>
+            <div class="metric"><span>Classes</span><strong>5</strong></div>
+          </div>
+          <div class="button-row"><button class="detail-button" data-dialog="detail-gold">LLM2Vec、平台与 Gold 构成</button></div>
+        </div>
+        <div class="media-stack">
+          <button class="case-card feature-media" data-caption="Kimodo 游戏动作人工标注平台"><img src="assets/final/annotation-platform.png" alt="Kimodo 游戏动作人工标注平台" loading="lazy"><span>Annotation platform</span></button>
+          <div class="case-grid compact-case-grid"><button class="case-card motion-card" data-caption="Gold 标注攻击动作学习结果"><img src="assets/final/gold-annotated-attack.gif" alt="Gold 标注攻击动作学习结果" loading="lazy"><span>Gold · Attack</span></button><button class="case-card motion-card" data-caption="Gold 标注浮空动作学习结果"><img src="assets/final/gold-annotated-hover.gif" alt="Gold 标注浮空动作学习结果" loading="lazy"><span>Gold · Hover</span></button></div>
+          <ul class="findings"><li><b>243</b><span>被击倒</span></li><li><b>167</b><span>原地正常动作</span></li><li><b>154</b><span>浮空</span></li><li><b>140</b><span>攻击</span></li><li><b>44</b><span>跳跃，类别明显不足</span></li></ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" id="strategies" data-number="06" aria-labelledby="strategies-title">
+      <div class="stage split">
+        <div>
+          <p class="eyebrow">六、三种训练策略及可视化结果</p>
+          <h2 id="strategies-title">先证明可学，再解决遗忘</h2>
+          <p class="lede">过拟合实验完成训练链路单元测试；正式 Gold 训练验证目标域可学习性；约 1:1 的 SEED 回放混合训练在基本保持游戏域效果的同时，大幅恢复原始语义能力。</p>
+          <div class="metric-strip">
+            <div class="metric good"><span>Overfit RTE ↓</span><strong class="compact-number">.552 → .130</strong><small>748-games</small></div>
+            <div class="metric good"><span>Gold RTE ↓</span><strong class="compact-number">.586 → .316</strong><small>75 test</small></div>
+            <div class="metric good"><span>SEED Content R@1</span><strong class="compact-number">38.86 → 95.33%</strong><small>Gold → Mixed</small></div>
+            <div class="metric good"><span>SEED Repetition R@1</span><strong class="compact-number">18.84 → 79.54%</strong><small>Gold → Mixed</small></div>
+          </div>
+          <ol class="steps"><li><b>01</b><span>过拟合：验证模型、特征、Prompt、Loss 和推理闭环。</span></li><li><b>02</b><span>正式 Gold：598 / 75 / 75，Stage 1 全参数 denoiser。</span></li><li><b>03</b><span>混合训练：20 类×40，martial art×20，与 Gold 约 1:1。</span></li></ol>
+          <div class="button-row"><button class="detail-button" data-dialog="detail-strategies">三种策略完整配置与指标</button><button class="detail-button" data-dialog="detail-gold-cases">Gold 测试 Case</button><button class="detail-button" data-dialog="detail-mixed-cases">混合训练 Case</button></div>
+        </div>
+        <div class="case-grid"><button class="case-card motion-card" data-caption="混合训练游戏动作对照一"><img src="assets/final/mixed-game-01.gif" alt="混合训练游戏动作对照一" loading="lazy"><span>Mixed game · 01</span></button><button class="case-card motion-card" data-caption="混合训练游戏动作对照二"><img src="assets/final/mixed-game-02.gif" alt="混合训练游戏动作对照二" loading="lazy"><span>Mixed game · 02</span></button><button class="case-card motion-card" data-caption="混合训练游戏动作对照三"><img src="assets/final/mixed-game-03.gif" alt="混合训练游戏动作对照三" loading="lazy"><span>Mixed game · 03</span></button><button class="case-card motion-card" data-caption="混合训练游戏动作对照四"><img src="assets/final/mixed-game-04.gif" alt="混合训练游戏动作对照四" loading="lazy"><span>Mixed game · 04</span></button></div>
+      </div>
+    </section>
+
+    <section class="slide" id="evaluation" data-number="07" aria-labelledby="evaluation-title">
+      <div class="stage split">
+        <div>
+          <p class="eyebrow">七、三维量化评测体系</p>
+          <h2 id="evaluation-title">目标域、泛化、保持，三者同时成立</h2>
+          <p class="lede">RTE/BPE 判断游戏动作是否学会；Unseen Prompt 判断是否只记忆训练文本；SEED 保持评测判断领域增强是否破坏原始能力。</p>
+          <div class="evidence-band"><span>RTE：Root Trajectory Error</span><span>BPE：Body Pose Error</span><span>按 motion_id 逐帧配对，不使用 DTW</span></div>
+          <div class="button-row"><button class="detail-button" data-dialog="detail-evaluation">指标定义与三维框架</button><button class="detail-button" data-dialog="detail-target-table">AI / Gold / Mixed 完整表</button><button class="detail-button" data-dialog="detail-unseen">Unseen 分类结果</button><button class="detail-button" data-dialog="detail-seed-table">SEED 保持完整表</button></div>
+        </div>
+        <div>
+          <ol class="steps">
+            <li><b>目标域</b><span><strong>Gold：</strong>RTE 0.585655 → 0.315964，BPE 0.493341 → 0.324660。</span></li>
+            <li><b>Unseen</b><span>Inplace 较稳定；Knocked Down、Attack、Hover 有一定泛化；Jump 仍不稳定。</span></li>
+            <li><b>保持</b><span>Mixed Content R@1 95.3256%，Repetition R@1 79.5441%，显著高于 Gold-only。</span></li>
+          </ol>
+          <div class="statement"><span class="status-pill partial">当前瓶颈</span><h3>Jump / Hover、Contact 与 Foot Skate</h3><p>混合训练缓解语义遗忘，但垂直 Root 轨迹、下半身动态和足底运动质量仍需进一步优化。</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" id="blender" data-number="08" aria-labelledby="blender-title">
+      <div class="stage split">
+        <div>
+          <p class="eyebrow">八、Blender 插件与工程演示</p>
+          <h2 id="blender-title">从 Prompt 到可编辑骨骼关键帧</h2>
+          <p class="lede">算法结果不再停留在训练日志和离线动作文件。Blender 原型支持选择 Prompt 与权重、调用推理、导入角色、播放检查，并在同条件下完成原始模型与微调模型 A/B。</p>
+          <div class="evidence-band"><span>Prompt + 权重</span><span>可播放、可编辑</span><span>同种子 / 帧数 / 骨架 A/B</span></div>
+          <div class="button-row"><button class="detail-button" data-dialog="detail-blender">六步链路与原型边界</button></div>
+        </div>
+        <ol class="steps"><li><b>01</b><span>输入或选择动作 Prompt。</span></li><li><b>02</b><span>选择原始模型或微调权重。</span></li><li><b>03</b><span>调用 Kimodo 推理生成动作。</span></li><li><b>04</b><span>导入或绑定到 Blender 角色。</span></li><li><b>05</b><span>直接播放、观察和继续编辑。</span></li><li><b>06</b><span>保持同 Prompt、种子、帧数和骨架进行 A/B。</span></li></ol>
+      </div>
+    </section>
+
+    <section class="slide" id="conclusion" data-number="09" aria-labelledby="conclusion-title">
+      <div class="stage">
+        <p class="eyebrow">九、最终结论</p>
+        <h2 id="conclusion-title">游戏动作能学会，遗忘也能显著缓解</h2>
+        <p class="lede">项目从无官方后训练代码、无商业训练数据出发，完成数据、Prompt、训练、三维评测和 Blender 闭环。最终问题已从“能不能学会、会不会严重遗忘”，收敛为“如何继续改善运动质量”。</p>
+        <div class="evidence-band"><span>43 个最终实验素材</span><span>18 张完整数据表</span><span>5 类 Unseen Prompt</span><span>7 类交付全部完成</span></div>
+        <div class="metric-strip">
+          <div class="metric good"><span>Pipeline</span><strong>打通</strong><small>数据 → 训练 → 推理 → 评测</small></div>
+          <div class="metric good"><span>Learnability</span><strong>验证</strong><small>Gold 提升目标域</small></div>
+          <div class="metric good"><span>Retention</span><strong>缓解</strong><small>混合训练恢复 SEED</small></div>
+          <div class="metric warn"><span>Next</span><strong>质量</strong><small>Jump / Hover / Foot Skate</small></div>
+        </div>
+        <div class="statement"><p><strong>最终判断：</strong>高质量监督使 Kimodo 学会游戏动作；SEED 回放使游戏域增强和原始语义能力保持不再互斥。当前重点转向垂直轨迹、下半身动态、Contact 和 Foot Skate。</p></div>
+        <div class="button-row"><button class="detail-button" data-dialog="detail-conclusion">五条最终结论与边界</button><button class="detail-button motion-cta" data-dialog="detail-case-index">完整 43 项证据</button></div>
+      </div>
+    </section>
+
+    <section class="slide" id="ai-native" data-number="A1" aria-labelledby="ai-native-title">
+      <div class="stage split">
+        <div>
+          <p class="eyebrow">附录一、AI Native 实践与团队协作</p>
+          <h2 id="ai-native-title">AI 批量执行，人类把守证据关口</h2>
+          <p class="lede">AI 用于报告阅读、代码梳理、脚本初稿、Prompt 候选、日志归纳和结果对比；人工投入集中在标签标准、动作核验、异常判断、证据评审与关键技术决策。</p>
+          <div class="evidence-band"><span>方案冻结</span><span>原始证据登记</span><span>独立评审</span><span>采纳 / 拒绝 / 修订 / 复现 / 停止</span></div>
+          <div class="button-row"><button class="detail-button" data-dialog="detail-ai-native">AI Native 与 R-SDD</button><button class="detail-button" data-dialog="detail-team">成员分工与贡献追溯</button></div>
+        </div>
+        <button class="case-card feature-media" data-caption="项目大脑与 R-SDD 协作流程"><img src="assets/final/rsdd-flow.png" alt="项目大脑与 R-SDD 协作流程" loading="lazy"><span>R-SDD flow</span></button>
+      </div>
+    </section>
+
+    <section class="slide" id="deliverables" data-number="A2" aria-labelledby="deliverables-title">
+      <div class="stage split">
+        <div>
+          <p class="eyebrow">附录二、核心交付物与复现情况</p>
+          <h2 id="deliverables-title">从数据到演示，最终链路已闭环</h2>
+          <p class="lede">最终稿确认数据、工具、标注、训练、评测、演示与文档七类交付均已完成，后续可沿用当前数据协议和评测方法继续迭代。</p>
+          <div class="evidence-band"><span>数据</span><span>工具</span><span>标注</span><span>训练</span><span>评测</span><span>演示</span><span>文档</span></div>
+          <div class="button-row"><button class="detail-button" data-dialog="detail-deliverables">完整交付清单</button></div>
+        </div>
+        <ul class="status-list"><li><span class="status-pill valid">已完成</span><span>7,951 初筛数据、748 Gold、598/75/75 划分</span></li><li><span class="status-pill valid">已完成</span><span>训练代码、配置、超参数与 Checkpoint</span></li><li><span class="status-pill valid">已完成</span><span>TMR、RTE、BPE、Unseen 与 SEED 保持评测</span></li><li><span class="status-pill valid">已完成</span><span>Blender 插件、案例视频与复现文档</span></li></ul>
+      </div>
+    </section>
+
+    <section class="slide" id="safety" data-number="A3" aria-labelledby="safety-title">
+      <div class="stage split">
+        <div>
+          <p class="eyebrow">附录三、安全、版权与可维护性</p>
+          <h2 id="safety-title">模型、数据、结果必须绑定版本</h2>
+          <p class="lede">开源模型与数据遵守各自 License；内部游戏动作、Prompt、衍生数据集与权重不得超授权公开。Gold 数据修改必须升版，Checkpoint 必须绑定配置、数据版本和评测报告。</p>
+          <div class="button-row"><button class="detail-button" data-dialog="detail-safety">完整维护约束</button><a class="ghost-button" href="full-report.html" target="_blank" rel="noopener">最终完整原文</a><a class="ghost-button" href="Kimodo-SOMA-RP-report.pdf" target="_blank" rel="noopener">最终 PDF</a></div>
+        </div>
+        <ol class="steps"><li><b>01</b><span>保存数据来源、筛选规则、版本号和人工标注记录。</span></li><li><b>02</b><span>Gold 任何修改产生新版本，不复用旧实验结论。</span></li><li><b>03</b><span>Checkpoint 绑定训练配置、数据版本和评测报告。</span></li><li><b>04</b><span>数据转换、训练、评测和 Blender 展示模块化维护。</span></li></ol>
+      </div>
+      <footer class="slide-footer"><span>Kimodo-SOMA-RP 后训练探索</span><span>END</span></footer>
+    </section>
+  </main>
+
+  <dialog class="drawer" id="detail-overview">
+    <header class="drawer-head"><h3>最终项目摘要</h3><button class="close-button" data-close aria-label="关闭">×</button></header>
+    <div class="drawer-body">
+    <p>本项目围绕 NVIDIA Kimodo-SOMA-RP-v1.1，在商业训练数据与官方后训练代码均未开放的条件下，自主建立可复现的游戏动作后训练原型。</p>
+    <h4>两阶段路线</h4><ol><li>Phase 1 使用开源 SEED 子集验证后训练、Checkpoint 与评测链路。</li><li>Phase 2 完成游戏动作转换、自动 Prompt 复查、人工 Gold、三种训练策略、三维评测与 Blender 原型。</li></ol>
+    <h4>最终结论</h4><p>高质量 Gold 数据使模型学会目标动作；Gold-only 全参数微调产生明显遗忘；加入 SEED 回放的混合训练大幅恢复原始语义能力，同时游戏域效果基本保持。当前主要问题转向 Jump / Hover、Contact 和 Foot Skate。</p>
+    <p><a href="full-report.html#从开源方法验证到游戏动作域适配" target="_blank" rel="noopener">阅读最终完整摘要 ↗</a></p></div>
+  </dialog>
+
+  <dialog class="drawer" id="detail-background">
+    <header class="drawer-head"><h3>一、项目背景与业务需求</h3><button class="close-button" data-close aria-label="关闭">×</button></header>
+    <div class="drawer-body">
+    <p><strong>服务对象：</strong>游戏动作制作人员与动作生成算法研发人员。文本生成动作可用于需求讨论和动作原型，降低攻击、受击、跳跃、浮空与倒地动作的前期试错成本。</p>
+    <blockquote><p>角色从自然站姿开始，双膝弯曲并下沉蓄力，随后双脚蹬地向上跃起，身体在空中短暂停留，最后双脚落地并恢复站立。</p></blockquote>
+    <p>核心问题是在缺少官方后训练代码时，建立可复现训练管线，并判断游戏动作增强是否以牺牲原始能力为代价。</p>
+    <div class="table-wrap"><table><thead><tr><th>阶段</th><th>主要任务</th><th>验收关注点</th></tr></thead><tbody><tr><td>Phase 1</td><td>基于开源 SEED 子集验证训练管线，探索学习率、训练步数和动作子集</td><td>链路可运行、可复现；目标子集有真实评测；分析原始能力影响</td></tr><tr><td>Phase 2</td><td>迁移到游戏动作域，完成数据转换、Prompt 标注、训练与自定义评测</td><td>游戏动作可学习；结果可量化、可演示；失败原因和边界清楚</td></tr><tr><td>工程交付</td><td>整理数据、代码、模型、评测脚本、运行说明和演示工具</td><td>核心链路无明显缺口，其他成员可复现和使用</td></tr></tbody></table></div>
+    <h4>核心产出</h4><ol><li>训练报告与训练管线。</li><li>制备完成的数据集。</li><li>训练完成的模型权重。</li><li>Blender 插件原型。</li><li>有效方案、失败路线和下一阶段判断。</li></ol>
+    <p><a href="full-report.html#一项目背景与业务需求" target="_blank" rel="noopener">本章完整原文 ↗</a></p></div>
+  </dialog>
+
+  <dialog class="drawer" id="detail-phase1">
+    <header class="drawer-head"><h3>二、Phase 1 完整实验</h3><button class="close-button" data-close aria-label="关闭">×</button></header>
+    <div class="drawer-body">
+    <p>链路：开源动作数据 → Kimodo 特征制备 → Feature Cache → Domain Finetune → Checkpoint → Text-to-Motion 推理 → TMR 与动作质量评测。</p>
+    <div class="table-wrap"><table><thead><tr><th>指标</th><th>原始模型</th><th>微调模型</th><th>变化</th></tr></thead><tbody><tr><td>T2M R@1</td><td>78.720%</td><td>79.150%</td><td><span class="positive">+0.430</span></td></tr><tr><td>T2M R@2</td><td>80.430%</td><td>85.530%</td><td><span class="positive">+5.100</span></td></tr><tr><td>T2M R@3</td><td>90.210%</td><td>91.910%</td><td><span class="positive">+1.700</span></td></tr><tr><td>T2M R@5</td><td>93.190%</td><td>96.600%</td><td><span class="positive">+3.410</span></td></tr><tr><td>Foot Skate Ratio</td><td>0.036120</td><td>0.042050</td><td><span class="negative">-0.00593</span></td></tr><tr><td>Height</td><td>0.077078</td><td>0.086261</td><td><span class="negative">-0.005532</span></td></tr></tbody></table></div>
+    <h4>Object Manipulation 保持评估</h4><p>3,000-step 中 R@1 仅提高 0.120 个百分点，R@2 下降 0.700 个百分点，FID Gen-GT 增加 0.000222，Foot Skate Ratio 增加 0.011467。</p>
+    <h4>四点结论</h4><ol><li>Kimodo 后训练在工程上可行。</li><li>Object Manipulation 更接近目标领域，但收益有限。</li><li>语义指标与物理质量可能反向变化。</li><li>学习率、步数与数据子集存在耦合。</li></ol>
+    <div class="case-index-grid case-index-grid-wide"><button class="case-card motion-card" data-caption="Phase 1 Content：Ground Truth、原始模型与微调模型"><img src="assets/final/phase1-content.gif" alt="Phase 1 Content：Ground Truth、原始模型与微调模型" loading="lazy"><span>Phase 1 · Content</span></button><button class="case-card motion-card" data-caption="Phase 1 Repetition：Ground Truth、原始模型与微调模型"><img src="assets/final/phase1-repetition.gif" alt="Phase 1 Repetition：Ground Truth、原始模型与微调模型" loading="lazy"><span>Phase 1 · Repetition</span></button></div>
+    <p><a href="full-report.html#二phase-1基于开源数据验证后训练方法" target="_blank" rel="noopener">本章完整原文 ↗</a></p></div>
+  </dialog>
+
+  <dialog class="drawer" id="detail-phase2">
+    <header class="drawer-head"><h3>三、Phase 2 数据转换与失败实验</h3><button class="close-button" data-close aria-label="关闭">×</button></header>
+    <div class="drawer-body">
+    <h4>数据管线</h4><p>21,529 原始动作 → 约 9,000 单人动作 → 7,951 keep_human → 骨架重定向与中性手腕修复 → 30 fps → 90×369 特征 → 6,532 / 1,419 划分。</p>
+    <h4>三条失败路线</h4><ol><li><strong>batch=8、3,000 steps：</strong>loss 下降、推理正常，强动态动作没有稳定增强。</li><li><strong>加噪 + MSE：</strong>数值收敛但可视化仍不理想。</li><li><strong>不做 normalized：</strong>位置、朝向、骨架尺度和特征范围不统一，Structured Loss 各项失衡。</li></ol>
+    <p>一致现象是脚像钉在地板上，模型保留站立与足底接触先验。结论是 loss 下降不等于学会离地、浮空和落地，不能继续只调 batch、学习率或优化器。</p>
+    <div class="case-index-grid"><button class="case-card" data-caption="7,951 条游戏动作初步训练损失曲线"><img src="assets/final/phase2-loss.png" alt="7,951 条游戏动作初步训练损失曲线" loading="lazy"><span>Phase 2 · Loss</span></button><button class="case-card" data-caption="初步训练过拟合损失曲线"><img src="assets/final/phase2-overfit-loss.png" alt="初步训练过拟合损失曲线" loading="lazy"><span>Phase 2 · Overfit</span></button><button class="case-card motion-card" data-caption="Hover 脚钉地失败案例"><img src="assets/final/phase2-hover-failure.gif" alt="Hover 脚钉地失败案例" loading="lazy"><span>Failure · Hover</span></button><button class="case-card motion-card" data-caption="Jump 脚钉地失败案例"><img src="assets/final/phase2-jump-failure.gif" alt="Jump 脚钉地失败案例" loading="lazy"><span>Failure · Jump</span></button><button class="case-card motion-card" data-caption="普通动作失败案例"><img src="assets/final/phase2-ordinary-failure.gif" alt="普通动作失败案例" loading="lazy"><span>Failure · Ordinary</span></button><button class="case-card motion-card" data-caption="加噪 MSE 动态重建结果"><img src="assets/final/noisy-reconstruction.gif" alt="加噪 MSE 动态重建结果" loading="lazy"><span>Noisy reconstruction</span></button></div>
+    <p><a href="full-report.html#三phase-2游戏动作数据转换与初步训练" target="_blank" rel="noopener">本章完整原文 ↗</a></p></div>
+  </dialog>
+
+  <dialog class="drawer" id="detail-structured">
+    <header class="drawer-head"><h3>四、Structured Motion Loss 与两阶段训练</h3><button class="close-button" data-close aria-label="关闭">×</button></header>
+    <div class="drawer-body">
+    <p>总损失由 Root Position、Root Heading、Joint Position、Joint Velocity、Joint Rotation、Foot Contact 与 FK Position 七项 masked Smooth L1 组成，论文权重为 10 / 2 / 10 / 3 / 10 / 4 / 5。</p>
+    <h4>Stage 1</h4><p>只使用文本条件训练全量 Text-to-Motion。部分攻击、原地和击倒动作改善；Jump、Hover、大幅 Root 位移和下半身动态仍弱。</p>
+    <h4>Stage 2</h4><p>混合 Text-to-Motion 与 Text + Sparse Full-body Keyframe Constraints。关键帧从 GT 自动采样。训练与推理正常，但相较 Stage 1 没有明显且稳定的视觉提升。</p>
+    <h4>问题收敛</h4><ol><li>自动 Prompt 存在信息缺失、顺序错误、左右错误、起止不完整和过度简化。</li><li>游戏动作有 Jump、Hover、击飞、倒地和大 Root 位移，与 Kimodo 的稳定站立和 Foot Contact 先验存在 Domain Gap。</li></ol>
+    <div class="case-index-grid"><button class="case-card" data-caption="Structured Motion Loss Stage 1 训练曲线"><img src="assets/final/stage1-loss.png" alt="Structured Motion Loss Stage 1 训练曲线" loading="lazy"><span>Stage 1 · Loss</span></button><button class="case-card motion-card" data-caption="自动 Prompt 与动作错配案例"><img src="assets/final/prompt-error.gif" alt="自动 Prompt 与动作错配案例" loading="lazy"><span>Prompt error</span></button><button class="case-card" data-caption="Prompt 正确但模型未充分学习案例"><img src="assets/final/underlearned.png" alt="Prompt 正确但模型未充分学习案例" loading="lazy"><span>Underlearned</span></button><button class="case-card motion-card" data-caption="Structured Motion Loss 较好案例一"><img src="assets/final/stage1-good-01.gif" alt="Structured Motion Loss 较好案例一" loading="lazy"><span>Stage 1 · Good 01</span></button><button class="case-card motion-card" data-caption="Structured Motion Loss 较好案例二"><img src="assets/final/stage1-good-02.gif" alt="Structured Motion Loss 较好案例二" loading="lazy"><span>Stage 1 · Good 02</span></button><button class="case-card motion-card" data-caption="Structured Motion Loss 较好案例三"><img src="assets/final/stage1-good-03.gif" alt="Structured Motion Loss 较好案例三" loading="lazy"><span>Stage 1 · Good 03</span></button><button class="case-card" data-caption="Stage 2 稀疏关键帧约束训练曲线"><img src="assets/final/stage2-loss.png" alt="Stage 2 稀疏关键帧约束训练曲线" loading="lazy"><span>Stage 2 · Loss</span></button><button class="case-card motion-card" data-caption="Stage 1 与 Stage 2 动态对比一"><img src="assets/final/stage2-case-01.gif" alt="Stage 1 与 Stage 2 动态对比一" loading="lazy"><span>Stage 1 vs Stage 2 · 01</span></button><button class="case-card motion-card" data-caption="Stage 1 与 Stage 2 动态对比二"><img src="assets/final/stage2-case-02.gif" alt="Stage 1 与 Stage 2 动态对比二" loading="lazy"><span>Stage 1 vs Stage 2 · 02</span></button></div>
+    <p><a href="full-report.html#四structured-motion-loss-与两阶段训练探索" target="_blank" rel="noopener">本章完整原文 ↗</a></p></div>
+  </dialog>
+
+  <dialog class="drawer" id="detail-gold">
+    <header class="drawer-head"><h3>五、AI Prompt 转向人工 Gold</h3><button class="close-button" data-close aria-label="关闭">×</button></header>
+    <div class="drawer-body">
+    <h4>自动 Prompt 的典型问题</h4><ul><li>只保留动作类别，缺少部位、方向和幅度。</li><li>忽略起始与结束姿态。</li><li>遗漏或改写多阶段顺序。</li><li>加入动画中不可观察的情绪、原因和意图。</li><li>同类描述风格和粒度不统一。</li></ul>
+    <h4>LLM2Vec 动作顺序预实验</h4><div class="table-wrap"><table><thead><tr><th>变体</th><th>平均 cosine</th></tr></thead><tbody><tr><td>SWAP_LAST：交换最后两个 Event</td><td>0.99351</td></tr><tr><td>PARAPHRASE：正确顺序，仅替换连接词</td><td>0.99253</td></tr><tr><td>SWAP_FIRST：交换前两个 Event</td><td>0.97661</td></tr><tr><td>ROTATE_LEFT：首个 Event 移到末尾</td><td>0.96615</td></tr><tr><td>RANDOM_SHUFFLE：固定种子随机乱序</td><td>0.96162</td></tr><tr><td>REVERSE：完全倒序</td><td>0.95130</td></tr></tbody></table></div><div class="table-wrap"><table><thead><tr><th>指标</th><th>结果</th></tr></thead><tbody><tr><td>正确顺序改写平均 cosine</td><td>0.99253</td></tr><tr><td>去除连接词平均 cosine</td><td>0.98793</td></tr><tr><td>order_margin_mean 平均值</td><td>0.02433</td></tr><tr><td>order_margin_hardest 平均值</td><td>0.00438</td></tr><tr><td>order_margin_hardest 中位数</td><td>0.00041</td></tr><tr><td>正确顺序胜过所有乱序比例</td><td>52.03%</td></tr></tbody></table></div>
+    <p>文本编码能识别明显全局顺序变化，但对局部交换不够敏感。Prompt 必须显式描述“开始、随后、接着、最后”，动作时序仍需单独检查。</p>
+    <h4>8 条人工标签标准</h4><ol><li>写出起始姿态。</li><li>按真实时间顺序描述。</li><li>写清身体部位、方向和幅度。</li><li>显式描述离地、落地、浮空和倒地。</li><li>写明结束姿态或持续状态。</li><li>不加入不可观察的情绪、原因和意图。</li><li>多动作切换不能压缩成单一类别。</li><li>同类动作使用统一术语和描述粒度。</li></ol>
+    <h4>Gold 数据构成</h4><div class="table-wrap"><table><thead><tr><th>类别</th><th>数量</th></tr></thead><tbody><tr><td>攻击</td><td>140</td></tr><tr><td>跳跃</td><td>44</td></tr><tr><td>浮空</td><td>154</td></tr><tr><td>被击倒</td><td>243</td></tr><tr><td>原地正常动作</td><td>167</td></tr><tr><td>合计</td><td>748</td></tr></tbody></table></div><p>1,200 候选 → 842 去重 → 748 成功转换。类别不均衡，适合验证可学习性，但不能视为最终生产训练集。</p>
+    <div class="case-index-grid"><button class="case-card" data-caption="Kimodo 游戏动作人工标注平台"><img src="assets/final/annotation-platform.png" alt="Kimodo 游戏动作人工标注平台" loading="lazy"><span>Annotation platform</span></button><button class="case-card motion-card" data-caption="Gold 标注攻击动作学习结果"><img src="assets/final/gold-annotated-attack.gif" alt="Gold 标注攻击动作学习结果" loading="lazy"><span>Gold · Attack</span></button><button class="case-card motion-card" data-caption="Gold 标注浮空动作学习结果"><img src="assets/final/gold-annotated-hover.gif" alt="Gold 标注浮空动作学习结果" loading="lazy"><span>Gold · Hover</span></button></div>
+    <p><a href="full-report.html#五关键转折从-ai-自动-prompt-转向人工-gold-数据" target="_blank" rel="noopener">本章完整原文 ↗</a></p></div>
+  </dialog>
+
+  <dialog class="drawer" id="detail-strategies">
+    <header class="drawer-head"><h3>六、三种训练策略与完整指标</h3><button class="close-button" data-close aria-label="关闭">×</button></header>
+    <div class="drawer-body">
+    <h4>1. 过拟合实验</h4><p>作为训练链路单元测试，验证模型、90×369 特征、Prompt、Structured Motion Loss、推理后处理和表达能力。游戏域 RTE/BPE 大幅下降，但 Contact 与 Foot Skate 明显恶化。</p><div class="table-wrap"><table><thead><tr><th>模型</th><th>数据集</th><th>RTE ↓</th><th>RTE-XZ ↓</th><th>RTE-Y ↓</th><th>BPE ↓</th><th>BPE-Upper ↓</th><th>BPE-Lower ↓</th><th>Contact ↑</th><th>Foot Skate Ratio ↓</th><th>Foot Skate Height ↓</th></tr></thead><tbody><tr><td>Kimodo 原始模型</td><td>748-games</td><td>0.551939</td><td>0.345670</td><td>0.306518</td><td>0.499431</td><td>0.509166</td><td>0.434206</td><td>0.957314</td><td>0.095524</td><td>0.110196</td></tr><tr><td>过拟合模型</td><td>748-games</td><td><span class="positive">0.130128</span></td><td><span class="positive">0.058020</span></td><td><span class="positive">0.094977</span></td><td><span class="positive">0.115420</span></td><td><span class="positive">0.118436</span></td><td><span class="positive">0.095209</span></td><td>0.906332</td><td><span class="negative">0.466643</span></td><td><span class="negative">1.997528</span></td></tr></tbody></table></div>
+    <h4>2. 正式 Gold 训练</h4><p>748 条按类别分层划分为 598 / 75 / 75。</p><div class="table-wrap"><table><thead><tr><th>配置项</th><th>设置</th></tr></thead><tbody><tr><td>初始化权重</td><td>nvidia/Kimodo-SOMA-RP-v1.1</td></tr><tr><td>微调方式</td><td>全参数 denoiser 微调</td></tr><tr><td>训练阶段</td><td>单阶段 Stage 1</td></tr><tr><td>Loss</td><td>Structured Motion Loss，masked Smooth L1，β=0.1</td></tr><tr><td>Learning rate</td><td>5e-5</td></tr><tr><td>Steps</td><td>3,000</td></tr><tr><td>Batch size</td><td>256</td></tr><tr><td>Warmup</td><td>50</td></tr></tbody></table></div>
+    <h4>3. 混合训练</h4><p>从 SEED 二十个小类各抽 40 条，martial art 抽 20 条，与 Gold 约 1:1。游戏数据可视化与 Gold-only 基本一致，SEED 语义能力显著恢复。</p>
+    <div class="case-index-grid"><button class="case-card motion-card" data-caption="混合训练游戏动作对照一"><img src="assets/final/mixed-game-01.gif" alt="混合训练游戏动作对照一" loading="lazy"><span>Mixed game · 01</span></button><button class="case-card motion-card" data-caption="混合训练游戏动作对照二"><img src="assets/final/mixed-game-02.gif" alt="混合训练游戏动作对照二" loading="lazy"><span>Mixed game · 02</span></button><button class="case-card motion-card" data-caption="混合训练游戏动作对照三"><img src="assets/final/mixed-game-03.gif" alt="混合训练游戏动作对照三" loading="lazy"><span>Mixed game · 03</span></button><button class="case-card motion-card" data-caption="混合训练游戏动作对照四"><img src="assets/final/mixed-game-04.gif" alt="混合训练游戏动作对照四" loading="lazy"><span>Mixed game · 04</span></button></div>
+    <p><a href="full-report.html#六三种训练策略及可视化结果" target="_blank" rel="noopener">本章完整原文 ↗</a></p></div>
+  </dialog>
+
+  <dialog class="drawer case-index-drawer" id="detail-gold-cases">
+    <header class="drawer-head"><h3>正式 Gold 测试 Case · 11 组</h3><button class="close-button" data-close aria-label="关闭">×</button></header>
+    <div class="drawer-body"><p>包括人工标注示例及 Attack、Hover、Jump、Inplace、Knocked Down 测试结果。</p><div class="case-index-grid"><button class="case-card motion-card" data-caption="Gold 标注攻击动作学习结果"><img src="assets/final/gold-annotated-attack.gif" alt="Gold 标注攻击动作学习结果" loading="lazy"><span>Gold · Attack</span></button><button class="case-card motion-card" data-caption="Gold 标注浮空动作学习结果"><img src="assets/final/gold-annotated-hover.gif" alt="Gold 标注浮空动作学习结果" loading="lazy"><span>Gold · Hover</span></button><button class="case-card motion-card" data-caption="Gold 测试集攻击动作"><img src="assets/final/gold-test-attack.gif" alt="Gold 测试集攻击动作" loading="lazy"><span>Gold test · Attack</span></button><button class="case-card motion-card" data-caption="Gold 测试集浮空动作一"><img src="assets/final/gold-test-hover-01.gif" alt="Gold 测试集浮空动作一" loading="lazy"><span>Gold test · Hover 01</span></button><button class="case-card motion-card" data-caption="Gold 测试集浮空动作二"><img src="assets/final/gold-test-hover-02.gif" alt="Gold 测试集浮空动作二" loading="lazy"><span>Gold test · Hover 02</span></button><button class="case-card motion-card" data-caption="Gold 测试集跳跃动作"><img src="assets/final/gold-test-jump.gif" alt="Gold 测试集跳跃动作" loading="lazy"><span>Gold test · Jump</span></button><button class="case-card motion-card" data-caption="Gold 测试集原地动作一"><img src="assets/final/gold-test-stand-01.gif" alt="Gold 测试集原地动作一" loading="lazy"><span>Gold test · Stand 01</span></button><button class="case-card motion-card" data-caption="Gold 测试集原地动作二"><img src="assets/final/gold-test-stand-02.gif" alt="Gold 测试集原地动作二" loading="lazy"><span>Gold test · Stand 02</span></button><button class="case-card motion-card" data-caption="Gold 测试集原地动作三"><img src="assets/final/gold-test-stand-03.gif" alt="Gold 测试集原地动作三" loading="lazy"><span>Gold test · Stand 03</span></button><button class="case-card motion-card" data-caption="Gold 测试集击倒动作一"><img src="assets/final/gold-test-knockdown-01.gif" alt="Gold 测试集击倒动作一" loading="lazy"><span>Gold test · Knockdown 01</span></button><button class="case-card motion-card" data-caption="Gold 测试集击倒动作二"><img src="assets/final/gold-test-knockdown-02.gif" alt="Gold 测试集击倒动作二" loading="lazy"><span>Gold test · Knockdown 02</span></button></div></div>
+  </dialog>
+  <dialog class="drawer case-index-drawer" id="detail-mixed-cases">
+    <header class="drawer-head"><h3>混合训练游戏域 Case · 4 组</h3><button class="close-button" data-close aria-label="关闭">×</button></header>
+    <div class="drawer-body"><p>Ground Truth、Gold-only 与混合训练对照。最终稿判断：游戏域效果基本保持。</p><div class="case-index-grid case-index-grid-wide"><button class="case-card motion-card" data-caption="混合训练游戏动作对照一"><img src="assets/final/mixed-game-01.gif" alt="混合训练游戏动作对照一" loading="lazy"><span>Mixed game · 01</span></button><button class="case-card motion-card" data-caption="混合训练游戏动作对照二"><img src="assets/final/mixed-game-02.gif" alt="混合训练游戏动作对照二" loading="lazy"><span>Mixed game · 02</span></button><button class="case-card motion-card" data-caption="混合训练游戏动作对照三"><img src="assets/final/mixed-game-03.gif" alt="混合训练游戏动作对照三" loading="lazy"><span>Mixed game · 03</span></button><button class="case-card motion-card" data-caption="混合训练游戏动作对照四"><img src="assets/final/mixed-game-04.gif" alt="混合训练游戏动作对照四" loading="lazy"><span>Mixed game · 04</span></button></div></div>
+  </dialog>
+
+  <dialog class="drawer" id="detail-evaluation">
+    <header class="drawer-head"><h3>七、三维量化评测框架</h3><button class="close-button" data-close aria-label="关闭">×</button></header>
+    <div class="drawer-body">
+    <div class="table-wrap"><table><thead><tr><th>评测维度</th><th>回答的问题</th></tr></thead><tbody><tr><td>RTE、BPE</td><td>目标游戏动作有没有学会？</td></tr><tr><td>Unseen Prompt</td><td>模型是在记忆训练文本，还是具备一定泛化？</td></tr><tr><td>SEED 保持评测</td><td>游戏域增强是否以破坏原始能力为代价？</td></tr></tbody></table></div>
+    <h4>Root Trajectory Error</h4><p>逐帧计算生成动作与 GT 根节点位置欧氏距离并取平均。RTE-XZ 反映水平轨迹，RTE-Y 重点反映跳跃、浮空和下落高度。</p>
+    <h4>Body Pose Error</h4><p>消除根节点位置与整体朝向后，计算对应关节平均位置误差。BPE-Upper 反映上半身，BPE-Lower 反映腿部、脚部和落地姿态。</p>
+    <div class="table-wrap"><table><thead><tr><th>指标</th><th>主要回答的问题</th><th>单位</th><th>方向</th></tr></thead><tbody><tr><td>RTE</td><td>角色整体是否移动到正确位置</td><td>米</td><td>越低越好</td></tr><tr><td>RTE-XZ</td><td>水平移动轨迹是否正确</td><td>米</td><td>越低越好</td></tr><tr><td>RTE-Y</td><td>跳跃、浮空高度是否正确</td><td>米</td><td>越低越好</td></tr><tr><td>BPE</td><td>身体整体姿态是否正确</td><td>米</td><td>越低越好</td></tr><tr><td>BPE-Upper</td><td>上半身动作是否正确</td><td>米</td><td>越低越好</td></tr><tr><td>BPE-Lower</td><td>下半身动作是否正确</td><td>米</td><td>越低越好</td></tr></tbody></table></div>
+    <p>当前脚本按 motion_id 精确配对，使用公共帧长，不使用 DTW；没有内置合格阈值，仅统计均值和中位数。</p>
+    <p><a href="full-report.html#七三维量化评测体系" target="_blank" rel="noopener">本章完整原文 ↗</a></p></div>
+  </dialog>
+
+  <dialog class="drawer" id="detail-target-table">
+    <header class="drawer-head"><h3>AI / Gold / Mixed 目标域完整指标</h3><button class="close-button" data-close aria-label="关闭">×</button></header>
+    <div class="drawer-body">
+    <h4>全量游戏数据训练前后（AI 标注）</h4><div class="table-wrap"><table><thead><tr><th>模型</th><th>RTE ↓</th><th>RTE-XZ ↓</th><th>RTE-Y ↓</th><th>BPE ↓</th><th>BPE-Upper ↓</th><th>BPE-Lower ↓</th><th>Contact ↑</th><th>Foot Skate Ratio ↓</th><th>Foot Skate Height ↓</th></tr></thead><tbody><tr><td>Kimodo 原始模型</td><td>0.599287</td><td>0.474419</td><td>0.233563</td><td>0.394007</td><td>0.418150</td><td>0.232254</td><td>0.967434</td><td>0.126444</td><td>0.141272</td></tr><tr><td>游戏全量数据微调模型</td><td>0.254880</td><td>0.226311</td><td>0.053175</td><td>0.179023</td><td>0.193499</td><td>0.082033</td><td>0.074873</td><td>0.126143</td><td>0.164242</td></tr></tbody></table></div>
+    <h4>Gold 数据微调前后（人工标注）</h4><div class="table-wrap"><table><thead><tr><th>模型</th><th>RTE ↓</th><th>RTE-XZ ↓</th><th>RTE-Y ↓</th><th>BPE ↓</th><th>BPE-Upper ↓</th><th>BPE-Lower ↓</th><th>Contact ↑</th><th>Foot Skate Ratio ↓</th><th>Foot Skate Height ↓</th></tr></thead><tbody><tr><td>Kimodo 原始模型</td><td>0.585655</td><td>0.333570</td><td>0.350617</td><td>0.493341</td><td>0.504325</td><td>0.419748</td><td>0.955791</td><td>0.137798</td><td>0.130193</td></tr><tr><td>Gold 数据微调模型</td><td>0.315964</td><td>0.143359</td><td>0.222094</td><td>0.324660</td><td>0.336493</td><td>0.245382</td><td>0.911493</td><td>0.452807</td><td>1.616363</td></tr></tbody></table></div>
+    <h4>混合训练（人工标注）</h4><div class="table-wrap"><table><thead><tr><th>模型</th><th>RTE ↓</th><th>RTE-XZ ↓</th><th>RTE-Y ↓</th><th>BPE ↓</th><th>BPE-Upper ↓</th><th>BPE-Lower ↓</th><th>Contact ↑</th><th>Foot Skate Ratio ↓</th><th>Foot Skate Height ↓</th></tr></thead><tbody><tr><td>Kimodo 原始模型</td><td>0.585655</td><td>0.333570</td><td>0.350617</td><td>0.493341</td><td>0.504325</td><td>0.419748</td><td>0.955791</td><td>0.137798</td><td>0.130193</td></tr><tr><td>Gold 数据微调模型</td><td>0.315964</td><td>0.143359</td><td>0.222094</td><td>0.324660</td><td>0.336493</td><td>0.245382</td><td>0.911493</td><td>0.452807</td><td>1.616363</td></tr><tr><td>混合训练 + Plaintext</td><td>0.340868</td><td>0.149795</td><td>0.244208</td><td>0.322132</td><td>0.331806</td><td>0.257315</td><td>0.932267</td><td>0.456818</td><td>2.158598</td></tr></tbody></table></div>
+    <p>Gold 与混合训练的 RTE/BPE 明显优于原始模型；混合训练游戏域结果与 Gold-only 接近，但 Contact、Foot Skate 仍是主要问题。</p></div>
+  </dialog>
+
+  <dialog class="drawer" id="detail-unseen">
+    <header class="drawer-head"><h3>Unseen Prompt 分类结果</h3><button class="close-button" data-close aria-label="关闭">×</button></header>
+    <div class="drawer-body">
+    <p>覆盖 Inplace Normal、Knocked Down、Attack、Hover、Jump，所有 Prompt 均未出现在训练集中。</p>
+    <div class="table-wrap"><table><thead><tr><th>类别</th><th>当前表现</th><th>主要问题</th></tr></thead><tbody><tr><td>Inplace Normal</td><td>较稳定</td><td>基本能够泛化</td></tr><tr><td>Knocked Down</td><td>较好</td><td>倒地细节仍可优化</td></tr><tr><td>Attack</td><td>有一定泛化</td><td>下半身动作不足</td></tr><tr><td>Hover</td><td>能够离地</td><td>垂直 Root 轨迹不稳定</td></tr><tr><td>Jump</td><td><span class="negative">仍未稳定学到</span></td><td><span class="negative">Root-Y + 下半身姿态</span></td></tr></tbody></table></div><div class="table-wrap"><table><thead><tr><th>类别</th><th>RTE</th><th>RTE-Y</th><th>BPE</th><th>BPE-Lower</th></tr></thead><tbody><tr><td>Attack</td><td>0.2891</td><td>0.1418</td><td>0.5026</td><td>0.5936</td></tr><tr><td>Hover</td><td>0.6029</td><td>0.5778</td><td>0.3007</td><td>0.3415</td></tr><tr><td>Inplace Normal</td><td>0.0752</td><td>0.0383</td><td>0.1943</td><td>0.2314</td></tr><tr><td>Jump</td><td>0.3322</td><td>0.2846</td><td>0.4329</td><td>0.6481</td></tr><tr><td>Knocked Down</td><td>0.3089</td><td>0.1823</td><td>0.3356</td><td>0.3960</td></tr></tbody></table></div>
+    <p>Inplace Normal 最稳定；Knocked Down、Attack、Hover 出现一定泛化；Jump 的 Root-Y 与下半身姿态仍不稳定。</p>
+    <div class="button-row"><button class="detail-button" data-dialog="detail-unseen-cases">打开 5 个 Unseen 动态 Case</button></div></div>
+  </dialog>
+  <dialog class="drawer case-index-drawer" id="detail-unseen-cases">
+    <header class="drawer-head"><h3>Unseen Prompt 动态 Case · 5 类</h3><button class="close-button" data-close aria-label="关闭">×</button></header>
+    <div class="drawer-body"><div class="case-index-grid unseen-grid"><button class="case-card motion-card" data-caption="Unseen Prompt：Inplace Normal"><img src="assets/final/unseen-inplace.gif" alt="Unseen Prompt：Inplace Normal" loading="lazy"><span>Unseen · Inplace</span></button><button class="case-card motion-card" data-caption="Unseen Prompt：Knocked Down"><img src="assets/final/unseen-knocked-down.gif" alt="Unseen Prompt：Knocked Down" loading="lazy"><span>Unseen · Knocked Down</span></button><button class="case-card motion-card" data-caption="Unseen Prompt：Attack"><img src="assets/final/unseen-attack.gif" alt="Unseen Prompt：Attack" loading="lazy"><span>Unseen · Attack</span></button><button class="case-card motion-card" data-caption="Unseen Prompt：Hover"><img src="assets/final/unseen-hover.gif" alt="Unseen Prompt：Hover" loading="lazy"><span>Unseen · Hover</span></button><button class="case-card motion-card" data-caption="Unseen Prompt：Jump"><img src="assets/final/unseen-jump.gif" alt="Unseen Prompt：Jump" loading="lazy"><span>Unseen · Jump</span></button></div></div>
+  </dialog>
+
+  <dialog class="drawer" id="detail-seed-table">
+    <header class="drawer-head"><h3>SEED 原始能力保持完整指标</h3><button class="close-button" data-close aria-label="关闭">×</button></header>
+    <div class="drawer-body">
+    <p>Gold-only 模型在 SEED Content 和 Repetition 上发生明显灾难性遗忘；混合数据模型恢复绝大多数语义指标。</p>
+    <h4>SEED Content</h4><div class="table-wrap"><table><thead><tr><th>模型</th><th>R@1 ↑</th><th>R@5 ↑</th><th>T2M Sim ↑</th><th>Contact ↑</th><th>Foot Skate Ratio ↓</th><th>Foot Skate Height ↓</th></tr></thead><tbody><tr><td>Kimodo 原始模型</td><td>97.4491%</td><td>99.2019%</td><td>0.927029</td><td>0.983554</td><td>0.105419</td><td>0.197719 m/s</td></tr><tr><td>Gold 游戏数据微调模型</td><td>38.8628%</td><td>50.9762%</td><td>0.600805</td><td>0.901491</td><td>0.128725</td><td>0.118240 m/s</td></tr><tr><td>混合数据微调模型</td><td><span class="positive">95.3256%</span></td><td><span class="positive">97.5061%</span></td><td><span class="positive">0.899417</span></td><td><span class="positive">0.911449</span></td><td>0.181151</td><td>0.222303 m/s</td></tr></tbody></table></div>
+    <h4>SEED Repetition</h4><div class="table-wrap"><table><thead><tr><th>模型</th><th>R@1 ↑</th><th>R@5 ↑</th><th>T2M Sim ↑</th><th>Contact ↑</th><th>Foot Skate Ratio ↓</th><th>Foot Skate Height ↓</th></tr></thead><tbody><tr><td>Kimodo 原始模型</td><td>85.7143%</td><td>95.8624%</td><td>0.937635</td><td>0.982887</td><td>0.092619</td><td>0.142594 m/s</td></tr><tr><td>Gold 游戏数据微调模型</td><td>18.8444%</td><td>33.2462%</td><td>0.604258</td><td>0.913408</td><td>0.123278</td><td>0.122588 m/s</td></tr><tr><td>混合数据微调模型</td><td><span class="positive">79.5441%</span></td><td><span class="positive">93.0604%</span></td><td><span class="positive">0.914383</span></td><td><span class="positive">0.924000</span></td><td>0.167662</td><td>0.183138 m/s</td></tr></tbody></table></div>
+    <p>Content R@1 从 38.8628% 恢复到 95.3256%；Repetition R@1 从 18.8444% 恢复到 79.5441%。同时 Foot Skate Ratio 仍高于原始模型。</p>
+    <div class="button-row"><button class="detail-button" data-dialog="detail-seed-cases">打开 4 个 SEED 动态对照</button></div></div>
+  </dialog>
+  <dialog class="drawer case-index-drawer" id="detail-seed-cases">
+    <header class="drawer-head"><h3>SEED 保持动态对照 · 4 组</h3><button class="close-button" data-close aria-label="关闭">×</button></header>
+    <div class="drawer-body"><div class="case-index-grid case-index-grid-wide"><button class="case-card motion-card" data-caption="SEED Content：原始模型与 Gold 微调模型"><img src="assets/final/seed-gold-content.gif" alt="SEED Content：原始模型与 Gold 微调模型" loading="lazy"><span>SEED Gold · Content</span></button><button class="case-card motion-card" data-caption="SEED Repetition：原始模型与 Gold 微调模型"><img src="assets/final/seed-gold-repetition.gif" alt="SEED Repetition：原始模型与 Gold 微调模型" loading="lazy"><span>SEED Gold · Repetition</span></button><button class="case-card motion-card" data-caption="SEED Content：混合模型与游戏数据模型"><img src="assets/final/seed-mixed-content.gif" alt="SEED Content：混合模型与游戏数据模型" loading="lazy"><span>SEED Mixed · Content</span></button><button class="case-card motion-card" data-caption="SEED Repetition：混合模型与游戏数据模型"><img src="assets/final/seed-mixed-repetition.gif" alt="SEED Repetition：混合模型与游戏数据模型" loading="lazy"><span>SEED Mixed · Repetition</span></button></div></div>
+  </dialog>
+
+  <dialog class="drawer" id="detail-blender">
+    <header class="drawer-head"><h3>八、Blender 插件与工程演示</h3><button class="close-button" data-close aria-label="关闭">×</button></header>
+    <div class="drawer-body">
+    <ol><li>在 Blender 中输入或选择动作 Prompt。</li><li>选择原始模型或指定微调权重。</li><li>调用 Kimodo 推理流程生成动作。</li><li>将结果导入或绑定到 Blender 角色。</li><li>直接播放并观察动作。</li><li>对原始模型和微调模型进行 A/B 对比。</li></ol>
+    <p>当前插件是接口原型，不是完整生产工具；已经覆盖从 Prompt 到动作预览的核心闭环，并使结果进入真实动作编辑环境。</p>
+    <p><a href="full-report.html#八blender-插件与工程演示" target="_blank" rel="noopener">本章完整原文 ↗</a></p></div>
+  </dialog>
+
+  <dialog class="drawer" id="detail-conclusion">
+    <header class="drawer-head"><h3>九、五条最终结论与边界</h3><button class="close-button" data-close aria-label="关闭">×</button></header>
+    <div class="drawer-body">
+    <ol><li><strong>开源权重可以后训练：</strong>数据、训练、推理、评测和 Blender 链路已打通。</li><li><strong>游戏动作域可学习：</strong>Gold 后 RTE/BPE 下降，Attack、Knocked Down、Hover 改善；Jump / Hover 垂直轨迹仍是瓶颈。</li><li><strong>Prompt-Motion 对齐是关键：</strong>748 条人工 Gold 比 7,951 条自动标注数据更有效。</li><li><strong>存在 Unseen 泛化：</strong>Inplace、Knocked Down、Attack、Hover 保持主要类别与部分时序；Jump 仍不稳定。</li><li><strong>混合训练可以大幅缓解遗忘：</strong>Content R@1 38.86% → 95.33%，Repetition R@1 18.84% → 79.54%，游戏域效果基本保持。</li></ol>
+    <p>当前问题从“能否学会、是否严重遗忘”收敛为“在保持游戏域和 SEED 语义能力时，进一步改善 Jump / Hover、Contact 和 Foot Skate”。</p>
+    <p><a href="full-report.html#九最终结论" target="_blank" rel="noopener">本章完整原文 ↗</a></p></div>
+  </dialog>
+
+  <dialog class="drawer" id="detail-ai-native">
+    <header class="drawer-head"><h3>附录一、AI Native 与 R-SDD</h3><button class="close-button" data-close aria-label="关闭">×</button></header>
+    <div class="drawer-body">
+    <p>AI 承担高频、可验证、可批量的工作，人工负责标签标准、动作核验、异常判断、证据评审和关键决策。AI Prompt 是人工标注候选，不默认作为 Gold；AI 代码必须运行和审查；结论必须由日志、指标、可视化和复现实验支持。</p>
+    <h4>R-SDD 协作循环</h4><pre>研究问题
+→ 实验方案
+→ 准备就绪审查
+→ 实验执行
+→ 原始证据登记
+→ 独立证据评审
+→ 团队决策
+→ 修订、复现、采纳或停止</pre>
+    <p>两个门控分别位于实验执行前与实验完成后。项目大脑根据方案、记录、评审和交接信息生成当前状态；<code>research validate</code> 检查冻结方案一致性，<code>research onboard</code> 生成接手数据包。</p>
+    <button class="case-card feature-media" data-caption="项目大脑与 R-SDD 协作流程"><img src="assets/final/rsdd-flow.png" alt="项目大脑与 R-SDD 协作流程" loading="lazy"><span>R-SDD flow</span></button>
+    <p><a href="full-report.html#附录一ai-native-实践与团队协作" target="_blank" rel="noopener">附录完整原文 ↗</a></p></div>
+  </dialog>
+  <dialog class="drawer" id="detail-team">
+    <header class="drawer-head"><h3>成员分工与贡献追溯</h3><button class="close-button" data-close aria-label="关闭">×</button></header>
+    <div class="drawer-body"><div class="table-wrap"><table><thead><tr><th>成员</th><th>对应协作角色</th><th>主要职责</th><th>可追溯材料</th></tr></thead><tbody><tr><td>邹（队长）</td><td>研究负责人、核心实验负责人、审查组织者</td><td>项目进程与方案审查；承担两阶段大部分训练、推理、测评和分析；参与清洗与标注</td><td>代码、配置、日志、权重、评测、实验与审查记录、标注记录</td></tr><tr><td>林</td><td>项目策略与成果表达</td><td>整体策略、阶段目标、结论边界、后续方向、结题汇报 HTML 与成果表达</td><td>策略文档、汇报 HTML 及修改记录、阶段总结</td></tr><tr><td>齐</td><td>能力保持与对照实验负责人</td><td>人工标注数据训练、混合训练、能力保持评估；参与清洗与标注</td><td>训练脚本、混合配置、权重、日志、保持评测、对比与标注记录</td></tr><tr><td>刘</td><td>模型推理、量化评测与复现流程负责人</td><td>批量推理、量化指标、评测基线、实验文档和复现流程；参与清洗与标注</td><td>推理评测脚本、评测结果、指标基线、文档、复现说明、标注记录</td></tr><tr><td>赵</td><td>动作可视化、标注平台与时序语义实验负责人</td><td>动作可视化、人工标注平台、文本编码器时序实验、数据规范；参与清洗与标注</td><td>可视化与平台代码、时序实验、规范、复现文档、标注记录</td></tr><tr><td>何</td><td>项目大脑与协作基础设施负责人、业务演示开发者</td><td>项目大脑、R-SDD、状态校验与交接机制、Blender 插件；参与清洗与标注</td><td>协作工具、Git 记录、CLI 与设计文档、Blender 插件、演示与标注记录</td></tr></tbody></table></div><p>真实贡献以版本控制、训练日志、模型权重、数据版本、标注记录、评测、可视化、实验文档和合并请求为准；AI 内容、智能体模拟和聊天记录不能单独作为贡献或结论依据。</p></div>
+  </dialog>
+  <dialog class="drawer" id="detail-deliverables">
+    <header class="drawer-head"><h3>附录二、核心交付物与复现情况</h3><button class="close-button" data-close aria-label="关闭">×</button></header>
+    <div class="drawer-body"><div class="table-wrap"><table><thead><tr><th>类别</th><th>交付内容</th><th>当前状态</th></tr></thead><tbody><tr><td>数据</td><td>7,951 条初筛数据、748 条 Gold 数据及 598/75/75 划分</td><td><span class="positive">已完成</span></td></tr><tr><td>数据工具</td><td>动作筛选、骨架重定向、特征提取、质检与数据划分脚本</td><td><span class="positive">已完成</span></td></tr><tr><td>标注工具</td><td>人工标注平台、Kimodo Prompt 标签转换标准</td><td><span class="positive">已完成</span></td></tr><tr><td>训练</td><td>Phase 1/Phase 2 训练代码、配置、超参数和 Checkpoint</td><td><span class="positive">已完成</span></td></tr><tr><td>评测</td><td>TMR、RTE、BPE、Unseen Prompt 和 SEED 保持评测</td><td><span class="positive">已完成</span></td></tr><tr><td>演示</td><td>Blender 插件、典型案例和对比视频</td><td><span class="positive">已完成</span></td></tr><tr><td>文档</td><td>环境依赖、数据准备、训练、推理、评测和已知问题说明</td><td><span class="positive">已完成</span></td></tr></tbody></table></div><p><a href="full-report.html#附录二核心交付物与复现情况" target="_blank" rel="noopener">附录完整原文 ↗</a></p></div>
+  </dialog>
+  <dialog class="drawer" id="detail-safety">
+    <header class="drawer-head"><h3>附录三、安全、版权与可维护性</h3><button class="close-button" data-close aria-label="关闭">×</button></header>
+    <div class="drawer-body">
+    <ul><li>开源模型与数据遵守各自 License 和使用范围。</li><li>内部动作只能在授权范围研究，原始动作、Prompt、衍生数据和权重不得擅自公开。</li><li>保存数据来源、筛选规则、版本号和人工标注记录。</li><li>Gold 修改必须产生新版本，不能继续使用旧实验结果。</li><li>Checkpoint 绑定训练配置、数据版本和评测报告，不能仅靠文件名区分。</li><li>数据转换、训练、评测和 Blender 展示保持模块化。</li></ul>
+    <p><a href="full-report.html#附录三安全版权与可维护性" target="_blank" rel="noopener">附录完整原文 ↗</a></p></div>
+  </dialog>
+
+  <dialog class="drawer case-index-drawer" id="detail-case-index">
+    <header class="drawer-head"><h3>完整实验 / 动态 Case 索引 · 43 项</h3><button class="close-button" data-close aria-label="关闭">×</button></header>
+    <div class="drawer-body"><p>按最终 MD/PDF 图位顺序排列。点击任意素材查看原尺寸动态图；成功、失败、训练曲线、Gold、Mixed、Unseen、SEED 保持和协作流程全部保留。</p><div class="case-index-grid"><button class="case-card motion-card" data-caption="Phase 1 Content：Ground Truth、原始模型与微调模型"><img src="assets/final/phase1-content.gif" alt="Phase 1 Content：Ground Truth、原始模型与微调模型" loading="lazy"><span>01 · Phase 1 · Content</span></button><button class="case-card motion-card" data-caption="Phase 1 Repetition：Ground Truth、原始模型与微调模型"><img src="assets/final/phase1-repetition.gif" alt="Phase 1 Repetition：Ground Truth、原始模型与微调模型" loading="lazy"><span>02 · Phase 1 · Repetition</span></button><button class="case-card" data-caption="7,951 条游戏动作初步训练损失曲线"><img src="assets/final/phase2-loss.png" alt="7,951 条游戏动作初步训练损失曲线" loading="lazy"><span>03 · Phase 2 · Loss</span></button><button class="case-card" data-caption="初步训练过拟合损失曲线"><img src="assets/final/phase2-overfit-loss.png" alt="初步训练过拟合损失曲线" loading="lazy"><span>04 · Phase 2 · Overfit</span></button><button class="case-card motion-card" data-caption="Hover 脚钉地失败案例"><img src="assets/final/phase2-hover-failure.gif" alt="Hover 脚钉地失败案例" loading="lazy"><span>05 · Failure · Hover</span></button><button class="case-card motion-card" data-caption="Jump 脚钉地失败案例"><img src="assets/final/phase2-jump-failure.gif" alt="Jump 脚钉地失败案例" loading="lazy"><span>06 · Failure · Jump</span></button><button class="case-card motion-card" data-caption="普通动作失败案例"><img src="assets/final/phase2-ordinary-failure.gif" alt="普通动作失败案例" loading="lazy"><span>07 · Failure · Ordinary</span></button><button class="case-card motion-card" data-caption="加噪 MSE 动态重建结果"><img src="assets/final/noisy-reconstruction.gif" alt="加噪 MSE 动态重建结果" loading="lazy"><span>08 · Noisy reconstruction</span></button><button class="case-card" data-caption="Structured Motion Loss Stage 1 训练曲线"><img src="assets/final/stage1-loss.png" alt="Structured Motion Loss Stage 1 训练曲线" loading="lazy"><span>09 · Stage 1 · Loss</span></button><button class="case-card motion-card" data-caption="自动 Prompt 与动作错配案例"><img src="assets/final/prompt-error.gif" alt="自动 Prompt 与动作错配案例" loading="lazy"><span>10 · Prompt error</span></button><button class="case-card" data-caption="Prompt 正确但模型未充分学习案例"><img src="assets/final/underlearned.png" alt="Prompt 正确但模型未充分学习案例" loading="lazy"><span>11 · Underlearned</span></button><button class="case-card motion-card" data-caption="Structured Motion Loss 较好案例一"><img src="assets/final/stage1-good-01.gif" alt="Structured Motion Loss 较好案例一" loading="lazy"><span>12 · Stage 1 · Good 01</span></button><button class="case-card motion-card" data-caption="Structured Motion Loss 较好案例二"><img src="assets/final/stage1-good-02.gif" alt="Structured Motion Loss 较好案例二" loading="lazy"><span>13 · Stage 1 · Good 02</span></button><button class="case-card motion-card" data-caption="Structured Motion Loss 较好案例三"><img src="assets/final/stage1-good-03.gif" alt="Structured Motion Loss 较好案例三" loading="lazy"><span>14 · Stage 1 · Good 03</span></button><button class="case-card" data-caption="Stage 2 稀疏关键帧约束训练曲线"><img src="assets/final/stage2-loss.png" alt="Stage 2 稀疏关键帧约束训练曲线" loading="lazy"><span>15 · Stage 2 · Loss</span></button><button class="case-card motion-card" data-caption="Stage 1 与 Stage 2 动态对比一"><img src="assets/final/stage2-case-01.gif" alt="Stage 1 与 Stage 2 动态对比一" loading="lazy"><span>16 · Stage 1 vs Stage 2 · 01</span></button><button class="case-card motion-card" data-caption="Stage 1 与 Stage 2 动态对比二"><img src="assets/final/stage2-case-02.gif" alt="Stage 1 与 Stage 2 动态对比二" loading="lazy"><span>17 · Stage 1 vs Stage 2 · 02</span></button><button class="case-card" data-caption="Kimodo 游戏动作人工标注平台"><img src="assets/final/annotation-platform.png" alt="Kimodo 游戏动作人工标注平台" loading="lazy"><span>18 · Annotation platform</span></button><button class="case-card motion-card" data-caption="Gold 标注攻击动作学习结果"><img src="assets/final/gold-annotated-attack.gif" alt="Gold 标注攻击动作学习结果" loading="lazy"><span>19 · Gold · Attack</span></button><button class="case-card motion-card" data-caption="Gold 标注浮空动作学习结果"><img src="assets/final/gold-annotated-hover.gif" alt="Gold 标注浮空动作学习结果" loading="lazy"><span>20 · Gold · Hover</span></button><button class="case-card motion-card" data-caption="Gold 测试集攻击动作"><img src="assets/final/gold-test-attack.gif" alt="Gold 测试集攻击动作" loading="lazy"><span>21 · Gold test · Attack</span></button><button class="case-card motion-card" data-caption="Gold 测试集浮空动作一"><img src="assets/final/gold-test-hover-01.gif" alt="Gold 测试集浮空动作一" loading="lazy"><span>22 · Gold test · Hover 01</span></button><button class="case-card motion-card" data-caption="Gold 测试集浮空动作二"><img src="assets/final/gold-test-hover-02.gif" alt="Gold 测试集浮空动作二" loading="lazy"><span>23 · Gold test · Hover 02</span></button><button class="case-card motion-card" data-caption="Gold 测试集跳跃动作"><img src="assets/final/gold-test-jump.gif" alt="Gold 测试集跳跃动作" loading="lazy"><span>24 · Gold test · Jump</span></button><button class="case-card motion-card" data-caption="Gold 测试集原地动作一"><img src="assets/final/gold-test-stand-01.gif" alt="Gold 测试集原地动作一" loading="lazy"><span>25 · Gold test · Stand 01</span></button><button class="case-card motion-card" data-caption="Gold 测试集原地动作二"><img src="assets/final/gold-test-stand-02.gif" alt="Gold 测试集原地动作二" loading="lazy"><span>26 · Gold test · Stand 02</span></button><button class="case-card motion-card" data-caption="Gold 测试集原地动作三"><img src="assets/final/gold-test-stand-03.gif" alt="Gold 测试集原地动作三" loading="lazy"><span>27 · Gold test · Stand 03</span></button><button class="case-card motion-card" data-caption="Gold 测试集击倒动作一"><img src="assets/final/gold-test-knockdown-01.gif" alt="Gold 测试集击倒动作一" loading="lazy"><span>28 · Gold test · Knockdown 01</span></button><button class="case-card motion-card" data-caption="Gold 测试集击倒动作二"><img src="assets/final/gold-test-knockdown-02.gif" alt="Gold 测试集击倒动作二" loading="lazy"><span>29 · Gold test · Knockdown 02</span></button><button class="case-card motion-card" data-caption="混合训练游戏动作对照一"><img src="assets/final/mixed-game-01.gif" alt="混合训练游戏动作对照一" loading="lazy"><span>30 · Mixed game · 01</span></button><button class="case-card motion-card" data-caption="混合训练游戏动作对照二"><img src="assets/final/mixed-game-02.gif" alt="混合训练游戏动作对照二" loading="lazy"><span>31 · Mixed game · 02</span></button><button class="case-card motion-card" data-caption="混合训练游戏动作对照三"><img src="assets/final/mixed-game-03.gif" alt="混合训练游戏动作对照三" loading="lazy"><span>32 · Mixed game · 03</span></button><button class="case-card motion-card" data-caption="混合训练游戏动作对照四"><img src="assets/final/mixed-game-04.gif" alt="混合训练游戏动作对照四" loading="lazy"><span>33 · Mixed game · 04</span></button><button class="case-card motion-card" data-caption="Unseen Prompt：Inplace Normal"><img src="assets/final/unseen-inplace.gif" alt="Unseen Prompt：Inplace Normal" loading="lazy"><span>34 · Unseen · Inplace</span></button><button class="case-card motion-card" data-caption="Unseen Prompt：Knocked Down"><img src="assets/final/unseen-knocked-down.gif" alt="Unseen Prompt：Knocked Down" loading="lazy"><span>35 · Unseen · Knocked Down</span></button><button class="case-card motion-card" data-caption="Unseen Prompt：Attack"><img src="assets/final/unseen-attack.gif" alt="Unseen Prompt：Attack" loading="lazy"><span>36 · Unseen · Attack</span></button><button class="case-card motion-card" data-caption="Unseen Prompt：Hover"><img src="assets/final/unseen-hover.gif" alt="Unseen Prompt：Hover" loading="lazy"><span>37 · Unseen · Hover</span></button><button class="case-card motion-card" data-caption="Unseen Prompt：Jump"><img src="assets/final/unseen-jump.gif" alt="Unseen Prompt：Jump" loading="lazy"><span>38 · Unseen · Jump</span></button><button class="case-card motion-card" data-caption="SEED Content：原始模型与 Gold 微调模型"><img src="assets/final/seed-gold-content.gif" alt="SEED Content：原始模型与 Gold 微调模型" loading="lazy"><span>39 · SEED Gold · Content</span></button><button class="case-card motion-card" data-caption="SEED Repetition：原始模型与 Gold 微调模型"><img src="assets/final/seed-gold-repetition.gif" alt="SEED Repetition：原始模型与 Gold 微调模型" loading="lazy"><span>40 · SEED Gold · Repetition</span></button><button class="case-card motion-card" data-caption="SEED Content：混合模型与游戏数据模型"><img src="assets/final/seed-mixed-content.gif" alt="SEED Content：混合模型与游戏数据模型" loading="lazy"><span>41 · SEED Mixed · Content</span></button><button class="case-card motion-card" data-caption="SEED Repetition：混合模型与游戏数据模型"><img src="assets/final/seed-mixed-repetition.gif" alt="SEED Repetition：混合模型与游戏数据模型" loading="lazy"><span>42 · SEED Mixed · Repetition</span></button><button class="case-card" data-caption="项目大脑与 R-SDD 协作流程"><img src="assets/final/rsdd-flow.png" alt="项目大脑与 R-SDD 协作流程" loading="lazy"><span>43 · R-SDD flow</span></button></div><p class="source-note">43 个素材来自用户提供的“最终版材料”目录，并与最终 MD 的 43 个图位逐项对应。</p></div>
+  </dialog>
+
+  <dialog class="lightbox" id="case-lightbox" aria-label="Case 图片预览">
+    <img src="assets/final/phase1-content.gif" alt="Case 预览">
+    <footer><span data-caption>Case 预览</span><button class="close-button" data-close aria-label="关闭">×</button></footer>
+  </dialog>
+
+  <script src="app.js?v=6"></script>
+</body>
+</html>

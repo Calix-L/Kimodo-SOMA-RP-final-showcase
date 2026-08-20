@@ -1,0 +1,58 @@
+:root {
+  color-scheme: dark;
+  --bg: oklch(16% 0.018 285);
+  --panel: oklch(22% 0.025 285);
+  --text: oklch(94% 0.012 285);
+  --muted: oklch(76% 0.025 285);
+  --line: oklch(39% 0.028 285 / .6);
+  --lime: oklch(87% 0.19 125);
+  --violet: oklch(70% 0.2 295);
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; background: var(--bg); }
+body {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: clamp(32px, 6vw, 88px) clamp(18px, 5vw, 72px) 120px;
+  color: var(--text);
+  background: var(--bg);
+  font-family: "SF Pro Display", "PingFang SC", "Noto Sans CJK SC", "Microsoft YaHei", sans-serif;
+  line-height: 1.8;
+}
+body::before {
+  content: "Kimodo-SOMA-RP · 完整报告";
+  display: block;
+  margin-bottom: 52px;
+  color: var(--lime);
+  font-size: 13px;
+  font-weight: 760;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+h1, h2, h3, h4 { color: var(--text); line-height: 1.2; text-wrap: balance; }
+h1, h2, h3, h4, p, li, a { overflow-wrap: anywhere; }
+h1 { margin: 0 0 40px; font-size: clamp(2.8rem, 7vw, 6.6rem); letter-spacing: -.06em; }
+h2 { margin: 100px 0 28px; padding-top: 30px; border-top: 1px solid var(--line); font-size: clamp(2rem, 4vw, 4rem); letter-spacing: -.045em; }
+h3 { margin-top: 44px; font-size: 1.55rem; }
+h4 { margin-top: 36px; font-size: 1.2rem; }
+p, li { max-width: 76ch; color: var(--muted); }
+strong { color: var(--text); }
+a { color: var(--lime); text-underline-offset: 3px; }
+nav#TOC { margin-bottom: 80px; padding: 24px 28px; border: 1px solid var(--line); border-radius: 18px; background: var(--panel); }
+nav#TOC::before { content: "完整目录"; display: block; margin-bottom: 14px; color: var(--text); font-size: 1.2rem; font-weight: 760; }
+nav#TOC ul { columns: 2; gap: 36px; padding-left: 1.2rem; }
+nav#TOC li { break-inside: avoid; margin: 6px 0; }
+blockquote { margin: 28px 0; padding: 20px 24px; border: 1px solid var(--line); border-radius: 16px; background: var(--panel); }
+blockquote p { margin: 0; color: var(--text); }
+pre { overflow: auto; padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: oklch(12% 0.018 285); }
+code { color: var(--lime); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; overflow-wrap: anywhere; word-break: break-word; }
+.math { overflow-x: auto; color: var(--text); }
+img { display: block; width: min(100%, 980px); height: auto; margin: 28px auto; border: 1px solid var(--line); border-radius: 16px; background: var(--panel); }
+table { width: 100%; min-width: 0; max-width: 100%; border-collapse: collapse; font-size: 13px; font-variant-numeric: tabular-nums; }
+table { display: block; overflow-x: auto; margin: 28px 0; border: 1px solid var(--line); border-radius: 14px; }
+th, td { padding: 12px 14px; border-bottom: 1px solid var(--line); text-align: left; white-space: nowrap; }
+th { color: var(--text); background: oklch(28% 0.03 285); }
+td { color: var(--muted); }
+hr { margin: 70px 0; border: 0; border-top: 1px solid var(--line); }
+@media (max-width: 720px) { nav#TOC ul { columns: 1; } body { padding-top: 28px; } }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }

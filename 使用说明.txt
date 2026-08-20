@@ -1,0 +1,16 @@
+Kimodo-SOMA-RP 后训练探索｜最终结题展示
+
+使用方式
+1. 请先完整解压压缩包，不要只从压缩包预览窗口打开文件。
+2. 双击 index.html，使用 Chrome、Edge、Safari 等现代浏览器打开。
+3. 打开后首先播放 Blender 插件演示视频；播放器默认静音，可手动开启声音。
+4. 页面右上角可查看完整原文与最终 PDF；页面中的实验 Case 可以点击放大。
+
+文件说明
+- index.html：对外展示入口（开场视频 + 13 个结题章节页面）
+- full-report.html：逐章完整报告（含全部正文、18 张表和 43 个素材）
+- Kimodo-SOMA-RP-report.pdf：最终版 48 页 PDF
+- source-report.md：最终版 Markdown 原文
+- assets/final：43 个实验图片/动图素材，以及 1 个 Blender 插件演示视频
+
+本压缩包为离线版本，不依赖互联网资源。请保留文件夹结构，不要单独移动 HTML 文件。
