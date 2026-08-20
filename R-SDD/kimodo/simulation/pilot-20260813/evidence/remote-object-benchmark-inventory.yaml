@@ -1,0 +1,168 @@
+schema_version: "1.0"
+artifact: remote-object-benchmark-inventory
+run_id: pilot-20260813
+cycle_id: C01-object-target-benchmark-pin
+collected_at: "2026-08-13T09:45:00Z"
+collection_mode: READ_ONLY_SANITIZED_METADATA
+collector: codex-primary
+purpose: Supply A02 with primary metadata for benchmark identity and disjointness verification without exposing final holdout metrics.
+upstream_decision_frame:
+  ref: simulation/pilot-20260813/outputs/A01/C01-benchmark-decision-framing.yaml
+  commit_sha: c5106bdc96aad9c4a8941275c91b821f9b8e2530
+approved_remote_scope:
+  host_alias: lintrain
+  roots:
+  - /home/share/user/zyc/kimodo
+  - /home/share/user/zyc/kimodo_seed_repro_train
+  excluded:
+  - GPU execution
+  - model training
+  - final holdout metric values
+  - credentials or private row contents
+transport_warning:
+  state: OBSERVED
+  message: "client_global_hostkeys_prove_confirm: server gave bad signature for RSA key 0: incorrect signature"
+  handling: Every read command exited successfully, but the warning remains a provenance risk and must not be silently promoted away.
+
+remote_repository:
+  root: /home/share/user/zyc/kimodo
+  git_head: 1aece8c124d73d255ceff5086d983b844c9f4e94
+  object_manifest_git_tracked: false
+  second_root_git_repository: false
+
+object_benchmark:
+  root: /home/share/user/zyc/kimodo/eval_work/domain_text_benchmarks_20260811/object_manip
+  manifest:
+    path: /home/share/user/zyc/kimodo/eval_work/domain_text_benchmarks_20260811/object_manip/domain_manifest.json
+    sha256: 97d13dcc78016c66396faee8a59a0cd8f126c9552542e2ad94de914d4bf519a3
+    target: object_manip
+    categories:
+    - Object Manipulation
+    splits:
+      content:
+        num_cases: 235
+      repetition:
+        num_cases: 57
+    total_cases: 292
+    unique_motion_ids: 292
+    ordered_unique_motion_id_set_sha256: 8f60670735432c31e24166b7b8a8f6785c1f50a10e471877d8e68db47d700c1b
+    identity_field: seed_motion.json.move_name
+  construction_script:
+    path: /home/share/user/zyc/kimodo_seed_repro_train/work/codex_pipeline/build_domain_text_benchmark.py
+    sha256: 18a602ddf4922f42dad03a2478a9ac731607663d54460dee1472210e393d88f3
+    size_bytes: 4399
+    line_count: 120
+    mtime: "2026-08-11 10:53:28 +0800"
+    git_commit: MISSING_NOT_A_GIT_REPOSITORY
+    declared_defaults:
+      seed: 20260811
+      max_frames: 320
+      max_per_split: 0
+      include_mirrors: false_unless_flag_present
+    observed_selection_rule:
+    - Load official content and repetition split identifiers.
+    - Filter metadata rows to the target category set.
+    - Exclude mirrored rows unless include-mirrors is passed.
+    - Select rows whose relative identity belongs to the corresponding official split.
+    - Use a seeded sample only when max-per-split is non-zero and smaller than the selected set.
+    reproducibility_limit: The generated manifest does not record the invocation, script hash, metadata hash, or source split hashes; script bytes are hashable but not commit-addressed.
+
+target_training_manifest:
+  path: /home/share/user/zyc/kimodo_seed_repro_train/work/manifests/cat_object_manip_fp32_20260811_0005.csv
+  sha256: 95dcd9c7f1e73d99e5bce10abb6bf94d55f58a17e8eefc7b83fbdfe74597bbd5
+  size_bytes: 2164318
+  mtime: "2026-08-11 02:36:07 +0800"
+  row_count: 5810
+  unique_motion_ids: 5810
+  ordered_unique_motion_id_set_sha256: b5c24c9bbb58be11dde44af6407a10b7997025011d457c8856d5a9a64096fa2c
+  fields:
+  - motion_id
+  - bvh_path
+  - text
+  - num_frames
+  - content_name
+  - category
+  - package
+
+full_holdout_manifest:
+  root: /home/share/user/zyc/kimodo/eval_work/seed_text_test_full_20260813
+  path: /home/share/user/zyc/kimodo/eval_work/seed_text_test_full_20260813/domain_manifest.json
+  sha256: 479f284385178ff323795a6b08a2458c7d161e148e8be6b626ef68fb82a47d20
+  size_bytes: 3402
+  mtime: "2026-08-13 14:47:26 +0800"
+  target: seed_full_text_test
+  include_mirrors: false
+  max_per_split: 0
+  splits:
+    content:
+      num_cases: 3510
+      object_manipulation_cases: 235
+    repetition:
+      num_cases: 3428
+      object_manipulation_cases: 57
+  total_cases: 6938
+  unique_motion_ids: 6938
+  ordered_unique_motion_id_set_sha256: bc4d0655f6a99e419c86ac18bc47818b10d69316fbf79c242d65d52191bda089
+
+disjointness_checks:
+  identity_basis: Exact equality of motion_id / seed_motion.move_name; no fuzzy matching.
+  object_eval_vs_target_train:
+    status: CONFLICTING
+    object_eval_total: 292
+    intersection_count: 284
+    object_eval_overlap_ratio: 0.972603
+    by_split:
+      content:
+        object_cases: 235
+        intersection_count: 235
+        non_overlapping_count: 0
+      repetition:
+        object_cases: 57
+        intersection_count: 49
+        non_overlapping_count: 8
+    implication: The existing Object benchmark is not an independent target-generalization evaluation for this training manifest.
+  object_eval_vs_full_holdout:
+    status: CONFLICTING
+    object_eval_total: 292
+    intersection_count: 292
+    object_only_count: 0
+    implication: The Object benchmark is an exact subset of the full 6938-case holdout by motion identity, so target and holdout evidence are not independent.
+  target_train_vs_full_holdout:
+    status: CONFLICTING
+    target_train_total: 5810
+    holdout_total: 6938
+    intersection_count: 284
+    target_train_overlap_ratio: 0.048881
+    holdout_overlap_ratio: 0.040934
+    implication: The current target training manifest overlaps the frozen full holdout; the overlap is concentrated in the Object benchmark except for eight Object repetition cases not present in training.
+
+paired_evaluation_structure:
+  root: /home/share/user/zyc/kimodo/eval_work/domain_text_eval_20260811/object_manip
+  status: VERIFIED_CASE_COUNTS_ONLY
+  runs:
+    baseline: {content_case_dirs: 235, repetition_case_dirs: 57}
+    cat_object_manip_fp32_20260811_0005: {content_case_dirs: 235, repetition_case_dirs: 57}
+    abl_object_lr1e7_s2000_20260811: {content_case_dirs: 235, repetition_case_dirs: 57}
+    abl_object_lr1e7_s3000_20260811: {content_case_dirs: 235, repetition_case_dirs: 57}
+  limit: Matching directory counts support paired structure but do not by themselves prove identical ordered case identities or valid metric aggregation.
+
+classification_summary:
+  benchmark_target_category_and_counts: VERIFIED
+  benchmark_manifest_hash: VERIFIED
+  construction_script_bytes_and_hash: VERIFIED
+  construction_invocation_and_input_hashes: MISSING
+  construction_script_commit: MISSING
+  target_training_manifest_hash_and_ids: VERIFIED
+  full_holdout_manifest_hash_and_ids: VERIFIED
+  target_eval_target_train_disjointness: CONFLICTING
+  target_eval_full_holdout_disjointness: CONFLICTING
+  target_train_full_holdout_disjointness: CONFLICTING
+  paired_run_case_counts: VERIFIED
+  paired_run_exact_order_and_metric_aggregation: MISSING
+
+sanitization:
+  raw_final_metrics_included: false
+  credentials_included: false
+  raw_training_rows_included: false
+  case_name_examples_included: false
+  commands_preserved_in_shared_artifact: false

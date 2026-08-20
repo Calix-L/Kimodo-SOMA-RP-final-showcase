@@ -1,0 +1,6 @@
+schema_version: "1.0"
+project:
+  id: kimodo-phase1-rsdd-pilot
+  name: Kimodo Phase 1 R-SDD Six-Agent Pilot
+  description: Evidence-grounded replay and live closure of the Kimodo-SOMA-RP Phase 1 post-training workflow.
+

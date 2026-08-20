@@ -1,0 +1,120 @@
+schema_version: "1.0"
+task_id: P01-A03-training-invariants
+run_id: pilot-20260813
+mode: VERIFY
+agent_id: A03
+research_id: R001
+experiment_id: null
+produced_at: 2026-08-13T08:27:58Z
+commit_sha: cd67942
+primary_records:
+  - research/R003/protocol.yaml
+  - source/phase1_ai_native_project_brain_20260813.md section 5, 6.2, 6.3
+  - simulation/pilot-20260813/evidence-map.yaml
+
+# ---------------------------------------------------------------------------
+# R003 declares a one-variable training-strength comparison at lr=1e-7
+# ---------------------------------------------------------------------------
+ablation_design:
+  research_id: R003
+  declared_core_variable: "training duration (steps)"
+  declared_fixed: "learning_rate=1e-7"
+  domains: [Dancing, Object-Manipulation]
+  step_levels: [2000, 3000]
+  source: "research/R003/protocol.yaml method (line 13) and tasks (line 15)"
+  evidence_states_note: "All four ablation runs are state DECLARED in evidence-map.yaml; not independently verified against configs/logs."
+
+# ---------------------------------------------------------------------------
+# Per-comparison one-variable boundary review
+# ---------------------------------------------------------------------------
+comparisons:
+  - id: C-Dancing-steps
+    runs: [abl_dancing_lr1e7_s2000_20260811, abl_dancing_lr1e7_s3000_20260811]
+    core_variable_changed: "steps (2000 -> 3000)"
+    variables_held_constant_declared: ["learning_rate=1e-7", "domain=Dancing"]
+    variables_held_constant_undocumented: [dtype, warmup, batch_size, grad_accum, target_repeat, replay_size, replay_repeat, text_dropout, max_grad_norm, optimizer, loss_function, lr_schedule, seed]
+    one_variable_valid: PROVISIONAL
+    validity_condition: "valid as one-variable ONLY IF all undocumented fields are equal across the two runs."
+    drift_state: MISSING
+    historical_observation: "2000/3000-step did not stably beat baseline; foot-skate ratio/height side effects visible (source brain section 6.2)."
+    conclusion_is_provisional: true
+
+  - id: C-Object-steps
+    runs: [abl_object_lr1e7_s2000_20260811, abl_object_lr1e7_s3000_20260811]
+    core_variable_changed: "steps (2000 -> 3000)"
+    variables_held_constant_declared: ["learning_rate=1e-7", "domain=Object-Manipulation"]
+    variables_held_constant_undocumented: [dtype, warmup, batch_size, grad_accum, target_repeat, replay_size, replay_repeat, text_dropout, max_grad_norm, optimizer, loss_function, lr_schedule, seed]
+    one_variable_valid: PROVISIONAL
+    validity_condition: "valid as one-variable ONLY IF all undocumented fields are equal across the two runs."
+    drift_state: MISSING
+    historical_observation: "3000-step shows stable Content retrieval/Similarity/FID/Contact gains and Repetition R@2/3/5/FID gains; foot-skate metrics still degrade (source brain section 6.3)."
+    candidate_status: PROVISIONAL
+    candidate_run: abl_object_lr1e7_s3000_20260811
+    candidate_status_condition: "remains provisional until R004 full non-regression closes (R003 protocol evaluation.criteria; A03 profile)."
+
+  - id: C-cross-domain-s2000
+    runs: [abl_dancing_lr1e7_s2000_20260811, abl_object_lr1e7_s2000_20260811]
+    core_variable_changed: "domain (Dancing -> Object)"
+    variables_held_constant_declared: ["learning_rate=1e-7", "steps=2000"]
+    variables_held_constant_undocumented: [all training hyperparameters]
+    one_variable_valid: PROVISIONAL
+    note: "Domain change necessarily changes the target manifest; this is a domain-selection comparison, not a pure training-strength ablation."
+    drift_state: MISSING
+
+  - id: C-cross-domain-s3000
+    runs: [abl_dancing_lr1e7_s3000_20260811, abl_object_lr1e7_s3000_20260811]
+    core_variable_changed: "domain (Dancing -> Object)"
+    variables_held_constant_declared: ["learning_rate=1e-7", "steps=3000"]
+    variables_held_constant_undocumented: [all training hyperparameters]
+    one_variable_valid: PROVISIONAL
+    drift_state: MISSING
+
+# ---------------------------------------------------------------------------
+# Explicit boundary: what is NOT a one-variable ablation
+# ---------------------------------------------------------------------------
+forbidden_conflations:
+  - id: F1-main-vs-ablation
+    description: "Comparing a 4000-step main run (lr=2e-7) to a 2000/3000-step ablation (lr=1e-7) changes BOTH lr and steps."
+    rule: "Report as a two-variable strength-reduction question (R002 -> R003), never as a single-variable ablation."
+    source: "source brain section 5 decision table (训练强度 row)."
+  - id: F2-steps-and-domain
+    description: "Comparing Dancing-2000 to Object-3000 changes steps AND domain."
+    rule: "Not a valid one-variable comparison; use matched-step pairs only (C-cross-domain-s2000, C-cross-domain-s3000)."
+
+# ---------------------------------------------------------------------------
+# Acceptance-criteria mapping
+# ---------------------------------------------------------------------------
+acceptance_mapping:
+  target_replay_mixing_explicit: true
+  cache_explicit: PARTIAL
+  cache_note: "process steps stated (section 4.1); cache format / feature-type MISSING"
+  loss_explicit: false
+  loss_note: "MISSING from all primary records"
+  precision_explicit: true
+  learning_rate_explicit: true
+  step_count_explicit: true
+  comparable_runs_drift_checked: true
+  drift_check_note: "checked; undocumented fields marked MISSING, not assumed away"
+  no_training_conclusion_uses_holdout: true
+
+# ---------------------------------------------------------------------------
+# Escalation triggers (A03 profile)
+# ---------------------------------------------------------------------------
+escalation:
+  - trigger: "configuration drift between claimed comparable runs"
+    status: OPEN
+    evidence: "undocumented hyperparameters across all comparisons; cannot close without A04 run cards."
+  - trigger: "hidden preprocessing or loss change"
+    status: OPEN
+    evidence: "loss function and optimizer are not recorded; manifest/preprocessing details sit with A02."
+
+# ---------------------------------------------------------------------------
+# Open risks
+# ---------------------------------------------------------------------------
+open_risks:
+  - id: A03-R02
+    risk: "Undocumented hyperparameter drift across ablation pairs (shared with training-invariants.yaml)."
+  - id: A03-R05
+    risk: "Candidate is selected on target-domain ablation metrics only; R004 holdout not yet closed, so candidate status is strictly provisional."
+
+recommended_next_action: "A04 reconstructs the four R003 ablation run cards (configs/logs/checkpoint refs) so the undocumented held-constant fields can be verified; until then every one-variable verdict stays PROVISIONAL."

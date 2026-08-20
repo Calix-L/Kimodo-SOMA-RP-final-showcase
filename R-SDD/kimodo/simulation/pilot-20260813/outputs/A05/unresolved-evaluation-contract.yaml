@@ -1,0 +1,206 @@
+schema_version: '1.0'
+contract_id: A05-unresolved-evaluation-contract
+run_id: pilot-20260813
+task_id: P01-A05-evaluation-recovery
+mode: VERIFY
+agent_id: A05
+research_id: R004
+prepared_at: '2026-08-13'
+prepared_at_precision: date_only_shell_clock_unavailable
+commit_sha: cd67942
+
+# ---------------------------------------------------------------------------
+# Unresolved / blocking evaluation-contract items recovered by A05 in VERIFY
+# mode. Each item states the gap, the evidence, the owner, and a resolution
+# that does NOT alter any frozen threshold and does NOT tune to candidate
+# results. Items are inputs to A06 cold-start review and Human Gate 2.
+# ---------------------------------------------------------------------------
+
+principle: >
+  Thresholds frozen at Human Gate 1 and in the frozen R004 Protocol digest are
+  NOT modified. Gaps are about WHICH benchmark/threshold applies WHERE, and
+  about MISSING evidence, not about changing numbers.
+
+items:
+  - id: UNRES-01
+    title: Target-domain (Object) benchmark not pinned in frozen R004.inputs
+    state: UNRESOLVED
+    category: contract-under-specification
+    severity: high
+    statement: >
+      final_adopt_rule requires target_Content_PASS and target_Repetition_PASS,
+      and Gate1 target_success_rule describes "target-domain improvement", but
+      R004.inputs lists only the SEED-test holdout benchmarks
+      (SEED-test-Content-3510, SEED-test-Repetition-3428). The Object
+      target-domain benchmark (where improvement is expected) is not listed,
+      and its Content/Repetition split counts are not frozen in R004.
+    evidence:
+      - kimodo/research/R004/protocol.yaml#final_adopt_rule
+      - kimodo/research/R004/protocol.yaml#inputs
+      - kimodo/simulation/pilot-20260813/decisions/human-gate-1.yaml#target_success_rule
+    owner: A01
+    human_gate: human-gate-2
+    resolution: >
+      Clarify and pin the Object target-domain benchmark identity and its
+      Content/Repetition split counts as an R004 contract addendum (no
+      threshold change, no tuning to results). Until then, target_*
+      outcomes are INCONCLUSIVE.
+    blocks: [target_Content_PASS, target_Repetition_PASS, independent-gate-table]
+
+  - id: UNRES-02
+    title: A04 raw artifact register (holdout-run-card) MISSING
+    state: MISSING
+    category: missing-evidence
+    severity: high
+    statement: >
+      outputs/R004/holdout-run-card.yaml does not exist; outputs/R004/ is not
+      created yet. A05 cannot independently recompute sample counts or the
+      gate table without the registered baseline/candidate counts, commands,
+      environment, logs, metrics, and deviations.
+    evidence:
+      - kimodo/simulation/pilot-20260813/workflow.yaml#R004-holdout-live
+      - kimodo/simulation/pilot-20260813/outputs/R004/ (absent)
+    owner: A04
+    resolution: >
+      A04 completes or collects the holdout run and registers
+      outputs/R004/holdout-run-card.yaml as LIVE evidence WITHOUT interpreting
+      success, including registered Content 3510 / Repetition 3428 counts.
+    blocks: [independent-gate-table, independent-comparison, A06-cold-start]
+
+  - id: UNRES-03
+    title: Benchmark construction code and manifests not available in worktree
+    state: MISSING
+    category: missing-evidence
+    severity: medium
+    statement: >
+      work/codex_pipeline/ is absent from this worktree.
+      build_seed_text_test_benchmark.py, build_domain_text_benchmark.py,
+      run_seed_full_text_holdout_eval.sh, and build_training_subset_manifest.py
+      are DECLARED in evidence-map but not inspectable here. A05 cannot verify
+      how Content/Repetition splits and counts were constructed.
+    evidence:
+      - kimodo/simulation/pilot-20260813/evidence-map.yaml#assets (SCRIPT-SEED-HOLDOUT, SCRIPT-DOMAIN-BENCHMARK, SCRIPT-FULL-HOLDOUT, SCRIPT-MANIFEST all state DECLARED)
+      - kimodo/research/R004/protocol.yaml#artifacts
+    owner: A02
+    resolution: >
+      Make construction scripts and benchmark manifests/meta.json/seed_motion.json
+      available (or register their hashes/outputs) so A05 can verify split
+      construction and counts before gate-table computation.
+    blocks: [construction-verification, count-independent-recompute]
+
+  - id: UNRES-04
+    title: Holdout run artifacts remote-only and inaccessible from sandbox
+    state: MISSING
+    category: missing-evidence
+    severity: medium
+    statement: >
+      The holdout run output is remote at
+      /home/share/user/zyc/kimodo/eval_work/seed_text_test_full_eval_20260813.
+      The remote root is approved by Gate1, but no remote access is available
+      in this VERIFY worktree. evidence-map marks the run DECLARED and notes it
+      was still running when the source snapshot was supplied.
+    evidence:
+      - kimodo/simulation/pilot-20260813/evidence-map.yaml#runs (seed_text_test_full_eval_20260813)
+      - kimodo/simulation/pilot-20260813/decisions/human-gate-1.yaml#resource_and_data_boundary
+    owner: A04
+    resolution: >
+      A04 registers the completed holdout run (metrics, summary_rows.json,
+      motions, embeddings) in the holdout-run-card; A06 attempts a low-cost
+      cold-start reproduction or metric recomputation per R004.
+    blocks: [independent-gate-table, A06-cold-start]
+
+  - id: UNRES-05
+    title: Independent cryptographic hash recompute of frozen snapshot not executed
+    state: NOT_EXECUTED
+    category: residual-verification-gap
+    severity: low
+    statement: >
+      A05 verified the digest by three-way string alignment (Gate1.protocol_sha256
+      == R004.freeze.sha256 == snapshot filename) and by content identity (full
+      read of snapshot vs live protocol), but did not recompute sha256 of the
+      snapshot bytes because the shell was unavailable / the shasum command was
+      declined.
+    evidence:
+      - kimodo/.specify/rsdd/protocols/R004/1f911559b69c5a7d3b68cf269c746c76ad1384f96a23963d533560eb83e8f0e5.yaml
+      - kimodo/research/R004/protocol.yaml#freeze
+    owner: A05
+    resolution: >
+      When a shell is available, run shasum -a 256 on the snapshot and confirm
+      it equals 1f911559b69c5a7d3b68cf269c746c76ad1384f96a23963d533560eb83e8f0e5.
+      Low risk because content identity + three-way alignment already establish
+      integrity.
+    blocks: []
+
+  - id: UNRES-06
+    title: Train/holdout and target train/test leakage not verifiable
+    state: INCONCLUSIVE
+    category: leakage
+    severity: medium
+    statement: >
+      A05 cannot verify that Object training data is disjoint from the SEED-test
+      holdout, nor that the Object target-domain evaluation benchmark is disjoint
+      from the Object training manifest. build_training_subset_manifest.py and
+      the target benchmark construction are not inspectable in this worktree.
+    evidence:
+      - kimodo/simulation/pilot-20260813/evidence-map.yaml#assets (SCRIPT-MANIFEST, SCRIPT-DOMAIN-BENCHMARK state DECLARED)
+    owner: A02
+    resolution: >
+      A02/A04 register manifest boundaries and the train/test split policy;
+      A05 re-checks disjointness before the independent gate-table computation.
+    blocks: [leakage-verification]
+
+  - id: UNRES-07
+    title: Result visibility NOT_ATTESTED at threshold approval
+    state: RISK_DOCUMENTED
+    category: retrospective-acceptance
+    severity: low
+    statement: >
+      Gate1 approval_context records result_visibility_at_approval = NOT_ATTESTED
+      and policy = RETROSPECTIVE_ACCEPTANCE_POLICY_UNLESS_BLINDING_ATTESTED. The
+      thresholds may not be described as preregistered.
+    evidence:
+      - kimodo/simulation/pilot-20260813/decisions/human-gate-1.yaml#approval_context
+      - kimodo/research/R004/protocol.yaml#risks
+    owner: human-gate-2
+    resolution: >
+      Human Gate 2 weighs the retrospective-acceptance caveat when recording the
+      final decision; A06 surfaces it in the cold-start review. No threshold
+      change.
+    blocks: []
+
+  - id: UNRES-08
+    title: A05 profile outputs independent-comparison.yaml and gate-table.yaml deferred
+    state: BLOCKED
+    category: blocked-by-missing-evidence
+    severity: info
+    statement: >
+      independent-comparison.yaml and gate-table.yaml are A05 profile
+      required_outputs but are outside this task allowed_output_refs and are
+      blocked on UNRES-02/03/04. They belong to the R004-independent-checks LIVE
+      phase at outputs/R004/independent-gate-table.yaml (per workflow.yaml).
+    evidence:
+      - kimodo/simulation/pilot-20260813/workflow.yaml#R004-independent-checks
+      - kimodo/simulation/pilot-20260813/agents/A05.yaml#required_outputs
+    owner: A05
+    resolution: >
+      Produce these in the R004 LIVE phase after A04 registers the holdout
+      run card; gate-table must NOT interpret candidate success and must be
+      recompute-only against frozen thresholds.
+    blocks: []
+
+acceptance_criteria_check:
+  content_repetition_target_holdout_footskate_separated: true
+  evidence: kimodo/simulation/pilot-20260813/outputs/A05/benchmark-integrity-review.yaml#meaning_separation
+  every_threshold_traced_to_gate1_and_R004_digest: true
+  threshold_mismatches_blocking: none_found
+  evidence_trace: kimodo/simulation/pilot-20260813/outputs/A05/benchmark-integrity-review.yaml#threshold_trace
+  early_constraint_suite_not_treated_as_full_holdout: true
+  evidence_separation: kimodo/simulation/pilot-20260813/outputs/A05/benchmark-integrity-review.yaml#benchmark_integrity.early_constraint_suite_separation
+
+next_action_for_A06: >
+  Cold-start review without A04 private transcript: confirm the frozen
+  threshold/holdout-count contract in benchmark-integrity-review.yaml; attempt
+  a low-cost reproduction or metric recomputation of the holdout once A04
+  registers the run card; weigh UNRES-01 (target benchmark pin) and UNRES-07
+  (retrospective acceptance) in the Review Proposal; do not treat any early
+  constraint-suite or domain-suite result as holdout evidence.

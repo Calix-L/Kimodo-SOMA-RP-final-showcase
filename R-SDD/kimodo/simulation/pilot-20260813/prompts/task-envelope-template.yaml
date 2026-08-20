@@ -1,0 +1,15 @@
+schema_version: "1.0"
+task_id: REQUIRED
+run_id: pilot-20260813
+mode: REQUIRED_REPLAY_VERIFY_OR_LIVE
+agent_id: REQUIRED
+research_id: REQUIRED
+experiment_id: null
+objective: REQUIRED
+input_refs: []
+allowed_output_refs: []
+acceptance_criteria: []
+forbidden_actions: []
+time_or_cost_limit: REQUIRED
+required_handoff_to: REQUIRED
+

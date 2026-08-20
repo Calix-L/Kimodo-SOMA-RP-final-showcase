@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spec-kit.dev/rsdd/research.schema.json",
+  "title": "R-SDD Research Spec",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "id",
+    "title",
+    "type",
+    "status",
+    "owner",
+    "profile",
+    "question",
+    "evaluation"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^R[0-9]{3,}$"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "type": {
+      "enum": [
+        "benchmark",
+        "confirmatory",
+        "diagnostic",
+        "exploratory",
+        "reproduction"
+      ]
+    },
+    "status": {
+      "enum": [
+        "CLOSED",
+        "DRAFT",
+        "READY",
+        "REVIEW",
+        "REVISE",
+        "RUNNING"
+      ]
+    },
+    "owner": {
+      "type": "string",
+      "minLength": 1
+    },
+    "profile": {
+      "type": "string",
+      "minLength": 1
+    },
+    "question": {
+      "type": "string",
+      "minLength": 1
+    },
+    "hypothesis": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "protocol_amendments": {
+      "type": "array"
+    },
+    "evaluation": {
+      "type": "object",
+      "required": [
+        "answer_criteria"
+      ],
+      "properties": {
+        "answer_criteria": {
+          "type": "array",
+          "minItems": 1
+        }
+      }
+    }
+  }
+}

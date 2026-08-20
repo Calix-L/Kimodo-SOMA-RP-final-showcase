@@ -1,0 +1,114 @@
+schema_version: "1.0"
+task_id: P01-A02-provenance-recovery-r2
+run_id: pilot-20260813
+mode: VERIFY
+agent_id: A02
+research_id: R001
+produced_at: "2026-08-13"
+produced_at_precision: "date_only_subday_time_unavailable_bash_forbidden"
+
+description: "Evidence needed for provenance but not available in the four task-envelope records, or not accessible to A02 under the frozen boundary (no Bash, no remote, no repository-wide discovery, no final-holdout access). Each item is marked MISSING and opened as a risk; none are promoted to VERIFIED."
+
+register:
+  - id: MISSING-BASE-MODEL
+    artifact: "Kimodo-SOMA-RP-v1.1 base model weights"
+    needed_for: "Finetune lineage; candidate checkpoint provenance depends on the base weights."
+    declared_in: ["source summary section 1", "source summary section 6.3", "protocol.yaml inputs"]
+    missing_evidence: "No version tag, commit, weight-file path, or sha256 in the four records."
+    a02_state: MISSING
+    escalate_to: [A03, A06]
+    boundary_note: "Approved remote root /home/share/user/zyc/kimodo may hold it, but remote access is forbidden to A02."
+
+  - id: MISSING-SEED-DATASET-AND-SPLITS
+    artifact: "SEED dataset version + Content/Repetition split manifests and per-split case-count source"
+    needed_for: "Train/evaluation split provenance; rule out train/eval overlap (A02 escalation trigger)."
+    declared_in: ["source summary section 1", "protocol.yaml inputs", "human-gate-1 split_policy", "human-gate-1 target_success_rule.required_splits"]
+    missing_evidence: "No dataset version, split-manifest path, per-split count source, or hash."
+    a02_state: MISSING
+    escalate_to: [A03, A05, A06]
+    boundary_note: "Split policy is declared but the concrete split artifacts are not."
+
+  - id: MISSING-TRAINING-MANIFESTS
+    artifact: "target / replay / combined training manifests"
+    needed_for: "Manifest-to-checkpoint lineage (data_selection -> feature_cache)."
+    declared_in: ["source summary section 7", "evidence-map SCRIPT-MANIFEST"]
+    missing_evidence: "No output path or hash for any produced manifest."
+    a02_state: MISSING
+    escalate_to: [A03, A04]
+
+  - id: MISSING-FEATURE-CACHES
+    artifact: "target cache / replay cache / combined cache"
+    needed_for: "Cache merge -> finetune lineage; replay-mix provenance."
+    declared_in: ["source summary section 4.1 task 4", "source summary section 6.3 hyperparameters (replay_size, replay_repeat, target_repeat)"]
+    missing_evidence: "No cache path, manifest linkage, or hash."
+    a02_state: MISSING
+    escalate_to: [A03, A04]
+
+  - id: MISSING-RUN-CHECKPOINTS
+    artifact: "Per-run finetune checkpoints (all 7 training/ablation runs, incl. candidate abl_object_lr1e7_s3000_20260811)"
+    needed_for: "Checkpoint provenance for every REPLAY run and the provisional candidate."
+    declared_in: ["evidence-map runs (ids only)", "source summary sections 6.1-6.3"]
+    missing_evidence: "No per-run checkpoint path or hash; run identity is DECLARED, the checkpoint artifact is MISSING."
+    a02_state: MISSING
+    escalate_to: [A03, A04, A06]
+    boundary_note: "Candidate checkpoint cannot be verified; quality not assessed by A02."
+
+  - id: MISSING-RUN-OUTPUT-PATHS
+    artifact: "Per-run output directories for the 7 training/ablation runs"
+    needed_for: "Locating each run's logs/checkpoints/metrics for downstream verification."
+    declared_in: ["evidence-map runs (id/owner/domain only; no ref)"]
+    missing_evidence: "No per-run output path declared (only the holdout run has a remote ref)."
+    a02_state: MISSING
+    escalate_to: [A04]
+
+  - id: MISSING-DOMAIN-EVAL-OUTPUTS
+    artifact: "Domain text2motion eval outputs (summary_rows.json, metrics, motion, embedding) per run/baseline"
+    needed_for: "Target-domain evaluation provenance backing the historical observations."
+    declared_in: ["source summary section 4.2", "evidence-map SCRIPT-DOMAIN-EVAL / SCRIPT-SUMMARY"]
+    missing_evidence: "No per-eval output path or hash."
+    a02_state: MISSING
+    escalate_to: [A05, A06]
+
+  - id: MISSING-FINAL-HOLDOUT-RESULTS
+    artifact: "seed_text_test_full_eval_20260813 final holdout results"
+    needed_for: "General-capability holdout decision (R004)."
+    declared_in: ["evidence-map holdout run (remote ref + expected_counts)", "source summary section 9"]
+    missing_evidence: "Results not available to A02."
+    a02_state: MISSING
+    escalate_to: [A04, A05, A06]
+    boundary_note: "Explicitly out of scope and forbidden to A02 (remote + final-holdout access prohibited). Remote ref and expected_counts are DECLARED, not verified."
+
+  - id: MISSING-TRAINING-CONFIG-ARTIFACT
+    artifact: "Verified training configuration artifact backing the candidate hyperparameters"
+    needed_for: "Confirm declared hyperparameters (lr, steps, warmup, batch, grad_accum, replay, etc.) match an actual config."
+    declared_in: ["source summary section 6.3 (declared values)"]
+    missing_evidence: "No config file path or hash; values are DECLARED from prose only."
+    a02_state: MISSING
+    escalate_to: [A03]
+
+  - id: MISSING-SCRIPT-CONTENT-HASHES
+    artifact: "Content/hash for the 7 DECLARED codex_pipeline scripts"
+    needed_for: "Script provenance; rule out silent edits between summary and run."
+    declared_in: ["evidence-map assets", "protocol.yaml artifacts", "source summary section 8"]
+    missing_evidence: "No script content hash; scripts are outside A02 allowed_paths and discovery is forbidden. SCRIPT-MANIFEST is owned by A02 but unverified in this run."
+    a02_state: MISSING
+    escalate_to: [A03, A04, A05]
+
+  - id: MISSING-BASIS-RECORD-DIGESTS
+    artifact: "Recomputed sha256 for protocol.yaml, evidence-map.yaml, human-gate-1.yaml"
+    needed_for: "Tamper-evident provenance of the four basis records."
+    declared_in: ["task-envelope input_refs (no digests supplied)"]
+    missing_evidence: "No digests in the four records for these three files; Bash forbidden so A02 cannot recompute. Only the source-snapshot digest (carried from evidence map) and the DECLARED protocol_sha256 (from human-gate-1) are available."
+    a02_state: MISSING
+    escalate_to: [A01, A06]
+    boundary_note: "Not a content gap; a verification-method gap caused by the no-Bash constraint."
+
+summary:
+  total_missing: 11
+  highest_priority:
+    - MISSING-BASE-MODEL
+    - MISSING-SEED-DATASET-AND-SPLITS
+    - MISSING-RUN-CHECKPOINTS
+    - MISSING-FINAL-HOLDOUT-RESULTS
+  none_promoted_to_verified: true
+  reason: "A02 had no primary material within allowed paths for any DECLARED item and is forbidden from Bash, remote access, repository-wide discovery, and final-holdout access."

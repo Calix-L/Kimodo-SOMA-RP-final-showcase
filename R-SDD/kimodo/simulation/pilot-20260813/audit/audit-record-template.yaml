@@ -1,0 +1,22 @@
+schema_version: "1.0"
+run_id: pilot-20260813
+agent_id: REQUIRED
+task_id: REQUIRED
+kscc_session_id: REQUIRED
+model: REQUIRED
+prompt_version: REQUIRED
+started_at: REQUIRED_ISO8601
+completed_at: REQUIRED_ISO8601
+token_usage:
+  input: REQUIRED_NUMBER
+  output: REQUIRED_NUMBER
+  cache_read: null
+cost:
+  amount: REQUIRED_NUMBER
+  currency: REQUIRED
+commit_sha: REQUIRED
+output_refs: []
+transcript_ref: REQUIRED_SANITIZED_PATH
+transcript_sha256: REQUIRED
+secrets_removed: REQUIRED_BOOLEAN
+

@@ -1,0 +1,234 @@
+schema_version: "1.0"
+handoff_id: C01-ER1-A02-to-hf
+run_id: pilot-20260813
+mode: VERIFY
+from_agent: A02
+to_agent: hf
+research_id: R004
+experiment_id: null
+owner: hf
+task_id: C01-A02-ER1-disjoint-pool-feasibility
+cycle_id: C01-object-target-benchmark-pin
+cycle_step: C01-ER1
+
+# ---------------------------------------------------------------------------
+# Inputs consumed (authorized input_refs of the task envelope)
+# ---------------------------------------------------------------------------
+input_refs:
+  - kimodo/simulation/pilot-20260813/evidence/ER1-disjoint-pool-inventory.yaml
+  - kimodo/simulation/pilot-20260813/outputs/A02/C01-object-benchmark-provenance.yaml
+  - kimodo/simulation/pilot-20260813/outputs/A01/C01-benchmark-recommendation.yaml
+human_authorization_ref: kimodo/simulation/pilot-20260813/decisions/human-collaboration-C01.yaml
+
+# ---------------------------------------------------------------------------
+# Outputs produced (allowed_output_refs)
+# ---------------------------------------------------------------------------
+output_refs:
+  - kimodo/simulation/pilot-20260813/outputs/A02/C01-ER1-disjoint-pool-survey.yaml
+  - kimodo/simulation/pilot-20260813/handoffs/C01-ER1-A02-to-hf.yaml
+
+# ---------------------------------------------------------------------------
+# Commit lineage (acceptance criterion 1)
+# ---------------------------------------------------------------------------
+approval_commit_sha: 6994bdad6d7d48f576dcbc3a27aaedca00b80a72
+approval_commit_sha_state: VERIFIED
+approval_commit_sha_evidence: "ER1-disjoint-pool-inventory.yaml#human_authorization.commit_sha; ledger C01-H1 REQUEST_MORE_EVIDENCE 2026-08-13T10:05:26Z; gitStatus short sha 6994bda 'Authorize bounded C01 evidence collection'"
+base_commit_sha: e2750806ec9c096c78902e5e192a20c26af1bd87
+base_commit_sha_state: VERIFIED_ORCHESTRATOR_BACKFILL
+base_commit_sha_note: "A02 observed short sha e275080; orchestrator backfilled the full launcher-audited sha after completion."
+commit_sha: PENDING
+commit_sha_note: "A02's outputs are not yet committed; the orchestrator/launcher records them (as in prior steps). Ledger C01-ER1 currently has state READY and no commit_sha."
+
+# ---------------------------------------------------------------------------
+# Session / timestamp (launcher backfilled after completion, per prior convention)
+# ---------------------------------------------------------------------------
+kscc_session_id: 11c6748d-88e1-4fd3-9098-a5098aad7fcc
+kscc_session_id_note: Backfilled by the orchestrator from the launcher-managed audit index.
+timestamp: '2026-08-13T10:22:06+00:00'
+timestamp_precision: launcher_audit_completed_at
+
+# ---------------------------------------------------------------------------
+# Verified actions  (all reads REPLAY/VERIFY of prior committed records;
+# the two outputs are LIVE writes within allowed_output_refs)
+# ---------------------------------------------------------------------------
+verified_actions:
+  - action: READ (REPLAY) ER1 sanitized inventory
+    ref: evidence/ER1-disjoint-pool-inventory.yaml
+    purpose: primary set-metadata for the disjoint-pool feasibility computation
+  - action: READ (REPLAY) prior A02 C01-S2 provenance
+    ref: outputs/A02/C01-object-benchmark-provenance.yaml
+    purpose: disjointness baseline being corrected by the authoritative identity
+  - action: READ (REPLAY) A01 C01-S3 recommendation
+    ref: outputs/A01/C01-benchmark-recommendation.yaml
+    purpose: ER-1 question definition + pre-stated secondary preferences
+  - action: READ (VERIFY) C01 cycle ledger / authorization / evidence-map / workflow / session-index / task envelope / handoff template
+    ref: collaboration/ledger.yaml, decisions/human-collaboration-C01.yaml, evidence-map.yaml, workflow.yaml, audit/session-index.yaml, tasks/C01-A02-ER1.yaml, handoffs/handoff-template.yaml
+    purpose: commit lineage, cycle state, session-id convention, handoff schema
+  - action: VERIFY feasibility classification against underlying set_results
+    finding: "|U|=5810, |T|=5810, U∩T=5810 => U=T => U∩¬T=∅ => eligible=∅ for both splits; empty-set digest corroborates."
+  - action: WRITE (LIVE) ER-1 disjoint-pool survey
+    ref: outputs/A02/C01-ER1-disjoint-pool-survey.yaml
+  - action: WRITE (LIVE) this handoff
+    ref: handoffs/C01-ER1-A02-to-hf.yaml
+
+# ---------------------------------------------------------------------------
+# Key evidence summary for hf  (the headline; full detail in the survey)
+# ---------------------------------------------------------------------------
+key_evidence_summary_for_hf:
+  feasibility_classification: VERIFIED_DEGENERATE
+  one_line: >-
+    No non-degenerate Object-Manipulation evaluation pool exists in the observed
+    SEED v004 non-mirror universe that is disjoint from both the candidate
+    training manifest and the SEED-test full holdout.
+  counts:
+    Content: { current_cases: 235, training_intersection: 235, eligible_after_training_exclusion: 0, maximum_from_observed_universe: 0 }
+    Repetition: { current_cases: 57, training_intersection: 57, eligible_after_training_exclusion: 0, maximum_from_observed_universe: 0 }
+    aggregate: { eligible_outside_training_and_holdout: 0 }
+  identity_and_set_operation:
+    identity: "last two BVH path components (take_date/motion_file_stem); authoritative; exact equality, no fuzzy matching"
+    operation: "eligible = U ∩ ¬T ∩ ¬H, where U = Object non-mirror universe (5810), T = candidate training manifest (5810), H = full holdout (6938)"
+    binding_constraint: "U = T (5810 = 5810 = U∩T), so U∩¬T = ∅; the holdout is not the binding constraint."
+  correction_to_prior_c01_s2:
+    prior: "train-eval overlap 284/292 = 97.26% (motion_id identity); Repetition non_overlapping 8"
+    corrected: "train-eval overlap 292/292 = 100% (authoritative path identity); Repetition non_overlapping 0; BOTH splits degenerate"
+    direction: "Leakage finding STRENGTHENED, not reversed. A01 OBS-S3-1 SUPERSEDED (was Content 0 / Repetition 8; is Content 0 / Repetition 0)."
+  dataset_coverage_limits:
+    - "Proven only for SEED metadata v004 non-mirror Object-Manipulation, inside the two approved roots."
+    - "Mirror Object rows UNSURVEYED (excluded by mirror_policy); later/external dataset versions UNSURVEYED; non-approved hosts UNSURVEYED."
+    - "metadata has no split column (non-decisive: U∩¬T already empty)."
+  inventory_hashes_consumed:
+    source_metadata_sha256: 71d09422034946d17dbb0db027d569408c486545bdb12f7979d55e6ffd9bbc39
+    object_universe_set_sha256: bb2a995a0770ca18168c31434c3c7132d4672cca424de4dac1301cfb7430aba6
+    candidate_training_manifest_sha256: 95dcd9c7f1e73d99e5bce10abb6bf94d55f58a17e8eefc7b83fbdfe74597bbd5
+    full_holdout_manifest_sha256: 479f284385178ff323795a6b08a2458c7d161e148e8be6b626ef68fb82a47d20
+    construction_script_sha256: 18a602ddf4922f42dad03a2478a9ac731607663d54460dee1472210e393d88f3
+    eligible_set_sha256: 01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b
+    eligible_set_sha256_note: "SHA-256 of a canonical empty newline-terminated set serialization (corroborates 0)."
+
+# ---------------------------------------------------------------------------
+# Gate result
+# ---------------------------------------------------------------------------
+gate_result: ER1_EVIDENCE_RETURNED_FEASIBILITY_VERIFIED_DEGENERATE
+gate_result_note: >-
+  ER-1 (disjoint Object pool feasibility) is answered: VERIFIED_DEGENERATE.
+  This closes A01's C01-RISK-11 (ALT-B feasibility UNKNOWN) to NEGATIVE and
+  resolves the stale C01-S2 by_split numbers. It does NOT choose MODIFY or
+  REJECT for hf. C01-H2 remains BLOCKED_ON_ER1_ER2 until ER-2 (A03/A04
+  linkage) lands; then hf decides.
+
+# ---------------------------------------------------------------------------
+# Open risks  (ER-1 specific; full detail in the survey)
+# ---------------------------------------------------------------------------
+open_risks:
+  - id: ER1-RISK-01
+    severity: high
+    statement: "Disjoint Object pool VERIFIED_DEGENERATE (Content 0 / Repetition 0; max-from-universe 0 both). ALT-B infeasible within observed SEED v004 non-mirror; requires retraining (GPU, forbidden) or new dataset/mirrors (out of scope)."
+    owner: hf (C01-H2)
+  - id: ER1-RISK-02
+    severity: medium
+    statement: "Prior C01-S2 by_split numbers are STALE (284/97.26% -> 292/100%; Repetition non_overlapping 8 -> 0). hf/downstream must use corrected figures."
+    owner: hf / A01
+  - id: ER1-RISK-03
+    severity: medium
+    statement: "Transport warning (SSH bad RSA signature) during inventory collection; reads succeeded; residual provenance risk (carried = prior C01-RISK-06)."
+    owner: hf / orchestrator
+  - id: ER1-RISK-04
+    severity: resolved
+    statement: "Full base sha was backfilled from the launcher audit."
+    owner: none
+  - id: ER1-RISK-05
+    severity: low
+    statement: "Candidate-to-training-manifest linkage (C01-RISK-09) still DECLARED; ER-2 owns it. ER-1 degeneracy does not depend on it."
+    owner: A03 / A04 (ER-2)
+  - id: ER1-RISK-06
+    severity: low
+    statement: "Dataset-coverage limits: mirrors, later/external versions, non-approved hosts UNSURVEYED."
+    owner: hf
+
+# ---------------------------------------------------------------------------
+# Forbidden-action compliance (task envelope)
+# ---------------------------------------------------------------------------
+forbidden_action_compliance:
+  remote_access_or_bash: NOT_PERFORMED
+  gpu_training_or_benchmark_generation: NOT_PERFORMED
+  inspect_final_holdout_metric_values: NOT_PERFORMED
+  modify_R004: NOT_PERFORMED
+  select_benchmark_or_choose_modify_reject_for_hf: NOT_PERFORMED
+  expose_raw_case_identifiers_or_private_rows: NOT_PERFORMED
+  operated_within_kimodo_only: true
+  tools_used: [Read, Glob]
+
+# ---------------------------------------------------------------------------
+# Next owner / state / action
+# ---------------------------------------------------------------------------
+next_owner: hf
+next_state: C01-H2 (BLOCKED_ON_ER1_ER2 -> awaiting ER-2 from A03/A04, then hf decision)
+next_action: >-
+  hf combines this ER-1 evidence (VERIFIED_DEGENERATE; disjoint Object pool is
+  empty for both splits within the observed SEED v004 non-mirror universe) with
+  ER-2 (A03/A04 candidate-to-training-manifest linkage verification, still
+  pending) and chooses MODIFY (ALT-B) or REJECT (ALT-C) at C01-H2. A02 does NOT
+  choose. Note: ALT-B is INFEASIBLE within the observed universe without
+  changing training data (GPU, forbidden in C01) or sourcing a new
+  dataset/version or permitting mirrors (outside ER-1 scope). Scope expansion
+  or retraining is hf's decision. If hf MODIFYs/ACCEPTs a pin later, A01
+  records it via research-revise AFTER C01-H2, adding only an R004.inputs entry
+  + benchmark snapshot and changing no frozen rule. Final adoption stays with
+  Human Gate 2.
+next_action_for_a01_if_re_synthesis: >-
+  If a C01-S3b re-synthesis runs, A01 should restate ALT-B as INFEASIBLE within
+  the observed universe (per ER-1) and restate the recommendation using the
+  corrected 292/100% overlap figures, not the stale 284/97.26% figures. A01
+  still does NOT select for hf.
+
+# ---------------------------------------------------------------------------
+# Attestation
+# ---------------------------------------------------------------------------
+attestation:
+  historical_work_not_misrepresented: true
+  historical_work_not_misrepresented_note: >-
+    This is a VERIFY step answering evidence request ER-1, authorized by hf's
+    C01-H1 REQUEST_MORE_EVIDENCE. No historical step is described as original
+    six-agent execution. The correction to the prior C01-S2 by_split numbers is
+    a factual update from new primary evidence (the ER-1 authoritative path
+    identity) over A02's own prior output, and it STRENGTHENS (does not reverse)
+    the confirmed leakage finding.
+  secrets_removed: true
+  secrets_removed_note: >-
+    No raw case identifiers, private rows, credentials, or final holdout
+    metric values are included. Only sanitized counts, ordered-set hashes,
+    manifest/script digests, and paths are carried. The ER-1 inventory
+    sanitization block confirms raw_case_ids_included = false,
+    raw_training_rows_included = false, final_holdout_metrics_included =
+    false, credentials_included = false.
+
+# ---------------------------------------------------------------------------
+# Structured handoff block (shared contract item 10)
+# ---------------------------------------------------------------------------
+Mode: VERIFY
+Status: PASS
+Verified_actions:
+  - "READ (REPLAY) ER1 sanitized inventory; READ (REPLAY) prior A02 C01-S2; READ (REPLAY) A01 C01-S3; READ (VERIFY) ledger/authorization/evidence-map/workflow/session-index/task/handoff-template"
+  - "VERIFY feasibility: |U|=5810=|T|=U∩T => U=T => U∩¬T=∅ => eligible(U∩¬T∩¬H)=0 for both splits; empty-set digest corroborates."
+  - "WRITE (LIVE) outputs/A02/C01-ER1-disjoint-pool-survey.yaml"
+  - "WRITE (LIVE) handoffs/C01-ER1-A02-to-hf.yaml"
+Produced_evidence_refs:
+  - kimodo/simulation/pilot-20260813/outputs/A02/C01-ER1-disjoint-pool-survey.yaml
+  - kimodo/simulation/pilot-20260813/handoffs/C01-ER1-A02-to-hf.yaml
+Protocol_deviations:
+  - "None. No R004 modification; no benchmark selection; no final holdout metric inspection; no Bash; no remote access; no GPU/training; no raw case ids. All reads inside kimodo/."
+Open_risks:
+  - "ER1-RISK-01 (high): disjoint Object pool VERIFIED_DEGENERATE; ALT-B infeasible within observed SEED v004 non-mirror. Owner hf (C01-H2)."
+  - "ER1-RISK-02 (medium): stale C01-S2 by_split numbers (284->292; 8->0) in circulation. Owner hf/A01."
+  - "ER1-RISK-03 (medium): transport warning (SSH bad RSA signature) carried. Owner hf/orchestrator."
+  - "ER1-RISK-04: RESOLVED — full base sha backfilled from launcher audit."
+  - "ER1-RISK-05 (low): candidate-to-training-manifest linkage still DECLARED (ER-2 owner A03/A04); ER-1 degeneracy does not depend on it."
+  - "ER1-RISK-06 (low): dataset-coverage limits (mirrors/later-external versions/non-approved hosts) UNSURVEYED. Owner hf."
+Recommended_next_action: >-
+  hf consumes ER-1 (VERIFIED_DEGENERATE) + ER-2 (pending, A03/A04) and chooses
+  MODIFY (ALT-B) or REJECT (ALT-C) at C01-H2. A02 does NOT choose. ALT-B is
+  infeasible within the observed universe without retraining (GPU, forbidden)
+  or sourcing a new dataset/version/mirrors (out of scope); scope expansion or
+  retraining is hf's decision. Any later pin is an additive research-revise
+  after C01-H2, changing no frozen rule; final adoption stays with Human Gate 2.
+Handoff_path: kimodo/simulation/pilot-20260813/handoffs/C01-ER1-A02-to-hf.yaml

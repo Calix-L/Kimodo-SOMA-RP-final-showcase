@@ -1,0 +1,338 @@
+schema_version: '1.0'
+task_id: P01-A04-execution-readiness
+run_id: pilot-20260813
+mode: VERIFY
+agent_id: A04
+research_id: R004
+experiment_id: null
+prepared_at: '2026-08-13'  # date-only; time-of-day unavailable in this read-only context (Bash/clock disabled); not fabricated
+prepared_by: A04
+model: glm-5.2  # harness-reported
+prompt_version: prompts/agent-contract.md (unversioned) + task-envelope schema_version 1.0
+objective: >-
+  Verify execution readiness, approved paths, commands, artifacts, environment
+  assumptions, and stop conditions without running or interpreting the final holdout.
+interpretation_guard:
+  no_pass_fail: true
+  no_adoption_verdict: true
+  scope_note: >-
+    This file asserts READINESS only. It does not label the candidate, the holdout,
+    or any metric as PASS/FAIL/ADOPTED. All MISSING items are enumerated, not invented.
+
+# ---------------------------------------------------------------------------
+# Acceptance criterion 1: active Protocol digest == Human Gate 1 digest
+# ---------------------------------------------------------------------------
+digest_match:
+  verdict: MATCH_AT_RECORD_LEVEL
+  protocol_freeze_sha256: 1f911559b69c5a7d3b68cf269c746c76ad1384f96a23963d533560eb83e8f0e5
+  sources:
+    - ref: research/R004/protocol.yaml
+      field: freeze.sha256
+      value: 1f911559b69c5a7d3b68cf269c746c76ad1384f96a23963d533560eb83e8f0e5
+    - ref: simulation/pilot-20260813/decisions/human-gate-1.yaml
+      field: protocol_sha256
+      value: 1f911559b69c5a7d3b68cf269c746c76ad1384f96a23963d533560eb83e8f0e5
+    - ref: simulation/pilot-20260813/workflow.yaml
+      field: phases[G01-ready-human-gate].protocol_sha256
+      value: 1f911559b69c5a7d3b68cf269c746c76ad1384f96a23963d533560eb83e8f0e5
+    - ref: research/R004/research.yaml
+      field: protocol_amendments[0].to_sha256
+      value: 1f911559b69c5a7d3b68cf269c746c76ad1384f96a23963d533560eb83e8f0e5
+  frozen_snapshot:
+    declared_path: .specify/rsdd/protocols/R004/1f911559b69c5a7d3b68cf269c746c76ad1384f96a23963d533560eb83e8f0e5.yaml
+    present_locally: true
+    content_matches_protocol_yaml: true  # evaluation/non_regression/foot_skate/aggregation/metric_priority/final_adopt_rule identical
+  byte_level_recompute:
+    state: MISSING
+    reason: >-
+      shasum recomputation of the snapshot file is unavailable; Bash is not enabled
+      in this context. Match is established by string equality across four
+      independent records plus content identity of the present snapshot file,
+      not by an independent byte hash.
+
+# ---------------------------------------------------------------------------
+# Acceptance criterion 2: every proposed command/host/GPU/input/output/stop
+# condition listed or marked MISSING
+# ---------------------------------------------------------------------------
+execution_envelope:
+  approved_boundary:
+    source_ref: simulation/pilot-20260813/decisions/human-gate-1.yaml#blocking_inputs[resource_and_data_boundary]
+    approved_host: lintrain
+    approved_gpu_count: 2
+    gpu_model_declared: H100  # from source brain section 3 ("lintrain，2 x H100")
+    approved_remote_roots:
+      - /home/share/user/zyc/kimodo
+      - /home/share/user/zyc/kimodo_seed_repro_train
+    private_data_allowed: false
+    raw_credentials_in_transcript: false
+    external_artifact_upload: false
+
+  commands:
+    - id: SCRIPT-FULL-HOLDOUT
+      ref: work/codex_pipeline/run_seed_full_text_holdout_eval.sh
+      mode: LIVE
+      owner: A04
+      reviewer: A05
+      state: DECLARED  # evidence-map asset state
+      invocation: MISSING  # script body not present in this worktree; lives under approved remote work/codex_pipeline/
+      role: baseline+candidate SEED full-test text2motion holdout evaluation
+    - id: SCRIPT-SEED-HOLDOUT
+      ref: work/codex_pipeline/build_seed_text_test_benchmark.py
+      mode: VERIFY
+      owner: A05
+      state: DECLARED
+      invocation: MISSING  # not present locally
+      role: build SEED test Content/Repetition text2motion benchmark
+    - id: SCRIPT-SUMMARY
+      ref: work/codex_pipeline/generate_phase1_current_summary.py
+      mode: VERIFY
+      owner: A05  # protocol artifact; evidence-map assigns summarize_domain_text_ablation.py to A05
+      state: DECLARED
+      invocation: MISSING  # not present locally
+      role: report/summary generation
+    - id: holdout_cli_invocation
+      state: MISSING
+      note: >-
+        No primary record exposes the exact CLI (CUDA_VISIBLE_DEVICES, flags,
+        batch size, seeds, output subpaths). Only the script path is declared.
+        To be captured by A04 during R004-holdout-live (LIVE), not fabricated here.
+
+  host:
+    approved: lintrain
+    state: VERIFIED_FROM_RECORD
+    actual_runtime_attested: MISSING  # no live session recorded; audit/session-index.yaml status NOT_STARTED, sessions: []
+
+  gpu:
+    approved_count: 2
+    approved_model: H100
+    state: VERIFIED_FROM_RECORD
+    usage_uncertainty:
+      state: MISSING
+      note: >-
+        Source brain section 11.3 states GPU1 was not yet used in parallel and the
+        long eval was slow; which GPU(s) the holdout eval actually uses is not
+        attested in any primary record. Approved boundary permits 2 GPUs.
+
+  inputs:
+    baseline:
+      id: nvidia/Kimodo-SOMA-RP-v1.1
+      state: DECLARED
+      remote_path: MISSING  # model id declared; absolute checkpoint path on lintrain not recorded
+    candidate:
+      id: abl_object_lr1e7_s3000_20260811
+      state: DECLARED
+      remote_path: MISSING  # run id declared; absolute checkpoint path not recorded
+      training_root_declared: /home/share/user/zyc/kimodo_seed_repro_train  # source brain section 3
+    benchmarks:
+      - id: SEED-test-Content-3510
+        expected_count: 3510
+        state: DECLARED
+        file_path: MISSING
+      - id: SEED-test-Repetition-3428
+        expected_count: 3428
+        state: DECLARED
+        file_path: MISSING
+    expected_counts:
+      content: 3510
+      repetition: 3428
+      total: 6938
+      state: VERIFIED_FROM_RECORD  # evidence-map run seed_text_test_full_eval_20260813.expected_counts
+    comparison_protocol:
+      pairing: same_cases_same_prompts_same_seeds
+      generation_batch_size: 1
+      postprocess: false
+      text_encoder_precision: fp32
+      effect_direction: positive_is_candidate_better
+      bootstrap:
+        paired: true
+        iterations: 2000
+        confidence: one_sided_95_percent
+        pass_condition: lower_confidence_bound_greater_than_or_equal_to_negative_margin
+      numeric_seeds: MISSING  # "same_seeds" declared; no numeric seed list recorded
+    state: VERIFIED_FROM_RECORD
+    remote_eval_output_root: /home/share/user/zyc/kimodo/eval_work/seed_text_test_full_eval_20260813
+    remote_eval_output_state: DECLARED  # not accessed; remote, outside local worktree boundary
+    historical_observation: >-
+      evidence-map notes the evaluation was still running when the source snapshot
+      was supplied (state DECLARED, not VERIFIED).
+
+  outputs:
+    remote:
+      - path: /home/share/user/zyc/kimodo/eval_work/seed_text_test_full_eval_20260813
+        state: DECLARED  # produced by the LIVE holdout, not by this readiness task
+    r004_protocol_outputs:  # from research/R004/protocol.yaml.outputs
+      - simulation/pilot-20260813/outputs/R004/holdout-run-card.yaml  # A04 LIVE holdout product
+      - simulation/pilot-20260813/outputs/R004/independent-gate-table.yaml  # A05
+      - simulation/pilot-20260813/outputs/R004/cold-start-review.yaml  # A06
+      - simulation/pilot-20260813/decisions/human-gate-2.yaml  # human
+      - reports/R004.md  # P99
+    this_task_outputs:
+      - simulation/pilot-20260813/outputs/A04/execution-readiness.yaml  # PRODUCED
+      - simulation/pilot-20260813/outputs/A04/artifact-register.yaml  # PRODUCED
+    profile_required_outputs_deferred:
+      - run-card.yaml
+      - execution-log-index.yaml
+    defer_reason: >-
+        Agent profile required_outputs list run-card.yaml and execution-log-index.yaml,
+        but this VERIFY readiness task's allowed_output_refs permit only
+        execution-readiness.yaml and artifact-register.yaml. Those two are produced
+        here; run-card.yaml and execution-log-index.yaml are deferred to the
+        R004-holdout-live (LIVE) phase per workflow.yaml and must not be written
+        in this read-only readiness task.
+
+  stop_conditions:
+    source_ref: agents/A04.yaml#escalation_triggers + manifest.yaml#execution_policy + research/R004/protocol.yaml
+    operational_stop_and_record:
+      - trigger: protocol_hash_mismatch
+        action: STOP
+        state: VERIFIED_FROM_RECORD
+      - trigger: NaN
+        action: STOP
+        state: VERIFIED_FROM_RECORD
+      - trigger: OOM
+        action: STOP
+        state: VERIFIED_FROM_RECORD
+      - trigger: missing_checkpoint
+        action: STOP
+        state: VERIFIED_FROM_RECORD
+      - trigger: storage_failure  # "No space"
+        action: STOP
+        state: VERIFIED_FROM_RECORD
+      - trigger: process_failure  # traceback / "No such file"
+        action: STOP
+        state: VERIFIED_FROM_RECORD
+      - trigger: unapproved_command_model_data_seed_or_resource_change
+        action: STOP
+        state: VERIFIED_FROM_RECORD
+    manifest_policy:
+      gate_failure: stop-and-record
+      agent_failure: record-partial-evidence-and-reassign-or-revise
+      protocol_change_after_ready: research-revise-required
+      state: VERIFIED_FROM_RECORD
+    protocol_eval_gates_recorded_not_run:
+      - missing_or_invalid_metric: INCONCLUSIVE
+      - foot_skate_max_vel_warning_relative_increase: 0.1  # WARNING, not a stop
+      - foot_skate_max_vel_hard_fail_relative_increase: 0.2  # HARD FAIL
+      - content_and_repetition_must_pass_separately: true
+      - cross_split_compensation: false
+    protocol_eval_gates_state: VERIFIED_FROM_RECORD
+    quantitative_abort_threshold:
+      state: MISSING
+      note: >-
+        No numeric loss/progress abort threshold is specified beyond the
+        qualitative NaN/OOM/storage/process triggers. Recorded as MISSING, not
+        invented.
+
+# ---------------------------------------------------------------------------
+# Acceptance criterion 3: no PASS/FAIL or adoption interpretation
+# ---------------------------------------------------------------------------
+readiness_result:
+  status: READY_WITH_OPEN_RISKS
+  status_scope: EXECUTION_READINESS_ONLY  # NOT a candidate or holdout verdict
+  acceptance_criteria:
+    - id: digest_match
+      met: true
+      evidence: digest_match section above
+    - id: enumerate_or_missing
+      met: true
+      evidence: execution_envelope section above; every item VERIFIED_FROM_RECORD or MISSING
+    - id: no_pass_fail_interpretation
+      met: true
+      evidence: interpretation_guard + readiness_result.status_scope
+  forbidden_action_compliance:
+    - did_not_start_training_or_holdout_eval: true  # read-only VERIFY
+    - did_not_access_outside_approved_boundary: true  # all reads within kimodo/ worktree; remote paths referenced, not accessed
+    - did_not_expose_credentials_or_copy_raw_transcripts: true  # none present
+
+open_risks:
+  - id: R-A04-01
+    severity: medium
+    desc: Byte-level sha256 of the frozen snapshot could not be recomputed (Bash disabled).
+    mitigation: A05 or orchestrator to recompute shasum of .specify/rsdd/protocols/R004/1f911559...yaml before LIVE.
+  - id: R-A04-02
+    severity: medium
+    desc: >-
+      Three holdout scripts (run_seed_full_text_holdout_eval.sh, build_seed_text_test_benchmark.py,
+      generate_phase1_current_summary.py) are DECLARED in evidence-map but not present in this
+      worktree; exact CLI invocation, flags, seeds, and resolved remote paths are MISSING.
+    mitigation: A04 to capture exact invocation during R004-holdout-live; A02/A05 to verify script provenance.
+  - id: R-A04-03
+    severity: low
+    desc: GPU usage not attested; approved 2xH100 boundary permits parallelism but source brain notes GPU1 unused.
+    mitigation: Record actual CUDA_VISIBLE_DEVICES / GPU usage in the LIVE run card.
+  - id: R-A04-04
+    severity: high
+    desc: >-
+      Remote eval output seed_text_test_full_eval_20260813 was still running per source brain / evidence-map
+      (state DECLARED). Completeness, integrity, and comparability of baseline vs candidate not verified here.
+    mitigation: R004-holdout-live (A04 LIVE) must register completion, counts (3510/3428/6938), and deviations before A05 independent checks.
+  - id: R-A04-05
+    severity: high
+    desc: >-
+      Retrospective acceptance policy: human-gate-1 records result_visibility_at_approval NOT_ATTESTED;
+      approver hf uncertain whether final holdout result was visible before threshold approval. Thresholds
+      must not be described as preregistered.
+    mitigation: Carry this caveat into human-gate-2; do not frame thresholds as preregistration.
+  - id: R-A04-06
+    desc: foot-skate side effects on current Object 3000-step candidate (source brain section 6.3/11.2).
+    severity: medium
+    mitigation: Operational note only; foot_skate gate is evaluated under the frozen contract by A05/A06, not interpreted here.
+  - id: R-A04-07
+    desc: kscc_session_id and exact completion timestamp not available (session-index NOT_STARTED; no clock in context).
+    severity: low
+    mitigation: Orchestrator to record session id and timestamp in audit/session-index.yaml.
+
+next_action:
+  for_A04: >-
+    Do NOT execute yet. Await orchestrator acceptance of this readiness report. Then proceed to
+    R004-holdout-live (LIVE): collect/complete baseline+candidate SEED full-test eval, register
+    Content 3510 / Repetition 3428 / total 6938 counts, exact commands, environment, logs, metrics,
+    artifacts, and deviations into outputs/R004/holdout-run-card.yaml and execution-log-index.yaml
+    WITHOUT success interpretation; hand raw evidence to A05.
+  for_A05: >-
+    Use this readiness report and the frozen R004 contract as inputs to P01-A05 benchmark-integrity-review,
+    and to prepare later independent gate-table recomputation (R004-independent-checks) once A04
+    registers LIVE holdout evidence.
+
+# ---------------------------------------------------------------------------
+# Structured handoff (also rendered in the final task response)
+# ---------------------------------------------------------------------------
+handoff:
+  handoff_id: P01-A04-execution-readiness-to-A05
+  run_id: pilot-20260813
+  mode: VERIFY
+  from_agent: A04
+  to_agent: A05
+  research_id: R004
+  experiment_id: null
+  owner: A04
+  input_refs:
+    - kimodo/research/R004/protocol.yaml
+    - kimodo/simulation/pilot-20260813/decisions/human-gate-1.yaml
+    - kimodo/simulation/pilot-20260813/evidence-map.yaml
+    - kimodo/source/phase1_ai_native_project_brain_20260813.md
+  output_refs:
+    - kimodo/simulation/pilot-20260813/outputs/A04/execution-readiness.yaml
+    - kimodo/simulation/pilot-20260813/outputs/A04/artifact-register.yaml
+  verified_actions:
+    - VERIFY read of R004 protocol.yaml and frozen snapshot; confirmed FROZEN status and digest
+    - VERIFY string-level digest match across protocol.yaml, human-gate-1.yaml, workflow.yaml, research.yaml
+    - VERIFY presence and content identity of frozen snapshot file at declared path
+    - VERIFY enumeration of approved host (lintrain), GPU (2xH100), remote roots, inputs, outputs
+    - VERIFY enumeration of operational and protocol stop conditions from profile + manifest + protocol
+    - VERIFY forbidden-action compliance: no training/holdout start, no out-of-boundary access, no credentials
+    - MISSING flagged: script bodies/invocations, numeric seeds, resolved remote paths, byte-level hash recompute, session id, timestamp
+  gate_result: READY_WITH_OPEN_RISKS  # EXECUTION_READINESS_ONLY; not a candidate/holdout PASS-FAIL verdict
+  open_risks: R-A04-01..R-A04-07  # see open_risks above
+  next_owner: A05
+  next_state: P01-A05 benchmark-integrity-review (parallel); R004 LIVE holdout gated behind this readiness
+  next_action: >-
+    A05 ingests this readiness report + frozen R004 contract for benchmark-integrity-review and later
+    independent gate recomputation; A04 proceeds to R004-holdout-live (LIVE) only after orchestrator
+    accepts this readiness, registering raw holdout evidence without success interpretation.
+  commit_sha: cd67942  # short SHA from session-start git status snapshot; full SHA unresolved (Bash disabled)
+  kscc_session_id: MISSING  # audit/session-index.yaml status NOT_STARTED, sessions: []
+  timestamp: '2026-08-13'  # date-only; time-of-day unavailable (no clock/Bash); not fabricated
+  attestation:
+    historical_work_not_misrepresented: true  # task was pure VERIFY readiness; no REPLAY of historical runs performed
+    secrets_removed: true  # no credentials or private data present or recorded

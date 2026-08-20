@@ -1,0 +1,44 @@
+schema_version: '1.0'
+research_id: R003
+status: DRAFT
+owner: A03
+created_at: '2026-08-13T07:53:16+00:00'
+updated_at: '2026-08-13T07:53:16+00:00'
+inputs:
+- abl_dancing_lr1e7_s2000_20260811
+- abl_dancing_lr1e7_s3000_20260811
+- abl_object_lr1e7_s2000_20260811
+- abl_object_lr1e7_s3000_20260811
+- frozen baseline and target-domain evaluation artifacts
+method: Reconstruct the one-variable training-strength comparison at lr=1e-7 for Dancing and Object. Verify each run card and independently compare target metrics and motion-quality regressions. Candidate selection remains provisional until R004 closes.
+tasks:
+- A03 verifies that the intended core variable is training duration within each domain.
+- A04 reconstructs the four ablation run cards and artifact references.
+- A05 independently verifies baseline deltas and side-effect metrics.
+- A06 reviews whether evidence supports choosing Object 3000-step as a provisional candidate.
+- A01 records why R004 full non-regression evaluation is required.
+outputs:
+- simulation/pilot-20260813/outputs/R003/ablation-run-cards.yaml
+- simulation/pilot-20260813/outputs/R003/candidate-review.yaml
+- one R003 Experiment Record per ablation run after READY
+evaluation:
+  criteria:
+  - Dancing and Object 2000/3000-step runs are compared against the same frozen baseline
+    and evaluation contract
+  - The selected candidate is explicitly provisional until full non-regression evaluation
+artifacts:
+- work/codex_pipeline/run_category_domain_finetune.sh
+- work/codex_pipeline/summarize_domain_text_ablation.py
+- work/codex_pipeline/generate_phase1_current_summary.py
+risks:
+- Run configurations may differ beyond learning rate and steps.
+- Target-domain gains may not generalize to the full SEED test distribution.
+- Foot-skate degradation may remain unacceptable despite retrieval improvements.
+collaboration:
+  owner_agent: A03
+  supporting_agents: [A01, A04]
+  evaluator_agent: A05
+  reviewer_agent: A06
+  human_gate: human-gate-1
+ready_review: null
+freeze: null

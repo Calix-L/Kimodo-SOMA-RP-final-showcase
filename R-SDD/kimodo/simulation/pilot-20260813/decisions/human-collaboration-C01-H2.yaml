@@ -1,0 +1,54 @@
+schema_version: "1.0"
+id: human-collaboration-C01-H2
+cycle_id: C01-object-target-benchmark-pin
+human_owned: true
+status: PENDING_HUMAN_DECISION
+reviewer_name: hf
+decision_type: POST_EVIDENCE_BENCHMARK_PATH
+allowed_responses: [MODIFY, REJECT]
+upstream_human_decision_ref: simulation/pilot-20260813/decisions/human-collaboration-C01.yaml
+evidence_summary:
+  er1:
+    result: VERIFIED_DEGENERATE
+    content_eligible: 0
+    repetition_eligible: 0
+    object_universe: 5810
+    object_universe_in_candidate_training: 5810
+    output_ref: simulation/pilot-20260813/outputs/A02/C01-ER1-disjoint-pool-survey.yaml
+    commit_sha: 51a3fb434c71a67e52eab72dc91b060568c58d59
+  er2:
+    result: CONFIRMED
+    manifest_sha256: 95dcd9c7f1e73d99e5bce10abb6bf94d55f58a17e8eefc7b83fbdfe74597bbd5
+    a03_classification: VERIFIED
+    a04_verdict: CONFIRM
+    output_ref: simulation/pilot-20260813/outputs/A04/C01-ER2-independent-linkage-verification.yaml
+    commit_sha: ffae6aecb898e04eae0127922396190d182c7e13
+  corrected_train_eval_overlap:
+    count: 292
+    total: 292
+    ratio: 1.0
+    identity: take_date/motion_file_stem from dated BVH path
+    supersedes: motion_id-based 284/292 and eight-case Repetition residual
+choices:
+- id: MODIFY
+  name: Expand the research scope before any benchmark pin
+  impact: Do not pin the current contaminated benchmark. Open a separately authorized cycle to source a new dataset/version or redesign training data and retrain before constructing a disjoint target benchmark.
+  authority_needed:
+  - approve a new data boundary and provenance plan, or
+  - approve GPU training and a new Research revision workflow
+  current_cycle_action: Close C01 without modifying R004; define a new Research/cycle before external data or retraining.
+  residual_risk: Higher cost and scope; no guarantee that a suitable new benchmark or candidate will be produced.
+- id: REJECT
+  name: Reject the current Object benchmark pin
+  impact: Record that R004 cannot satisfy target_Content_PASS and target_Repetition_PASS with the current candidate/data boundary because the available target benchmark is fully contained in training and holdout.
+  current_cycle_action: Close C01 as a negative validity finding; keep R004 frozen and do not claim ADOPT.
+  residual_risk: The current candidate cannot complete R004's confirmatory adoption rule as framed.
+ai_recommendation:
+  choice: REJECT
+  binding: false
+  reason: Within the authorized SEED v004 boundary the disjoint pool is provably empty, and the candidate's use of the full Object manifest is independently confirmed. MODIFY is only meaningful as a new, materially expanded data/training cycle, not as a repair within C01.
+human_response: null
+human_modification: null
+response_reason: null
+decided_at: null
+instructions: Only hf may choose MODIFY or REJECT. AI must not modify R004 or start expanded data/training work before that choice.

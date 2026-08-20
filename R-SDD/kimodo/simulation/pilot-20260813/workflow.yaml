@@ -1,0 +1,194 @@
+schema_version: "1.0"
+id: kimodo-phase1-six-agent-pilot
+run_id: pilot-20260813
+state: IN_PROGRESS
+execution_policy:
+  schedule: staged-parallel
+  primary_state: research/
+  gate_failure: stop-and-record
+  agent_failure: record-partial-evidence-and-reassign-or-revise
+  protocol_change_after_ready: research-revise-required
+phases:
+- id: P00-bootstrap
+  mode: LIVE
+  research_id: null
+  phase_status: COMPLETE
+  owners: [orchestrator]
+  depends_on: []
+  actions:
+  - validate the scaffold
+  - create isolated branches and worktrees after the pilot scaffold is committed
+  - start six KSCC sessions with role-scoped prompts
+  outputs:
+  - audit/session-index.yaml
+  exit_gate: six-session-identities-recorded
+
+- id: P01-cognition-recovery
+  mode: VERIFY
+  research_id: null
+  phase_status: COMPLETE_WITH_OPEN_RISKS
+  owners: [A01, A02, A03, A04, A05, A06]
+  parallel: true
+  depends_on: [P00-bootstrap]
+  actions:
+  - A01 reconstructs goal, state, owners, risks, and next transitions
+  - A02 reconstructs code, model, data, and artifact provenance
+  - A03 reconstructs training invariants and ablation boundaries
+  - A04 verifies execution readiness without starting the final holdout
+  - A05 reconstructs evaluation suites and unresolved contract gaps
+  - A06 performs a cold-start READY red-team review
+  outputs:
+  - outputs/A01/project-state-snapshot.yaml
+  - outputs/A02/provenance-report.yaml
+  - outputs/A03/training-invariants.yaml
+  - outputs/A04/execution-readiness.yaml
+  - outputs/A05/benchmark-integrity-review.yaml
+  - outputs/A06/ready-red-team-review.yaml
+  exit_gate: independent-recovery-findings-handed-to-A03-and-A06
+
+- id: R001-pipeline-replay
+  mode: REPLAY
+  research_id: R001
+  owners: [A02, A03, A04]
+  parallel: false
+  depends_on: [P01-cognition-recovery]
+  actions:
+  - A02 verifies manifest, cache, model, dataset, and checkpoint lineage
+  - A03 verifies target/replay and finetune semantics
+  - A04 performs an approved low-cost command/config smoke verification
+  outputs:
+  - outputs/R001/provenance-report.yaml
+  - outputs/R001/pipeline-verification.md
+  handoff_to: A06
+  exit_gate: A06-pipeline-evidence-review-proposal
+
+- id: R002-main-domain-replay
+  mode: REPLAY
+  research_id: R002
+  owners: [A02, A03, A04]
+  depends_on: [R001-pipeline-replay]
+  actions:
+  - reconstruct G+C 4000-step run card
+  - reconstruct Dancing 4000-step run card
+  - reconstruct Object Manipulation 4000-step run card
+  - preserve every negative, unstable, and foot-skate observation
+  outputs:
+  - outputs/R002/domain-run-cards.yaml
+  handoff_to: A05
+  exit_gate: all-three-domain-cards-have-primary-evidence-refs
+
+- id: R002-main-domain-evaluation
+  mode: VERIFY
+  research_id: R002
+  owners: [A05, A06]
+  parallel: false
+  depends_on: [R002-main-domain-replay]
+  actions:
+  - A05 independently verifies Content and Repetition comparisons
+  - A06 challenges cherry-picking and the Object-forward decision
+  - A01 records rationale and unresolved risk
+  outputs:
+  - outputs/R002/independent-domain-comparison.yaml
+  - outputs/A01/decision-trace.yaml
+  exit_gate: reviewed-provisional-domain-selection
+
+- id: R003-ablation-replay
+  mode: REPLAY
+  research_id: R003
+  owners: [A03, A04]
+  depends_on: [R002-main-domain-evaluation]
+  actions:
+  - reconstruct Dancing 2000-step and 3000-step run cards
+  - reconstruct Object 2000-step and 3000-step run cards
+  - verify that each comparison changes only its declared core variable
+  outputs:
+  - outputs/R003/ablation-run-cards.yaml
+  handoff_to: A05
+  exit_gate: four-ablation-cards-have-config-log-and-metric-refs
+
+- id: R003-candidate-review
+  mode: VERIFY
+  research_id: R003
+  owners: [A05, A06, A01]
+  depends_on: [R003-ablation-replay]
+  actions:
+  - A05 verifies target metrics and motion-quality regressions
+  - A06 reviews Object 3000-step as provisional only
+  - A01 records why full non-regression evaluation is mandatory
+  outputs:
+  - outputs/R003/candidate-review.yaml
+  exit_gate: provisional-candidate-with-visible-risks
+
+- id: G01-ready-human-gate
+  mode: LIVE
+  research_id: R004
+  owners: [human-gate-1]
+  gate_status: APPROVED
+  protocol_sha256: 1f911559b69c5a7d3b68cf269c746c76ad1384f96a23963d533560eb83e8f0e5
+  depends_on: [R003-candidate-review]
+  actions:
+  - approve target-domain success rules
+  - approve general-capability tolerance and aggregation
+  - approve foot-skate tolerance and qualitative review policy
+  - approve data, cost, and resource boundaries
+  outputs:
+  - decisions/human-gate-1.yaml
+  exit_gate: human-gate-1-approved-and-R004-protocol-frozen
+
+- id: R004-holdout-live
+  mode: LIVE
+  research_id: R004
+  owners: [A04]
+  depends_on: [G01-ready-human-gate]
+  actions:
+  - collect or complete baseline and candidate SEED full-test evaluation
+  - register Content 3510 and Repetition 3428 counts
+  - register commands, environment, logs, metrics, artifacts, and deviations
+  outputs:
+  - outputs/R004/holdout-run-card.yaml
+  handoff_to: A05
+  exit_gate: raw-holdout-evidence-registered-without-success-interpretation
+
+- id: R004-independent-checks
+  mode: LIVE
+  research_id: R004
+  owners: [A05, A06]
+  parallel: true
+  depends_on: [R004-holdout-live]
+  actions:
+  - A05 independently recomputes the frozen gate table
+  - A06 cold-starts without A04 private transcript and reproduces a low-cost check
+  outputs:
+  - outputs/R004/independent-gate-table.yaml
+  - outputs/R004/cold-start-review.yaml
+  exit_gate: independent-evidence-review-proposal
+
+- id: G02-final-human-gate
+  mode: LIVE
+  research_id: R004
+  owners: [human-gate-2]
+  depends_on: [R004-independent-checks]
+  actions:
+  - inspect primary artifacts and AI recommendations
+  - record ADOPT, REJECT, REVISE, REPRODUCE, or STOP
+  - record which AI advice was adopted, modified, or rejected and why
+  outputs:
+  - decisions/human-gate-2.yaml
+  exit_gate: human-owned-final-decision
+
+- id: P99-sync-and-assess
+  mode: LIVE
+  research_id: R004
+  owners: [A01, orchestrator]
+  depends_on: [G02-final-human-gate]
+  actions:
+  - run research validate, status, and report
+  - refresh BRAIN and Registry from primary records
+  - complete the two-route assessment matrix
+  - nominate only verified reusable practices as future Skill candidates
+  outputs:
+  - reports/R004.md
+  - BRAIN.md
+  - registry.json
+  - assessment/evidence-matrix.md
+  exit_gate: pilot-evidence-package-complete

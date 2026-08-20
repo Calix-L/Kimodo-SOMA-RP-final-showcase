@@ -1,0 +1,30 @@
+schema_version: "1.0"
+id: kimodo-posttraining
+name: Kimodo Post-training
+description: Evidence-grounded replay, evaluation, and closure of Kimodo-SOMA-RP post-training research.
+required_fields:
+  research:
+    - scope.in
+    - scope.out
+    - provenance.mode
+  protocol:
+    - inputs
+    - method
+    - artifacts
+    - risks
+    - collaboration.owner_agent
+    - collaboration.reviewer_agent
+  experiment:
+    - execution_mode
+    - run.code_ref
+    - run.environment
+    - evidence.artifacts
+additional_gates:
+  - data-boundary-review
+  - baseline-or-reference-frozen
+  - evaluation-contract-frozen
+  - training-evaluation-role-separation
+  - replay-provenance-check
+  - independent-evidence-review
+  - human-final-decision
+

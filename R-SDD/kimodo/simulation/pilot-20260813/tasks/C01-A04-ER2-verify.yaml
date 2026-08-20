@@ -1,0 +1,31 @@
+schema_version: "1.0"
+task_id: C01-A04-ER2-independent-linkage-verification
+run_id: pilot-20260813
+mode: VERIFY
+agent_id: A04
+research_id: R004
+experiment_id: null
+objective: Independently verify A03's candidate-to-training-manifest lineage conclusion against the committed sanitized operational evidence.
+upstream_a03_commit_sha: 1cd5926043954917ff9fee0c662e72ce46535ad7
+human_authorization_ref: kimodo/simulation/pilot-20260813/decisions/human-collaboration-C01.yaml
+input_refs:
+- kimodo/simulation/pilot-20260813/outputs/A03/C01-ER2-training-manifest-linkage.yaml
+- kimodo/simulation/pilot-20260813/evidence/ER2-training-manifest-linkage-inventory.yaml
+- kimodo/simulation/pilot-20260813/outputs/A02/C01-ER1-disjoint-pool-survey.yaml
+- kimodo/research/R004/protocol.yaml
+allowed_output_refs:
+- kimodo/simulation/pilot-20260813/outputs/A04/C01-ER2-independent-linkage-verification.yaml
+- kimodo/simulation/pilot-20260813/handoffs/C01-ER2-A04-to-hf.yaml
+acceptance_criteria:
+- Cite the exact committed A03 output consumed.
+- Independently compare run identity, command/config manifest reference, output/checkpoint identity, and hashes.
+- Use ER-1's authoritative path-identity correction (292/292 train overlap); explicitly supersede the stale 284/292 motion_id figure when stating consequences.
+- Return CONFIRM, REFUTE, or INCONCLUSIVE with explicit evidence gaps; do not merely repeat A03.
+- Preserve the approval boundary and return evidence to hf without a benchmark decision.
+forbidden_actions:
+- remote access or Bash
+- GPU use, training, evaluation, or checkpoint mutation
+- inspect final holdout metric values
+- modify R004 or interpret scientific success
+time_or_cost_limit: 7 turns; sanitized records only
+required_handoff_to: hf

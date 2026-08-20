@@ -1,0 +1,55 @@
+{
+  "schema_version": "1.0",
+  "generated_at": "2026-08-13T08:21:58+00:00",
+  "research": {
+    "R001": {
+      "title": "Kimodo post-training pipeline feasibility",
+      "type": "reproduction",
+      "profile": "kimodo-posttraining",
+      "status": "DRAFT",
+      "owner": "A01",
+      "question": "Can the open Kimodo weights and SEED data support a traceable end-to-end post-training pipeline without the official training code?",
+      "decision": null,
+      "updated_at": "2026-08-13T07:53:15+00:00",
+      "path": "research/R001/research.yaml",
+      "experiments": {}
+    },
+    "R002": {
+      "title": "Kimodo target-domain candidate selection",
+      "type": "exploratory",
+      "profile": "kimodo-posttraining",
+      "status": "DRAFT",
+      "owner": "A01",
+      "question": "Which of G+C, Dancing, and Object Manipulation provides the most stable target-domain improvement under the shared Phase 1 setup?",
+      "decision": null,
+      "updated_at": "2026-08-13T07:53:15+00:00",
+      "path": "research/R002/research.yaml",
+      "experiments": {}
+    },
+    "R003": {
+      "title": "Kimodo training-strength ablation",
+      "type": "confirmatory",
+      "profile": "kimodo-posttraining",
+      "status": "DRAFT",
+      "owner": "A03",
+      "question": "Can lower learning rate and 2000/3000-step training retain target-domain gains while reducing side effects?",
+      "decision": null,
+      "updated_at": "2026-08-13T07:53:16+00:00",
+      "path": "research/R003/research.yaml",
+      "experiments": {}
+    },
+    "R004": {
+      "title": "Kimodo Phase 1 candidate closure",
+      "type": "confirmatory",
+      "profile": "kimodo-posttraining",
+      "status": "READY",
+      "owner": "A01",
+      "question": "Does abl_object_lr1e7_s3000_20260811 improve the Object target domain while satisfying the SEED full-test non-regression contract and acceptable foot-skate risk?",
+      "decision": null,
+      "updated_at": "2026-08-13T08:21:58+00:00",
+      "path": "research/R004/research.yaml",
+      "experiments": {}
+    }
+  },
+  "artifacts": {}
+}

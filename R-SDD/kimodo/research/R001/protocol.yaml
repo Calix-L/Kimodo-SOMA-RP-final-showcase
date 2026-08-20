@@ -1,0 +1,42 @@
+schema_version: '1.0'
+research_id: R001
+status: DRAFT
+owner: A01
+created_at: '2026-08-13T07:53:15+00:00'
+updated_at: '2026-08-13T07:53:15+00:00'
+inputs:
+- source/phase1_ai_native_project_brain_20260813.md
+- historical script and artifact references in simulation/pilot-20260813/evidence-map.yaml
+- Kimodo-SOMA-RP-v1.1 model reference
+- SEED metadata and manifests
+method: Reconstruct the manifest-to-checkpoint pipeline from primary scripts, configs, logs, and artifacts. A02 verifies provenance, A03 checks training semantics, A04 verifies run operability, and A06 independently reports gaps. No expensive training rerun is required solely for simulation evidence.
+tasks:
+- A01 creates the shared state and assigns evidence owners.
+- A02 verifies repository, data, manifest, cache, and checkpoint provenance.
+- A03 verifies target/replay composition and training configuration semantics.
+- A04 performs a low-cost command/config smoke verification and registers real outputs.
+- A06 independently reviews whether the pipeline can be reproduced from versioned inputs.
+outputs:
+- simulation/pilot-20260813/outputs/R001/provenance-report.yaml
+- simulation/pilot-20260813/outputs/R001/pipeline-verification.md
+- one or more R001 Experiment Records created after READY
+evaluation:
+  criteria:
+  - The manifest, cache, finetune, checkpoint, and evaluation chain can be reconstructed
+    from versioned inputs and artifacts
+  - An independent reviewer can identify every unresolved provenance gap
+artifacts:
+- work/codex_pipeline/build_training_subset_manifest.py
+- work/codex_pipeline/run_category_domain_finetune.sh
+- work/codex_pipeline/run_domain_text_eval.sh
+risks:
+- Historical code commit or environment references may be incomplete.
+- Remote paths may exist without versioned manifests or hashes.
+- A smoke verification cannot substitute for a full training rerun.
+collaboration:
+  owner_agent: A02
+  supporting_agents: [A01, A03, A04]
+  reviewer_agent: A06
+  human_gate: human-gate-1
+ready_review: null
+freeze: null

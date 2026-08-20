@@ -1,0 +1,17 @@
+schema_version: "1.0"
+id: exploratory-research
+name: Exploratory Research
+description: Explore a bounded question without requiring a confirmatory hypothesis.
+required_fields:
+  research:
+    - scope.in
+    - scope.out
+  protocol:
+    - method
+    - tasks
+    - outputs
+  experiment:
+    - evidence.observations
+    - evidence.artifacts
+additional_gates:
+  - exploration-boundary-review

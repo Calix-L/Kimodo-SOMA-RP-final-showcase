@@ -1,0 +1,28 @@
+schema_version: "1.0"
+task_id: C01-A03-ER2-training-manifest-linkage
+run_id: pilot-20260813
+mode: VERIFY
+agent_id: A03
+research_id: R004
+experiment_id: null
+objective: Reconstruct whether cat_object_manip_fp32_20260811_0005.csv actually supplied training data to candidate abl_object_lr1e7_s3000_20260811.
+human_authorization_ref: kimodo/simulation/pilot-20260813/decisions/human-collaboration-C01.yaml
+input_refs:
+- kimodo/simulation/pilot-20260813/evidence/ER2-training-manifest-linkage-inventory.yaml
+- kimodo/simulation/pilot-20260813/outputs/A02/C01-object-benchmark-provenance.yaml
+- kimodo/research/R004/protocol.yaml
+allowed_output_refs:
+- kimodo/simulation/pilot-20260813/outputs/A03/C01-ER2-training-manifest-linkage.yaml
+- kimodo/simulation/pilot-20260813/handoffs/C01-ER2-A03-to-A04.yaml
+acceptance_criteria:
+- Cite exact config, command/log, checkpoint metadata hashes and approval/base commit consumed.
+- Trace candidate name to run directory, launch command, resolved manifest path, and produced checkpoint without relying on filenames alone.
+- Classify linkage VERIFIED, DECLARED, MISSING, or CONFLICTING and state what breaks the chain.
+- Hand the evidence to A04 for independent operational verification; do not interpret model quality.
+forbidden_actions:
+- remote access or Bash
+- GPU use, training, evaluation, or checkpoint mutation
+- inspect final holdout metric values
+- modify R004 or frozen evaluation rules
+time_or_cost_limit: 8 turns; sanitized linkage inventory only
+required_handoff_to: A04

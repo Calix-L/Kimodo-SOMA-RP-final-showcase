@@ -1,0 +1,29 @@
+schema_version: "1.0"
+task_id: C01-A02-ER1-disjoint-pool-feasibility
+run_id: pilot-20260813
+mode: VERIFY
+agent_id: A02
+research_id: R004
+experiment_id: null
+objective: Determine whether a non-degenerate Object-Manipulation evaluation pool exists that is disjoint from both the candidate training manifest and the full holdout.
+human_authorization_ref: kimodo/simulation/pilot-20260813/decisions/human-collaboration-C01.yaml
+input_refs:
+- kimodo/simulation/pilot-20260813/evidence/ER1-disjoint-pool-inventory.yaml
+- kimodo/simulation/pilot-20260813/outputs/A02/C01-object-benchmark-provenance.yaml
+- kimodo/simulation/pilot-20260813/outputs/A01/C01-benchmark-recommendation.yaml
+allowed_output_refs:
+- kimodo/simulation/pilot-20260813/outputs/A02/C01-ER1-disjoint-pool-survey.yaml
+- kimodo/simulation/pilot-20260813/handoffs/C01-ER1-A02-to-hf.yaml
+acceptance_criteria:
+- Cite the exact approval/base commit and every inventory hash consumed.
+- Report eligible counts separately for Content and Repetition and define the identity/set operation used.
+- Classify feasibility as VERIFIED_NON_DEGENERATE, VERIFIED_DEGENERATE, MISSING, or CONFLICTING without inventing cases.
+- Expose dataset-coverage limits and return evidence only; do not choose MODIFY or REJECT for hf.
+forbidden_actions:
+- remote access or Bash
+- GPU use, model training, or benchmark generation
+- inspect final holdout metric values
+- modify R004 or select the benchmark
+- expose raw case identifiers or private rows
+time_or_cost_limit: 8 turns; consume sanitized inventory only; no compute beyond set-metadata reasoning
+required_handoff_to: hf

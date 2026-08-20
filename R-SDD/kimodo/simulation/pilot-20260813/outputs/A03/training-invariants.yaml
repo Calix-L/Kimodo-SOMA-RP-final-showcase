@@ -1,0 +1,187 @@
+schema_version: "1.0"
+task_id: P01-A03-training-invariants
+run_id: pilot-20260813
+mode: VERIFY
+agent_id: A03
+research_id: R001
+experiment_id: null
+produced_at: 2026-08-13T08:27:58Z
+commit_sha: cd67942
+primary_record: source/phase1_ai_native_project_brain_20260813.md
+
+# ---------------------------------------------------------------------------
+# Verification scope
+# ---------------------------------------------------------------------------
+verification_scope:
+  mode: VERIFY
+  basis: "Reconstruct training semantics from the supplied Phase 1 source brain and R001-R004 protocols."
+  independently_verified_against_code: false
+  reason: "work/codex_pipeline/ (referenced by source brain section 8 and R001/R003 protocol.artifacts) is absent from this worktree; training scripts, configs, logs, and run cards are not present in allowed scope."
+  evidence_states_note: "All training-side scripts and runs are state DECLARED in simulation/pilot-20260813/evidence-map.yaml; DECLARED means referenced by the source summary but not yet independently checked by this pilot."
+  no_remote_compute: true
+  no_holdout_results_used: true
+  classification_note: "This is current VERIFY recovery of training semantics, not a claim that six agents originally performed the historical training."
+
+# ---------------------------------------------------------------------------
+# Candidate invariants (abl_object_lr1e7_s3000_20260811)
+# Source: source brain section 6.3 "最佳超参" table
+# ---------------------------------------------------------------------------
+candidate_invariants:
+  run_id: abl_object_lr1e7_s3000_20260811
+  provenance: "source/phase1_ai_native_project_brain_20260813.md section 6.3"
+  fields:
+    - {name: target_domain, value: "Object Manipulation", state: VERIFIED_FROM_RECORD}
+    - {name: base_model, value: "nvidia/Kimodo-SOMA-RP-v1.1", state: VERIFIED_FROM_RECORD}
+    - {name: dtype, value: "fp32", state: VERIFIED_FROM_RECORD}
+    - {name: learning_rate, value: "1e-7", state: VERIFIED_FROM_RECORD}
+    - {name: steps, value: "3000", state: VERIFIED_FROM_RECORD}
+    - {name: warmup, value: "200", state: VERIFIED_FROM_RECORD}
+    - {name: batch_size, value: "4", state: VERIFIED_FROM_RECORD}
+    - {name: grad_accum, value: "8", state: VERIFIED_FROM_RECORD}
+    - {name: target_repeat, value: "2", state: VERIFIED_FROM_RECORD}
+    - {name: replay_size, value: "4000", state: VERIFIED_FROM_RECORD}
+    - {name: replay_repeat, value: "1", state: VERIFIED_FROM_RECORD}
+    - {name: text_dropout, value: "0.10", state: VERIFIED_FROM_RECORD}
+    - {name: max_grad_norm, value: "0.5", state: VERIFIED_FROM_RECORD}
+
+# ---------------------------------------------------------------------------
+# Training semantics NOT documented in any primary record (must not be inferred)
+# ---------------------------------------------------------------------------
+missing_training_semantics:
+  - name: loss_function
+    state: MISSING
+    note: "Source brain section 4.2 monitors 'loss/NaN' but never names the loss; no protocol states it; scripts absent."
+  - name: optimizer
+    state: MISSING
+    note: "No primary record names the optimizer (AdamW / Adam / SGD etc.)."
+  - name: lr_schedule
+    state: PARTIAL
+    note: "Only warmup=200 is recorded; the post-warmup schedule (constant / cosine / linear-decay) is undocumented."
+  - name: weight_decay
+    state: MISSING
+  - name: feature_cache_format
+    state: MISSING
+    note: "Section 4.1 lists target cache, replay cache, combined cache as process steps; cache format / feature-type not documented. Deep provenance deferred to A02."
+  - name: replay_mixing_implementation
+    state: MISSING
+    note: "Mixing ratio is documented (target_repeat=2, replay_size=4000, replay_repeat=1); per-batch composition mechanism is not."
+  - name: random_seed
+    state: MISSING
+  - name: checkpoint_frequency
+    state: MISSING
+
+# ---------------------------------------------------------------------------
+# Target/replay mixing (core training-composition assumption)
+# ---------------------------------------------------------------------------
+target_replay_mixing:
+  stated_in: "source brain section 6.3 table"
+  target_repeat: 2
+  replay_size: 4000
+  replay_repeat: 1
+  interpretation: "Target-domain data repeated twice; a 4000-sample replay pool repeated once; combined then cached and merged (section 4.1 steps 3-5)."
+  implementation_state: MISSING
+  drift_risk: "Only the Object 3000-step candidate documents target_repeat / replay_size / replay_repeat; the main runs and the 2000-step ablations do not state them."
+
+# ---------------------------------------------------------------------------
+# Precision
+# ---------------------------------------------------------------------------
+precision:
+  training_dtype: fp32
+  training_dtype_state: VERIFIED_FROM_RECORD
+  training_dtype_source: "source brain section 6.3 table; run IDs gc_safe_fp32 / cat_dancing_fp32 / cat_object_manip_fp32 encode fp32"
+  text_encoder_precision_eval: fp32
+  text_encoder_precision_eval_state: VERIFIED_FROM_RECORD
+  text_encoder_precision_source: "R004 protocol comparison_protocol.text_encoder_precision"
+  note: "Ablation run IDs omit the fp32 suffix, but the candidate (an ablation run) table states fp32, so fp32 is assumed shared across ablations."
+
+# ---------------------------------------------------------------------------
+# Main-run configuration (4000-step) reconstructed from the decision table
+# Source: source brain section 5 decision table (训练强度 row)
+# ---------------------------------------------------------------------------
+main_run_config:
+  stated_in: "source brain section 5 decision table (训练强度 row)"
+  learning_rate: 2e-7
+  steps: 4000
+  learning_rate_state: VERIFIED_FROM_RECORD
+  steps_state: VERIFIED_FROM_RECORD
+  shared_hyperparameters_state: ASSUMED_SHARED
+  note: "Only lr and steps are documented for the 4000-step main runs; warmup/batch/grad_accum/target_repeat/replay_size/replay_repeat/text_dropout/max_grad_norm are assumed to match the candidate table but are not separately recorded per main run."
+  runs:
+    - {id: gc_safe_fp32_20260810_2045, domain: "Gestures-and-Communication", research_id: R002, evidence_map_state: DECLARED}
+    - {id: cat_dancing_fp32_20260811_0005, domain: Dancing, research_id: R002, evidence_map_state: DECLARED}
+    - {id: cat_object_manip_fp32_20260811_0005, domain: "Object-Manipulation", research_id: R002, evidence_map_state: DECLARED}
+
+# ---------------------------------------------------------------------------
+# Comparable-runs drift check
+# (folds in the agent-profile required main-run-config-comparison content;
+#  kept inside this file because the task envelope authorizes only two outputs)
+# ---------------------------------------------------------------------------
+comparable_runs_drift_check:
+  comparison_A_main_vs_ablation:
+    changed_variables:
+      - "learning_rate: 2e-7 (main) -> 1e-7 (ablation)"
+      - "steps: 4000 (main) -> 2000 or 3000 (ablation)"
+    verdict: INTENTIONAL_MULTI_VARIABLE
+    note: "Main-to-ablation is NOT a one-variable comparison; both lr and steps change. Acceptable as a separate strength-reduction question (R002 -> R003) but must not be labelled a single-variable ablation."
+  comparison_B_dancing_ablation:
+    runs: [abl_dancing_lr1e7_s2000_20260811, abl_dancing_lr1e7_s3000_20260811]
+    declared_core_variable: "steps (2000 vs 3000)"
+    held_constant_declared: ["learning_rate=1e-7", "domain=Dancing"]
+    held_constant_undocumented: [dtype, warmup, batch_size, grad_accum, target_repeat, replay_size, replay_repeat, text_dropout, max_grad_norm, optimizer, loss_function, lr_schedule, seed]
+    drift_state: MISSING
+    note: "R003 protocol line 15 declares training duration as the core variable; undocumented hyperparameters are assumed shared but unverified."
+  comparison_C_object_ablation:
+    runs: [abl_object_lr1e7_s2000_20260811, abl_object_lr1e7_s3000_20260811]
+    declared_core_variable: "steps (2000 vs 3000)"
+    held_constant_declared: ["learning_rate=1e-7", "domain=Object-Manipulation"]
+    held_constant_undocumented: [dtype, warmup, batch_size, grad_accum, target_repeat, replay_size, replay_repeat, text_dropout, max_grad_norm, optimizer, loss_function, lr_schedule, seed]
+    drift_state: MISSING
+  comparison_D_cross_domain_at_same_strength:
+    pairs:
+      - [abl_dancing_lr1e7_s2000_20260811, abl_object_lr1e7_s2000_20260811]
+      - [abl_dancing_lr1e7_s3000_20260811, abl_object_lr1e7_s3000_20260811]
+    declared_core_variable: "domain (Dancing vs Object)"
+    held_constant_declared: ["learning_rate=1e-7", "steps"]
+    held_constant_undocumented: [all training hyperparameters]
+    drift_state: MISSING
+    note: "Only the Object 3000-step candidate has a full hyperparameter table; Dancing runs' hyperparameters are assumed-equal, not verified."
+
+# ---------------------------------------------------------------------------
+# Shared-invariant assumption summary
+# ---------------------------------------------------------------------------
+shared_invariants_assumption:
+  state: ASSUMED_NOT_VERIFIED
+  fields_assumed_constant: [dtype, warmup, batch_size, grad_accum, target_repeat, replay_size, replay_repeat, text_dropout, max_grad_norm]
+  basis: "Only the Object 3000-step candidate documents these; the source brain gives no per-run override, so equality is assumed."
+  escalation: "If A04 run cards or recovered configs show any of these differ across runs, raise configuration-drift escalation per A03 escalation_triggers."
+
+# ---------------------------------------------------------------------------
+# Holdout isolation (acceptance criterion 3)
+# ---------------------------------------------------------------------------
+holdout_isolation:
+  r004_holdout_state: DECLARED
+  r004_holdout_ref: "/home/share/user/zyc/kimodo/eval_work/seed_text_test_full_eval_20260813"
+  historical_observation: "Evaluation was still running when the source snapshot was supplied (evidence-map.yaml)."
+  gate1_blinding_attestation: NOT_ATTESTED
+  gate1_policy_classification: RETROSPECTIVE_ACCEPTANCE_POLICY_UNLESS_BLINDING_ATTESTED
+  no_training_conclusion_uses_holdout: true
+  note: "No training-side conclusion in this output references holdout Content/Repetition results; candidate status remains provisional until R004 closes (A03 profile; R003 protocol evaluation.criteria)."
+
+# ---------------------------------------------------------------------------
+# Open risks
+# ---------------------------------------------------------------------------
+open_risks:
+  - id: A03-R01
+    risk: "Training code (run_category_domain_finetune.sh) and all run configs/logs are absent from the worktree; every training invariant above is verified only against the source-brain summary, not against code or run artifacts."
+    impact: "Cannot independently confirm loss, optimizer, cache, or replay-mixing semantics."
+  - id: A03-R02
+    risk: "Configuration drift across claimed comparable runs is undocumented for all hyperparameters except lr/steps and the Object 3000-step candidate."
+    impact: "A one-variable ablation claim could be invalidated by an undocumented difference."
+  - id: A03-R03
+    risk: "Loss function and optimizer are not recorded anywhere; reproduction of training is not fully specified by primary records."
+    impact: "A future reproduction cannot be guaranteed bit-equivalent."
+  - id: A03-R04
+    risk: "Main-to-ablation transition changes two variables (lr and steps) but may be misread as a single ablation."
+    impact: "Inflated causal claim if presented as one-variable."
+
+recommended_next_action: "A04 reconstructs run cards (configs/logs/checkpoint refs) for the seven training runs so the ASSUMED_SHARED fields can be promoted to VERIFIED or flagged as drift; A02 confirms feature-cache provenance."

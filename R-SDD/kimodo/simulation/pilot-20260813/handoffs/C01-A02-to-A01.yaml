@@ -1,0 +1,229 @@
+schema_version: "1.0"
+handoff_id: C01-A02-to-A01
+run_id: pilot-20260813
+mode: VERIFY
+from_agent: A02
+to_agent: A01
+research_id: R004
+experiment_id: null
+owner: A02
+cycle_id: C01-object-target-benchmark-pin
+cycle_step: C01-S2 -> C01-S3
+
+input_refs:
+- kimodo/simulation/pilot-20260813/outputs/A01/C01-benchmark-decision-framing.yaml
+- kimodo/simulation/pilot-20260813/evidence/remote-object-benchmark-inventory.yaml
+- kimodo/simulation/pilot-20260813/outputs/A02/provenance-report.yaml
+- kimodo/research/R004/protocol.yaml
+- kimodo/simulation/pilot-20260813/collaboration/ledger.yaml
+- kimodo/simulation/pilot-20260813/decisions/human-gate-1.yaml
+- kimodo/simulation/pilot-20260813/handoffs/C01-A01-to-A02.yaml
+- kimodo/simulation/pilot-20260813/outputs/A02/missing-evidence-register.yaml
+- kimodo/simulation/pilot-20260813/handoffs/handoff-template.yaml
+
+output_refs:
+- kimodo/simulation/pilot-20260813/outputs/A02/C01-object-benchmark-provenance.yaml
+- kimodo/simulation/pilot-20260813/handoffs/C01-A02-to-A01.yaml
+
+upstream_A01_consumed:
+  output_ref: kimodo/simulation/pilot-20260813/outputs/A01/C01-benchmark-decision-framing.yaml
+  commit_sha: c5106bdc96aad9c4a8941275c91b821f9b8e2530
+  commit_sha_state: VERIFIED
+  commit_sha_evidence:
+  - collaboration/ledger.yaml cycles[C01].sequence[C01-S1].commit_sha (state COMPLETE)
+  - evidence/remote-object-benchmark-inventory.yaml upstream_decision_frame.commit_sha
+  - session-start gitStatus short sha c5106bd (consistent prefix)
+  note: >-
+    A01's own base_commit_sha 046ed3e is the base A01 built on, NOT the commit
+    that recorded A01's output. The upstream commit consumed is c5106bd.
+
+verified_actions:
+- mode: VERIFY
+  action: >-
+    Consumed A01's committed C01-S1 framing at commit
+    c5106bdc96aad9c4a8941275c91b821f9b8e2530 (output_ref
+    outputs/A01/C01-benchmark-decision-framing.yaml), confirmed by ledger.yaml
+    and the sanitized inventory upstream_decision_frame.commit_sha.
+- mode: VERIFY
+  action: >-
+    Confirmed the approved remote scope (lintrain; roots
+    /home/share/user/zyc/kimodo and /home/share/user/zyc/kimodo_seed_repro_train)
+    from three primary records (inventory, human-gate-1, prior A02
+    provenance-report) and confirmed every inventory read path resolves under
+    one of those two roots. A02 performed NO remote access itself; it consumed
+    only the sanitized read-only inventory.
+- mode: VERIFY
+  action: >-
+    Classified every A01 benchmark_pin_schema field: VERIFIED for computed
+    digests/counts/intersections and frozen-R004 identity matches (with
+    disclosed provenance + residual risks); DECLARED for names/prose/canonical
+    ids/timestamps; MISSING for script_commit_sha (non-git root),
+    construction_invocation_and_input_hashes, per-split separate manifests,
+    and evaluation_protocol scalar conformance; CONFLICTING for the two
+    disjointness statuses; NOT_APPLICABLE_AT_C01_S2 for the populate-at-revise
+    freeze block.
+- mode: VERIFY
+  action: >-
+    Answered A01's Q1-Q7: construction script VERIFIED present + hashed (commit
+    MISSING); split counts VERIFIED (Content 235 / Repetition 57 / total 292);
+    combined manifest + sha256 VERIFIED (per-split separate manifests MISSING);
+    target-train disjointness CONFLICTING with intersection 284; holdout
+    disjointness CONFLICTING with intersection 292; paired evaluation
+    VERIFIED_CASE_COUNTS_ONLY (ordered identity MISSING); reproducibility
+    partial (by hash+seed, not commit, not invocation-proven).
+- mode: VERIFY
+  action: >-
+    Checked target training vs target evaluation manifest disjointness:
+    REFUTED by primary evidence. 284 of 292 Object eval cases (97.26%) appear
+    in cat_object_manip_fp32_20260811_0005.csv. The Object eval is also an
+    exact subset of the SEED-test full holdout (292/292). Set membership only;
+    NO holdout metrics inspected.
+- mode: VERIFY
+  action: >-
+    Produced the viable candidate Object benchmark identity (evidence only, not
+    a selection) and determined alternative viability: ALT-A NOT viable as-is
+    (fails both leakage_prevention intersections and construction.commit);
+    ALT-B (reconstruct disjoint, no GPU) and ALT-C (reject/escalate) remain
+    viable. A02 did NOT choose among alternatives (a02_selection = NONE).
+- mode: VERIFY
+  action: >-
+    Resolved C01-RISK-02 and C01-RISK-03 from UNKNOWN to CONFIRMED; opened
+    C01-RISK-06 (transport warning), C01-RISK-07 (script commit MISSING),
+    C01-RISK-08 (paired order/protocol conformance MISSING), C01-RISK-09
+    (candidate-to-training-manifest linkage DECLARED), C01-RISK-10 (per-split
+    manifests MISSING); partially resolved prior C01-RISK-04 (script now
+    VERIFIED present + hashed).
+- mode: VERIFY
+  action: >-
+    Preserved all data boundaries: no remote access by A02, no final holdout
+    metrics (set membership only), no private data, no credentials, no external
+    upload, no GPU training, no Bash, no repository-wide discovery. Did NOT edit
+    R004 and did NOT select the benchmark for hf.
+
+gate_result: PASS-C01-S2-evidence-complete-leakage-confirmed-no-selection
+gate_result_note: >-
+  C01-S2 evidence is complete: the Object target-domain benchmark identity is
+  recovered and classified, and the disjointness evidence is primary-verified.
+  This is NOT an adoption pass and NOT a selection. Leakage is CONFIRMED on
+  both surfaces (train_eval 284/292; eval_holdout 292/292), so ALT-A is NOT
+  viable as-is; ALT-B and ALT-C remain viable. A01 runs C01-S3 to synthesize
+  options + a non-binding recommendation; hf decides at C01-H1. Adoption
+  authority stays with Human Gate 2. No frozen R004 rule was modified.
+
+open_risks:
+- id: C01-RISK-02
+  severity: high
+  prior_state: UNKNOWN
+  new_state: CONFIRMED
+  description: >-
+    Target-train leakage CONFIRMED: 284 of 292 Object eval cases (97.26%)
+    appear in the target training manifest cat_object_manip_fp32_20260811_0005.csv.
+  owner: hf (C01-H1); A01 synthesizes at C01-S3
+- id: C01-RISK-03
+  severity: high
+  prior_state: UNKNOWN
+  new_state: CONFIRMED
+  description: >-
+    Holdout contamination CONFIRMED: Object eval (292) is an exact subset of
+    the SEED-test full holdout (6938).
+  owner: hf (C01-H1); A01 synthesizes at C01-S3
+- id: C01-RISK-06
+  severity: medium
+  description: >-
+    Transport warning observed during inventory collection (SSH bad RSA
+    signature); all reads succeeded but residual provenance risk remains.
+  owner: hf / orchestrator (re-collect or attest)
+- id: C01-RISK-07
+  severity: medium
+  description: >-
+    construction.script_commit_sha MISSING (construction root is not a git
+    repository); construction is hash-addressable but not commit-addressed.
+  owner: hf (C01-H1)
+- id: C01-RISK-08
+  severity: medium
+  description: >-
+    Paired ordered identity + metric aggregation MISSING; evaluation_protocol
+    scalar conformance (batch 1 / postprocess false / fp32) not attested for
+    the target run.
+  owner: A05 / A01 (C01-S3)
+- id: C01-RISK-09
+  severity: medium
+  description: >-
+    The 284-case leakage is computed against cat_object_manip_fp32_20260811_0005.csv,
+    which is DECLARED-as-the-candidate's-training-manifest (naming + source
+    summary), not VERIFIED by A02.
+  owner: A03 / A04 (confirm manifest actually trained the candidate)
+- id: C01-RISK-10
+  severity: low
+  description: >-
+    Per-split SEPARATE manifest artifacts MISSING (one combined manifest serves
+    both splits); per-case split-label encoding not independently inspected.
+  owner: A05
+- id: C01-RISK-04
+  severity: resolved-to-partial
+  description: >-
+    Prior C01-RISK-04 partially resolved: construction script now VERIFIED
+    present + hashed via the sanitized inventory; commit sub-gap folded into
+    C01-RISK-07.
+
+next_owner: A01
+next_state: C01-S3 (A01 synthesize verified options + non-binding recommendation)
+next_action: >-
+  A01 consumes outputs/A02/C01-object-benchmark-provenance.yaml and synthesizes
+  ALT-A / ALT-B / ALT-C against this evidence. Key inputs for A01: ALT-A is NOT
+  viable as-is (leakage_prevention fails: train_eval intersection 284 > 0,
+  holdout intersection 292 > 0; construction.script_commit_sha MISSING).
+  ALT-B (reconstruct a disjoint Object target benchmark via a new set-assembly
+  construction run; NO GPU, NO final holdout) and ALT-C (REJECT / escalate)
+  remain viable. A01 produces a NON-BINDING recommendation and hands to hf for
+  C01-H1 (ACCEPT / MODIFY / REJECT). A01 must NOT select the benchmark, must
+  NOT modify any frozen R004 threshold / count / comparison-protocol field, and
+  must NOT inspect final holdout metrics. If hf ACCEPTs or MODIFYs, the pin is
+  recorded via research-revise AFTER C01-H1, adding only an R004.inputs entry +
+  benchmark snapshot.
+
+key_evidence_summary_for_A01:
+  upstream_A01_commit: c5106bdc96aad9c4a8941275c91b821f9b8e2530
+  object_benchmark_manifest_sha256: 97d13dcc78016c66396faee8a59a0cd8f126c9552542e2ad94de914d4bf519a3
+  object_benchmark_counts: {Content: 235, Repetition: 57, total: 292}
+  construction_script_sha256: 18a602ddf4922f42dad03a2478a9ac731607663d54460dee1472210e393d88f3
+  construction_script_commit_sha: MISSING_NOT_A_GIT_REPOSITORY
+  target_train_manifest_sha256: 95dcd9c7f1e73d99e5bce10abb6bf94d55f58a17e8eefc7b83fbdfe74597bbd5
+  full_holdout_manifest_sha256: 479f284385178ff323795a6b08a2458c7d161e148e8be6b626ef68fb82a47d20
+  disjointness:
+    object_eval_vs_target_train: {status: CONFLICTING, intersection: 284, ratio: 0.972603}
+    object_eval_vs_full_holdout: {status: CONFLICTING, intersection: 292, subset: true}
+    target_train_vs_full_holdout: {status: CONFLICTING, intersection: 284}
+  alternatives_viability:
+    ALT-A_pin_as_is: NOT_VIABLE_AS_IS
+    ALT-B_reconstruct_disjoint: VIABLE
+    ALT-C_reject_or_escalate: VIABLE
+  a02_selection: NONE
+
+commit_sha: 6c3f651
+commit_sha_note: >-
+  Short sha from the session-start gitStatus snapshot (most recent commit
+  6c3f651 "Record Object benchmark overlap evidence"), which is the base A02
+  built on. The full 40-char sha was NOT re-confirmed (Bash unavailable). The
+  commit that will record A02's C01-S2 outputs is pending orchestrator commit
+  on top of 6c3f651; that sha is not yet known to A02.
+kscc_session_id: 320fbfae-d1cc-4b9c-a9fc-ed476288dbfc
+kscc_session_id_note: Backfilled from the launcher-managed audit/session-index.yaml after successful completion.
+timestamp: '2026-08-13T09:52:34+00:00'
+timestamp_note: Launcher audit completion time; sequenced before A01 C01-S3.
+
+attestation:
+  historical_work_not_misrepresented: true
+  historical_work_not_misrepresented_note: >-
+    VERIFY mode only. A05/A02 prior findings and A01's framing are cited as
+    evidence, not re-described as original six-agent work. No historical step
+    is claimed as new execution. The disjointness computations are carried
+    from the sanitized inventory (collected by codex-primary) and cross-checked
+    by A02 for internal consistency; A02 did not recompute digests (Bash
+    unavailable) and discloses this per-field.
+  secrets_removed: true
+  secrets_removed_note: >-
+    No credentials, private data, or raw final holdout metrics referenced.
+    Disjointness used motion_id set membership only, never scores. No remote
+    access performed by A02. The transport_warning is disclosed as a residual
+    risk (C01-RISK-06), not hidden.

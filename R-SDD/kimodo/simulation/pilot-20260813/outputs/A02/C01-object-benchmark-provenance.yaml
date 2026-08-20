@@ -1,0 +1,968 @@
+schema_version: "1.0"
+artifact: c01-object-benchmark-provenance
+run_id: pilot-20260813
+task_id: C01-A02-object-benchmark-provenance
+mode: VERIFY
+agent_id: A02
+agent_display_name: "Qiao — Repository and Data Engineer"
+research_id: R004
+experiment_id: null
+cycle_id: C01-object-target-benchmark-pin
+cycle_step: C01-S2
+produced_at: "2026-08-13T09:52:34+00:00"
+produced_at_precision: launcher_audit_completed_at
+kscc_session_id: 320fbfae-d1cc-4b9c-a9fc-ed476288dbfc
+kscc_session_id_note: Backfilled from the launcher-managed audit/session-index.yaml after successful completion.
+model: glm-5.2
+
+# ---------------------------------------------------------------------------
+# Mode statement (shared contract item 2). This is a VERIFY step. No historical
+# step is described as original six-agent execution. A02 did NOT modify R004,
+# did NOT select a benchmark for hf, did NOT inspect final holdout metrics, used
+# NO Bash, performed NO remote access itself, and started NO GPU training.
+# ---------------------------------------------------------------------------
+mode_statement:
+  this_step: C01-S2
+  mode: VERIFY
+  rule: >
+    A02 consumes A01's committed C01-S1 framing plus the sanitized read-only
+    Object benchmark inventory, classifies each benchmark-pin field against
+    primary evidence, and reports disjointness. A02 does NOT choose the
+    benchmark for hf and does NOT edit R004. This is evidence + viable candidate
+    identity only.
+
+# ===========================================================================
+# 0. UPSTREAM A01 CONSUMPTION  (acceptance criterion 1)
+# ===========================================================================
+upstream_A01_consumed:
+  output_ref: kimodo/simulation/pilot-20260813/outputs/A01/C01-benchmark-decision-framing.yaml
+  commit_sha: c5106bdc96aad9c4a8941275c91b821f9b8e2530
+  commit_sha_state: VERIFIED
+  commit_sha_evidence:
+    - "collaboration/ledger.yaml#cycles[C01].sequence[C01-S1].commit_sha = c5106bdc96aad9c4a8941275c91b821f9b8e2530 (state COMPLETE)"
+    - "evidence/remote-object-benchmark-inventory.yaml#upstream_decision_frame.commit_sha = c5106bdc96aad9c4a8941275c91b821f9b8e2530"
+    - "session-start gitStatus snapshot short sha c5106bd 'Frame C01 benchmark decision for A01' (consistent prefix; harness primary)"
+  commit_sha_caveat: >-
+    Full 40-char sha is confirmed by two independent primary records (ledger +
+    inventory) and is consistent with the harness gitStatus short sha; A02 did
+    NOT recompute it (Bash unavailable). A01's own file records base_commit_sha
+    046ed3e (the base A01 built on), which is NOT the commit that recorded A01's
+    output; the upstream commit consumed is c5106bd, not 046ed3e.
+  framing_artifact: c01-benchmark-decision-framing
+  framing_cycle_step: C01-S1
+  framing_gate_result: PASS-C01-S1-framing-complete
+  schema_consumed: C01-benchmark-decision-framing.yaml#benchmark_pin_schema
+  evidence_request_consumed: C01-benchmark-decision-framing.yaml#evidence_request_for_A02 (Q1-Q7)
+  alternatives_consumed: C01-benchmark-decision-framing.yaml#alternatives (ALT-A / ALT-B / ALT-C)
+
+# ===========================================================================
+# 1. RECORDS READ BY A02  (process facts; READ != VERIFIED)
+#    All reads used the Read tool only. No Bash, no remote access by A02, no
+#    repository-wide discovery. The sanitized inventory is the sanctioned
+#    primary-evidence channel for C01-S2 (collected READ_ONLY_SANITIZED_METADATA
+#    within the approved remote roots by collector codex-primary).
+# ===========================================================================
+records_read:
+  - ref: kimodo/simulation/pilot-20260813/outputs/A01/C01-benchmark-decision-framing.yaml
+    read: true
+    role: upstream A01 framing (schema + Q1-Q7 + alternatives)
+  - ref: kimodo/simulation/pilot-20260813/evidence/remote-object-benchmark-inventory.yaml
+    read: true
+    role: sanitized primary metadata for benchmark identity + disjointness
+  - ref: kimodo/simulation/pilot-20260813/outputs/A02/provenance-report.yaml
+    read: true
+    role: A02 prior provenance baseline (DECLARED/MISSING baseline)
+  - ref: kimodo/research/R004/protocol.yaml
+    read: true
+    role: frozen comparison_protocol + inputs (baseline / candidate identity)
+  - ref: kimodo/simulation/pilot-20260813/collaboration/ledger.yaml
+    read: true
+    role: C01 cycle sequence + C01-S1 commit sha + C01-S2 state
+  - ref: kimodo/simulation/pilot-20260813/decisions/human-gate-1.yaml
+    read: true
+    role: approved remote roots + frozen protocol_sha256 + gate status
+  - ref: kimodo/simulation/pilot-20260813/handoffs/C01-A01-to-A02.yaml
+    read: true
+    role: A01 -> A02 handoff (next_action + forbidden_for_A02)
+  - ref: kimodo/simulation/pilot-20260813/handoffs/handoff-template.yaml
+    read: true
+    role: handoff schema for the C01-A02-to-A01 handoff
+  - ref: kimodo/simulation/pilot-20260813/outputs/A02/missing-evidence-register.yaml
+    read: true
+    role: prior A02 missing-evidence baseline (for delta vs this run)
+
+# ===========================================================================
+# 2. APPROVED REMOTE SCOPE  (forbidden-action boundary: do not access outside)
+# ===========================================================================
+approved_remote_scope:
+  state: VERIFIED
+  host_alias: lintrain
+  roots:
+    - /home/share/user/zyc/kimodo
+    - /home/share/user/zyc/kimodo_seed_repro_train
+  evidence:
+    - "evidence/remote-object-benchmark-inventory.yaml#approved_remote_scope"
+    - "decisions/human-gate-1.yaml#blocking_inputs[resource_and_data_boundary].approved_remote_roots"
+    - "outputs/A02/provenance-report.yaml#data_boundary_review.boundaries.approved_remote_roots"
+  excluded:
+    - GPU execution
+    - model training
+    - final holdout metric values
+    - credentials or private row contents
+  a02_access: >-
+    A02 performed NO remote access itself. A02 consumed only the sanitized
+    read-only inventory, which collector codex-primary gathered within the
+    two approved roots above. Every inventory read path resolves under one of
+    these two roots (verified by A02 path-prefix check against the declared
+    roots). No path outside the approved roots was accessed by A02 or by the
+    inventory A02 consumed.
+
+# ---------------------------------------------------------------------------
+# Transport warning — a residual provenance risk that must NOT be silently
+# promoted away (per the inventory's own transport_warning.handling).
+# ---------------------------------------------------------------------------
+transport_warning:
+  state: OBSERVED
+  message: "client_global_hostkeys_prove_confirm: server gave bad signature for RSA key 0: incorrect signature"
+  handling_from_inventory: "Every read command exited successfully, but the warning remains a provenance risk and must not be silently promoted away."
+  a02_treatment: >-
+    Carried forward as C01-RISK-06. A02 does NOT downgrade any VERIFIED field
+    to DECLARED solely on this warning (the inventory states all reads
+    succeeded), but A02 records the warning as a residual provenance risk for
+    hf / orchestrator to re-collect or attest.
+
+# ===========================================================================
+# 3. CLASSIFICATION RULE  (acceptance criterion 2)
+# ===========================================================================
+classification_rule:
+  states_used: [VERIFIED, DECLARED, MISSING, CONFLICTING, NOT_APPLICABLE_AT_C01_S2]
+  state_definitions:
+    VERIFIED: >-
+      Primary evidence available to A02 for this field: either (a) a computed
+      digest / count / intersection carried from the sanitized inventory
+      (collected within approved roots) and cross-checked by A02 for internal
+      consistency and schema mapping, or (b) an identity match against the
+      FROZEN R004 protocol. Digests are carried from the inventory, NOT
+      recomputed by A02 (Bash unavailable); this is disclosed per-field, not
+      silently promoted. The transport_warning residual risk is recorded as
+      C01-RISK-06 and does not by itself downgrade a computed-digest field.
+    DECLARED: >-
+      Referenced by a name / path / prose summary in the supplied records but
+      no computed digest, count, or frozen identity backs it as primary
+      evidence. Per forbidden_action, names and prose summaries are NOT
+      promoted to VERIFIED.
+    MISSING: >-
+      Needed for the pin but no value, path, hash, or owner exists in the
+      supplied primary records (or the inventory explicitly marks it MISSING).
+    CONFLICTING: >-
+      Primary evidence exists AND shows a contradiction with a pin requirement
+      (e.g., a disjointness check with intersection_count greater than 0).
+      The computation is primary-verified; the conflict is in the result.
+    NOT_APPLICABLE_AT_C01_S2: >-
+      A populate-at-revise field (freeze block) that A02 does not and must not
+      set; it is populated when hf accepts at C01-H1 and A01 records via
+      research-revise. A02 records it as not-applicable-here, not as MISSING.
+  carry_rule: >-
+    A02 promotes a field to VERIFIED only when primary evidence (a computed
+    digest, a count, an intersection, or a frozen-R004 identity match) backs
+    it. Names, prose summaries, and approximate timestamps remain DECLARED.
+    No field is promoted on a filename or a prose claim alone.
+
+# ===========================================================================
+# 4. BENCHMARK-PIN FIELD CLASSIFICATION
+#    (acceptance criterion 2: classify EACH requested pin field)
+#    Maps A01's benchmark_pin_schema.required_fields to a state + evidence.
+# ===========================================================================
+benchmark_pin_classification:
+  # --- identity fields ---
+  - field: benchmark_id
+    state: DECLARED
+    value_proposed: object-manip-target-text2motion
+    evidence:
+      - "inventory.object_benchmark.target = object_manip"
+      - "inventory.object_benchmark.root = .../domain_text_benchmarks_20260811/object_manip"
+    note: >-
+      No frozen canonical unique id string is supplied in the primary records;
+      only a target label and directory name (object_manip). A02 proposes a
+      candidate id for hf's consideration but does NOT freeze it (prose-level
+      naming is not promoted to VERIFIED).
+
+  - field: benchmark_name
+    state: DECLARED
+    value_proposed: "Object Manipulation target-domain text2motion benchmark"
+    evidence:
+      - "inventory.object_benchmark.categories = [Object Manipulation]"
+    note: "Human-readable name is prose; not promoted to VERIFIED. The domain label itself is VERIFIED (see domain)."
+
+  - field: role
+    state: VERIFIED
+    fixed_value: target
+    evidence:
+      - "A01 schema fixes role = target for this pin (definitional)."
+      - "inventory.object_benchmark.categories = [Object Manipulation] confirms the target domain."
+      - "R004 inputs candidate abl_object_lr1e7_s3000_20260811 domain = Object-Manipulation (source summary section 6.3)."
+    note: "Role is a schema constant confirmed by the verified domain, not a measured field."
+
+  - field: domain
+    state: VERIFIED
+    value: Object Manipulation
+    evidence:
+      - "inventory.object_benchmark.categories = [Object Manipulation]"
+      - "inventory.object_benchmark.target = object_manip"
+    verification_basis: sanitized_inventory_primary_metadata
+
+  - field: baseline
+    state: VERIFIED
+    value: nvidia/Kimodo-SOMA-RP-v1.1
+    expected_match: R004.inputs baseline
+    evidence:
+      - "research/R004/protocol.yaml#inputs = baseline:nvidia/Kimodo-SOMA-RP-v1.1 (FROZEN)"
+    verification_basis: frozen_R004_identity_match
+    note: >-
+      A01 schema requires identity match with R004.inputs, NOT checkpoint
+      provenance. Identity matches the frozen protocol. Baseline checkpoint /
+      weight provenance remains MISSING (out of scope for this field; carried
+      from prior A02 provenance-report MISSING-BASE-MODEL).
+
+  - field: candidate
+    state: VERIFIED
+    value: abl_object_lr1e7_s3000_20260811
+    expected_match: R004.inputs candidate
+    evidence:
+      - "research/R004/protocol.yaml#inputs = candidate:abl_object_lr1e7_s3000_20260811 (FROZEN)"
+      - "inventory.paired_evaluation_structure.runs.cat_object_manip... and abl_object_lr1e7_s3000_20260811 present (235/57 case dirs)"
+    verification_basis: frozen_R004_identity_match
+    note: >-
+      Identity matches the frozen protocol. Candidate checkpoint provenance
+      remains MISSING (out of scope for this field; carried from prior A02
+      provenance-report MISSING-RUN-CHECKPOINTS).
+
+  # --- splits ---
+  - field: splits
+    state: MISSING
+    note: "Per-split case counts and the combined manifest are VERIFIED, but complete per-split case-id manifests required for a frozen pin are MISSING."
+    subfields:
+      - split: Content
+        case_count: 235
+        case_count_state: VERIFIED
+        case_count_evidence: "inventory.object_benchmark.splits.content.num_cases = 235"
+        manifest_ref: "/home/share/user/zyc/kimodo/eval_work/domain_text_benchmarks_20260811/object_manip/domain_manifest.json"
+        manifest_ref_state: VERIFIED
+        manifest_sha256: 97d13dcc78016c66396faee8a59a0cd8f126c9552542e2ad94de914d4bf519a3
+        manifest_sha256_state: VERIFIED
+        manifest_sha256_evidence: "inventory.object_benchmark.manifest.sha256"
+        per_split_separate_manifest_state: MISSING
+        per_split_separate_manifest_note: >-
+          One combined domain_manifest.json covers Content + Repetition; no
+          separate per-split manifest artifact exists. Acceptable only if the
+          combined manifest encodes a per-case split label; A02 could not
+          inspect the manifest's column schema from the inventory summary
+          (counts only). Recorded as C01-RISK-10.
+      - split: Repetition
+        case_count: 57
+        case_count_state: VERIFIED
+        case_count_evidence: "inventory.object_benchmark.splits.repetition.num_cases = 57"
+        manifest_ref: "/home/share/user/zyc/kimodo/eval_work/domain_text_benchmarks_20260811/object_manip/domain_manifest.json"
+        manifest_ref_state: VERIFIED
+        manifest_sha256: 97d13dcc78016c66396faee8a59a0cd8f126c9552542e2ad94de914d4bf519a3
+        manifest_sha256_state: VERIFIED
+        per_split_separate_manifest_state: MISSING
+    aggregate_consistency:
+      content_plus_repetition: 235 + 57 = 292
+      total_cases: 292
+      unique_motion_ids: 292
+      ordered_unique_motion_id_set_sha256: 8f60670735432c31e24166b7b8a8f6785c1f50a10e471877d8e68db47d700c1b
+      ordered_set_sha256_state: VERIFIED
+      consistency_check: PASS
+      consistency_check_by_a02: "A02 confirmed 235 + 57 = 292 = total_cases = unique_motion_ids (no count drift)."
+
+  # --- construction ---
+  - field: construction
+    state: MISSING
+    note: >-
+      Script present + hashed (VERIFIED), selection rule + seed VERIFIED, output
+      artifact + hash VERIFIED; but script_commit_sha MISSING (non-git root),
+      source_dataset version/hash DECLARED, constructed_at DECLARED, and
+      construction invocation / input hashes MISSING (the manifest does not
+      record its own construction provenance).
+    subfields:
+      - subfield: script_ref
+        value: /home/share/user/zyc/kimodo_seed_repro_train/work/codex_pipeline/build_domain_text_benchmark.py
+        state: VERIFIED
+        evidence: "inventory.object_benchmark.construction_script.path (under approved root kimodo_seed_repro_train)"
+      - subfield: script_sha256
+        value: 18a602ddf4922f42dad03a2478a9ac731607663d54460dee1472210e393d88f3
+        state: VERIFIED
+        evidence: "inventory.object_benchmark.construction_script.sha256 (size 4399, line_count 120, mtime 2026-08-11 10:53:28 +0800)"
+        verification_basis: sanitized_inventory_primary_metadata
+      - subfield: script_commit_sha
+        state: MISSING
+        evidence: "inventory.object_benchmark.construction_script.git_commit = MISSING_NOT_A_GIT_REPOSITORY; inventory.remote_repository.second_root_git_repository = false"
+        note: >-
+          The construction script lives in kimodo_seed_repro_train, which is NOT
+          a git repository. A01's acceptance rule requires 'construction script
+          present with commit + hash'; the hash is VERIFIED but the commit is
+          MISSING. Construction is hash-addressable but NOT commit-addressed.
+          Recorded as C01-RISK-07.
+      - subfield: source_dataset
+        state: DECLARED
+        evidence: "inventory.observed_selection_rule references 'official content and repetition split identifiers'"
+        note: >-
+          The selection rule refers to official SEED content/repetition
+          identifiers, but no frozen source-dataset version or hash is supplied
+          in the inventory. The SEED dataset version remains MISSING (carried
+          from prior A02 MISSING-SEED-DATASET-AND-SPLITS) for the source side;
+          the split identifiers it loads are DECLARED.
+      - subfield: selection_criteria
+        state: VERIFIED
+        evidence: "inventory.object_benchmark.observed_selection_rule (5 explicit steps) + declared_defaults"
+        value_summary: >-
+          (1) Load official content and repetition split identifiers; (2) filter
+          metadata rows to the target category set; (3) exclude mirrored rows
+          unless include-mirrors passed; (4) select rows whose relative identity
+          belongs to the corresponding official split; (5) use a seeded sample
+          only when max-per-split is non-zero and smaller than the selected set.
+        verification_basis: sanitized_inventory_primary_metadata
+      - subfield: seed
+        state: VERIFIED
+        value: 20260811
+        evidence: "inventory.object_benchmark.construction_script.declared_defaults.seed = 20260811"
+      - subfield: constructed_at
+        state: DECLARED
+        evidence: "inventory.object_benchmark.root dir name domain_text_benchmarks_20260811 + script mtime 2026-08-11 10:53:28 +0800"
+        note: "Approximate construction date from directory name and script mtime; not a frozen construction timestamp."
+      - subfield: output_artifact_ref
+        state: VERIFIED
+        value: /home/share/user/zyc/kimodo/eval_work/domain_text_benchmarks_20260811/object_manip/domain_manifest.json
+        evidence: "inventory.object_benchmark.manifest.path"
+      - subfield: output_artifact_sha256
+        state: VERIFIED
+        value: 97d13dcc78016c66396faee8a59a0cd8f126c9552542e2ad94de914d4bf519a3
+        evidence: "inventory.object_benchmark.manifest.sha256"
+      - subfield: construction_invocation_and_input_hashes
+        state: MISSING
+        evidence: "inventory.classification_summary.construction_invocation_and_input_hashes = MISSING"
+        note: >-
+          inventory.reproducibility_limit: 'The generated manifest does not
+          record the invocation, script hash, metadata hash, or source split
+          hashes.' Reproducible-by-script-bytes+seed but NOT invocation-proven.
+
+  # --- evaluation_protocol ---
+  - field: evaluation_protocol
+    state: MISSING
+    note: >-
+      A01 requires this block to equal R004.comparison_protocol byte-for-byte.
+      The inventory confirms paired case-dir COUNTS only (VERIFIED_CASE_COUNTS_ONLY);
+      it does NOT attest ordered case identity, prompt/seed pairing, or the
+      scalar protocol fields (batch / postprocess / precision) for the target
+      run. The frozen R004 requirement exists; conformance of the actual
+      target eval run to it is NOT attested by the inventory.
+    subfields:
+      - subfield: pairing
+        expected: same_cases_same_prompts_same_seeds
+        state: DECLARED
+        evidence: "inventory.paired_evaluation_structure.status = VERIFIED_CASE_COUNTS_ONLY (235/57 case dirs match baseline + candidate)"
+        note: >-
+          Case-directory COUNTS match; ordered case identity and prompt/seed
+          pairing are NOT proven (inventory.limit). paired_run_exact_order_and_metric_aggregation = MISSING.
+      - subfield: generation_batch_size
+        expected: 1
+        state: MISSING
+        evidence: "not attested by the inventory for the target eval run; only the frozen R004.comparison_protocol requirement exists"
+      - subfield: postprocess
+        expected: false
+        state: MISSING
+        evidence: "not attested by the inventory for the target eval run"
+      - subfield: text_encoder_precision
+        expected: fp32
+        state: MISSING
+        evidence: "not attested by the inventory for the target eval run"
+      - subfield: effect_direction
+        expected: positive_is_candidate_better
+        state: VERIFIED
+        evidence: "research/R004/protocol.yaml#evaluation.comparison_protocol.effect_direction (FROZEN)"
+        note: "Frozen in R004; this is the protocol requirement, not an attestation of the target run's behavior."
+    r004_comparison_protocol_ref: research/R004/protocol.yaml#evaluation.comparison_protocol
+    decision_branch: >-
+      Counts match but ordered identity and scalar conformance unattested ->
+      MODIFY (verify needed), not a confirmed deviation.
+
+  # --- leakage_prevention (PRIMARY block; constitution rule 8) ---
+  - field: leakage_prevention
+    state: CONFLICTING
+    note: >-
+      The manifests and their hashes are VERIFIED and the disjointness method
+      is VERIFIED, but BOTH disjointness checks return non-zero intersections:
+      target-train/eval overlap 284 and eval/holdout overlap 292. Per A01's
+      acceptance_rule, ANY non-zero intersection forces MODIFY or REJECT, so
+      the pin is NOT ACCEPT-ready as-is. This is the primary leakage finding.
+    subfields:
+      - subfield: target_train_manifest_ref
+        state: VERIFIED
+        value: /home/share/user/zyc/kimodo_seed_repro_train/work/manifests/cat_object_manip_fp32_20260811_0005.csv
+        evidence: "inventory.target_training_manifest.path"
+      - subfield: target_train_manifest_sha256
+        state: VERIFIED
+        value: 95dcd9c7f1e73d99e5bce10abb6bf94d55f58a17e8eefc7b83fbdfe74597bbd5
+        evidence: "inventory.target_training_manifest.sha256"
+        supplemental:
+          row_count: 5810
+          unique_motion_ids: 5810
+          ordered_unique_motion_id_set_sha256: b5c24c9bbb58be11dde44af6407a10b7997025011d457c8856d5a9a64096fa2c
+      - subfield: target_eval_manifest_ref
+        state: VERIFIED
+        value: /home/share/user/zyc/kimodo/eval_work/domain_text_benchmarks_20260811/object_manip/domain_manifest.json
+        evidence: "inventory.object_benchmark.manifest.path"
+      - subfield: target_eval_manifest_sha256
+        state: VERIFIED
+        value: 97d13dcc78016c66396faee8a59a0cd8f126c9552542e2ad94de914d4bf519a3
+        evidence: "inventory.object_benchmark.manifest.sha256"
+        supplemental:
+          unique_motion_ids: 292
+          ordered_unique_motion_id_set_sha256: 8f60670735432c31e24166b7b8a8f6785c1f50a10e471877d8e68db47d700c1b
+      - subfield: train_eval_disjointness_status
+        state: CONFLICTING
+        value: NOT_DISJOINT
+        evidence: "inventory.disjointness_checks.object_eval_vs_target_train.status = CONFLICTING; intersection_count = 284"
+      - subfield: train_eval_intersection_count
+        state: VERIFIED
+        value: 284
+        evidence: "inventory.disjointness_checks.object_eval_vs_target_train.intersection_count = 284"
+        by_split:
+          content: {object_cases: 235, intersection: 235, non_overlapping: 0}
+          repetition: {object_cases: 57, intersection: 49, non_overlapping: 8}
+        overlap_ratio: 0.972603
+        requirement: "A01 acceptance_rule requires train_eval_intersection_count == 0; 284 > 0 -> FAILS"
+      - subfield: train_eval_disjointness_method
+        state: VERIFIED
+        value: "Exact equality of motion_id / seed_motion.move_name; no fuzzy matching"
+        evidence: "inventory.disjointness_checks.identity_basis"
+      - subfield: train_eval_disjointness_owner
+        state: VERIFIED
+        value: "A02 (C01-S2) via sanitized inventory collected by codex-primary within approved roots"
+      - subfield: holdout_disjointness_status
+        state: CONFLICTING
+        value: NOT_DISJOINT
+        evidence: "inventory.disjointness_checks.object_eval_vs_full_holdout.status = CONFLICTING; intersection_count = 292"
+      - subfield: holdout_intersection_count
+        state: VERIFIED
+        value: 292
+        evidence: "inventory.disjointness_checks.object_eval_vs_full_holdout.intersection_count = 292"
+        implication: "Object eval (292) is an EXACT SUBSET of the full 6938-case holdout; object_only_count = 0"
+        requirement: "A01 acceptance_rule requires holdout_intersection_count == 0; 292 > 0 -> FAILS"
+      - subfield: holdout_disjointness_method
+        state: VERIFIED
+        value: "Exact equality of motion_id / seed_motion.move_name against full holdout manifest"
+        evidence: "inventory.disjointness_checks.identity_basis; inventory.full_holdout_manifest.ordered_unique_motion_id_set_sha256 = bc4d0655..."
+      - subfield: holdout_disjointness_owner
+        state: VERIFIED
+        value: "A02 (C01-S2) via sanitized inventory; set membership only, NO holdout metrics inspected"
+      - subfield: prompt_reuse_check
+        state: DECLARED
+        evidence: "inventory.paired_evaluation_structure (baseline + candidate + 2 ablations each 235/57 case dirs)"
+        note: >-
+          A01 requires this to confirm paired evaluation (same cases / prompts /
+          seeds for baseline and candidate). The inventory confirms case-dir
+          COUNTS only, not prompt-level reuse or ordered identity. Recorded as
+          C01-RISK-08.
+
+  # --- freeze (populate-at-revise; NOT A02's to set) ---
+  - field: freeze
+    state: NOT_APPLICABLE_AT_C01_S2
+    note: >-
+      A01's schema states snapshot_path is created at revise time, NOT by A01
+      here, and reviewer must be hf. A02 does NOT set frozen_at / reviewer /
+      spec_sha256 / snapshot_path. These are populated when hf accepts at
+      C01-H1 and A01 records the pin via research-revise. A02 explicitly does
+      NOT freeze anything.
+
+# ===========================================================================
+# 5. DISJOINTNESS REVIEW  (acceptance criterion 3)
+# ===========================================================================
+disjointness_review:
+  question: "Can target training and target evaluation manifests be shown disjoint?"
+  answer: "NO"
+  answer_state: REFUTED_BY_PRIMARY_EVIDENCE
+  identity_basis: "Exact equality of motion_id / seed_motion.move_name; no fuzzy matching (VERIFIED)"
+  comparisons:
+    - comparison: object_eval_vs_target_train
+      object_eval_manifest: .../object_manip/domain_manifest.json (sha256 97d13dcc..., 292 ids, ordered set 8f606707...)
+      target_train_manifest: .../work/manifests/cat_object_manip_fp32_20260811_0005.csv (sha256 95dcd9c7..., 5810 ids, ordered set b5c24c9b...)
+      status: CONFLICTING
+      intersection_count: 284
+      object_eval_overlap_ratio: 0.972603
+      by_split:
+        content: {object_cases: 235, intersection: 235, non_overlapping: 0}
+        repetition: {object_cases: 57, intersection: 49, non_overlapping: 8}
+      implication: >-
+        284 of 292 Object eval cases (97.26%) appear in the target training
+        manifest. The candidate abl_object_lr1e7_s3000_20260811 was finetuned on
+        Object training data (per source summary + A01 INF-2); if
+        cat_object_manip_fp32_20260811_0005.csv is that training set, target
+        eval is NOT independent of training -> target_success would be inflated
+        by train-on-eval leakage (constitution rule 8).
+      linkage_caveat: >-
+        The disjointness is computed against cat_object_manip_fp32_20260811_0005.csv,
+        which is DECLARED-as-the-candidate's-training-manifest by naming
+        convention and source summary. The 284 overlap is a primary-verified
+        count; the CLAIM that this manifest trained the candidate is DECLARED,
+        not VERIFIED by A02 (recorded as C01-RISK-09; owner A03/A04 to confirm
+        the manifest actually trained abl_object_lr1e7_s3000_20260811).
+    - comparison: object_eval_vs_full_holdout
+      object_eval_manifest: .../object_manip/domain_manifest.json (292 ids)
+      full_holdout_manifest: .../seed_text_test_full_20260813/domain_manifest.json (sha256 479f2843..., 6938 ids, ordered set bc4d0655...)
+      status: CONFLICTING
+      intersection_count: 292
+      object_only_count: 0
+      implication: >-
+        The Object eval (292) is an EXACT SUBSET of the full 6938-case holdout
+        by motion identity. Target-domain evidence and SEED-test holdout
+        non-regression evidence are NOT independent (shared cases). Set
+        membership only; NO holdout metrics were inspected.
+    - comparison: target_train_vs_full_holdout
+      target_train_manifest: .../cat_object_manip_fp32_20260811_0005.csv (5810 ids)
+      full_holdout_manifest: .../seed_text_test_full_20260813/domain_manifest.json (6938 ids)
+      status: CONFLICTING
+      intersection_count: 284
+      target_train_overlap_ratio: 0.048881
+      holdout_overlap_ratio: 0.040934
+      implication: >-
+        The target training manifest overlaps the frozen full holdout by 284
+        cases; the overlap is concentrated in the Object benchmark except eight
+        Object repetition cases absent from training. This is additional
+        contamination surface beyond the eval/holdout subset finding.
+  verdict: >-
+    Target training and target evaluation manifests CANNOT be shown disjoint:
+    284 of 292 Object eval cases appear in the target training manifest. The
+    Object eval is also an exact subset of the SEED-test holdout (292/292).
+    Both leakage_prevention requirements (train_eval_intersection 0 and
+    holdout_intersection 0) FAIL against the existing constructed benchmark.
+    This resolves C01-RISK-02 and C01-RISK-03 from UNKNOWN to CONFIRMED.
+
+# ===========================================================================
+# 6. ANSWERS TO A01 EVIDENCE REQUEST (Q1-Q7)
+# ===========================================================================
+answers_to_A01_questions:
+  - id: Q1-construction-identity
+    answer: >-
+      build_domain_text_benchmark.py EXISTS in the approved root
+      kimodo_seed_repro_train (script_ref VERIFIED; script_sha256
+      18a602dd... VERIFIED). It constructs Object-Manipulation Content 235 /
+      Repetition 57 (total 292). script_commit_sha is MISSING
+      (MISSING_NOT_A_GIT_REPOSITORY; the construction root is not a git repo).
+    schema_fields:
+      construction.script_ref: VERIFIED
+      construction.script_sha256: VERIFIED
+      construction.script_commit_sha: MISSING
+    decision_branch_moved: >-
+      Present + hashed -> ALT-A viable on identity+counts; commit MISSING and
+      (separately) leakage failure prevent ACCEPT-as-is.
+  - id: Q2-split-counts
+    answer: "Content = 235, Repetition = 57, total = 292, unique_motion_ids = 292 (all VERIFIED)."
+    schema_fields:
+      splits.Content.case_count: VERIFIED
+      splits.Repetition.case_count: VERIFIED
+    decision_branch_moved: "Frozen integers greater than 0 -> counts satisfy the ACCEPT path on counts alone."
+  - id: Q3-manifests-hashes
+    answer: >-
+      Combined manifest .../object_manip/domain_manifest.json, sha256
+      97d13dcc... (VERIFIED), ordered_unique_motion_id_set_sha256
+      8f606707... (VERIFIED). Per-split SEPARATE manifest artifacts are MISSING
+      (one combined manifest serves both splits). Manifest + hash ARE present,
+      so disjointness COULD be (and was) computed.
+    schema_fields:
+      splits.Content.manifest_ref: VERIFIED (combined)
+      splits.Content.manifest_sha256: VERIFIED (combined)
+      splits.Repetition.manifest_ref: VERIFIED (combined)
+      splits.Repetition.manifest_sha256: VERIFIED (combined)
+      per_split_separate_manifests: MISSING
+    decision_branch_moved: >-
+      Manifest+hash present -> disjointness computable -> result is overlap ->
+      MODIFY (ALT-B) or REJECT (ALT-C).
+  - id: Q4-target-train-disjointness
+    answer: >-
+      NOT disjoint. target_train manifest
+      cat_object_manip_fp32_20260811_0005.csv (sha256 95dcd9c7..., 5810 ids).
+      target_eval manifest .../object_manip/domain_manifest.json (sha256
+      97d13dcc..., 292 ids). Intersection (exact motion_id equality) = 284
+      (Content 235/235, Repetition 49/57; 8 non-overlapping repetition cases).
+      train_eval_disjointness_status = CONFLICTING; intersection_count = 284.
+      THIS IS THE PRIMARY LEAKAGE QUESTION: status upgraded from UNKNOWN to
+      CONFIRMED. C01-RISK-02 RESOLVED to CONFIRMED.
+    schema_fields:
+      leakage_prevention.target_train_manifest_ref: VERIFIED
+      leakage_prevention.target_train_manifest_sha256: VERIFIED
+      leakage_prevention.train_eval_disjointness_status: CONFLICTING
+      leakage_prevention.train_eval_intersection_count: VERIFIED (value 284, fails the 0 requirement)
+      leakage_prevention.train_eval_disjointness_method: VERIFIED
+      leakage_prevention.train_eval_disjointness_owner: VERIFIED (A02 C01-S2)
+    decision_branch_moved: >-
+      intersection_count 284 > 0 -> REJECT (ALT-C) or MODIFY to remove overlap
+      (ALT-B). ALT-A as-is is NOT viable.
+  - id: Q5-holdout-disjointness
+    answer: >-
+      NOT disjoint. Object eval (292) vs full holdout
+      seed_text_test_full_20260813/domain_manifest.json (sha256 479f2843...,
+      6938 ids, ordered set bc4d0655...). Intersection = 292; object_only_count
+      = 0; the Object eval is an EXACT SUBSET of the full holdout.
+      holdout_disjointness_status = CONFLICTING; holdout_intersection_count =
+      292. Set membership only; NO holdout metrics inspected. C01-RISK-03
+      RESOLVED to CONFIRMED contamination.
+    schema_fields:
+      leakage_prevention.holdout_disjointness_status: CONFLICTING
+      leakage_prevention.holdout_intersection_count: VERIFIED (value 292, fails the 0 requirement)
+      leakage_prevention.holdout_disjointness_method: VERIFIED
+      leakage_prevention.holdout_disjointness_owner: VERIFIED (A02 C01-S2)
+    decision_branch_moved: "Overlap with holdout -> MODIFY / REJECT (contamination)."
+  - id: Q6-paired-evaluation
+    answer: >-
+      paired_evaluation_structure: baseline, candidate
+      (abl_object_lr1e7_s3000_20260811), and two ablations each have 235 content
+      + 57 repetition case_dirs -> VERIFIED_CASE_COUNTS_ONLY. Pairing
+      (same_cases_same_prompts_same_seeds) is DECLARED (counts match; ordered
+      identity NOT proven). generation_batch_size, postprocess, and
+      text_encoder_precision for the target run are MISSING (not attested by
+      the inventory; only the frozen R004.comparison_protocol requirement
+      exists). paired_run_exact_order_and_metric_aggregation = MISSING.
+    schema_fields:
+      evaluation_protocol.pairing: DECLARED
+      evaluation_protocol.generation_batch_size: MISSING
+      evaluation_protocol.postprocess: MISSING
+      evaluation_protocol.text_encoder_precision: MISSING
+      evaluation_protocol.effect_direction: VERIFIED (frozen R004 requirement)
+    decision_branch_moved: "Counts match but order/protocol conformance unattested -> MODIFY (verify needed)."
+  - id: Q7-reproducibility
+    answer: >-
+      Reproducible-by-script-bytes+seed: script_sha256 VERIFIED, seed 20260811
+      VERIFIED, selection_criteria VERIFIED (5-step rule). NOT
+      commit-addressed (script_commit_sha MISSING; non-git root). NOT
+      invocation-proven (construction_invocation_and_input_hashes MISSING; the
+      manifest does not record its own construction). source_dataset version
+      DECLARED (no frozen hash).
+    schema_fields:
+      construction.source_dataset: DECLARED
+      construction.selection_criteria: VERIFIED
+      construction.seed: VERIFIED
+      construction.output_artifact_ref: VERIFIED
+      construction.output_artifact_sha256: VERIFIED
+      construction.script_commit_sha: MISSING
+      construction.construction_invocation_and_input_hashes: MISSING
+    decision_branch_moved: >-
+      Partially reproducible (by hash + seed) but not commit-pinned and not
+      invocation-proven -> MODIFY (pin explicitly by hash+seed, accept
+      no-commit) or REJECT if hf requires commit-pinned construction.
+
+# ===========================================================================
+# 7. VIABLE CANDIDATE IDENTITY + ALTERNATIVES  (acceptance criterion 4)
+#    A02 produces evidence and viable candidate identities ONLY. A02 does NOT
+#    choose the benchmark for hf and does NOT select among ALT-A/B/C.
+# ===========================================================================
+viable_candidate_identity:
+  description: >-
+    The single Object target-domain benchmark identity recovered from primary
+    metadata. Produced as EVIDENCE for hf, NOT as a selection. Its
+    leakage_prevention block FAILS as-is (see disjointness_review).
+  benchmark_id_proposed: object-manip-target-text2motion
+  domain: Object Manipulation
+  role: target
+  root: /home/share/user/zyc/kimodo/eval_work/domain_text_benchmarks_20260811/object_manip
+  manifest_ref: /home/share/user/zyc/kimodo/eval_work/domain_text_benchmarks_20260811/object_manip/domain_manifest.json
+  manifest_sha256: 97d13dcc78016c66396faee8a59a0cd8f126c9552542e2ad94de914d4bf519a3
+  ordered_unique_motion_id_set_sha256: 8f60670735432c31e24166b7b8a8f6785c1f50a10e471877d8e68db47d700c1b
+  splits:
+    Content: {case_count: 235, manifest_ref: combined, manifest_sha256: 97d13dcc...}
+    Repetition: {case_count: 57, manifest_ref: combined, manifest_sha256: 97d13dcc...}
+    total: 292
+  construction:
+    script_ref: /home/share/user/zyc/kimodo_seed_repro_train/work/codex_pipeline/build_domain_text_benchmark.py
+    script_sha256: 18a602ddf4922f42dad03a2478a9ac731607663d54460dee1472210e393d88f3
+    script_commit_sha: MISSING_NOT_A_GIT_REPOSITORY
+    seed: 20260811
+  baseline: nvidia/Kimodo-SOMA-RP-v1.1
+  candidate: abl_object_lr1e7_s3000_20260811
+  accept_ready: false
+  accept_ready_reason: >-
+    leakage_prevention FAILS as-is (train_eval_intersection 284 > 0;
+    holdout_intersection 292 > 0) and construction.script_commit_sha is MISSING.
+    Per A01 acceptance_rule, any non-zero intersection or MISSING field forces
+    MODIFY or REJECT.
+
+alternatives_viability:
+  note: >-
+    A02 states which alternatives remain viable given the evidence. This is NOT
+    a selection. A01 synthesizes and recommends at C01-S3; hf decides at
+    C01-H1.
+  ALT-A_pin_as_is:
+    viable_as_is: false
+    reason: >-
+      Fails leakage_prevention (train_eval 284, holdout 292) and
+      construction.script_commit_sha MISSING. A01 acceptance_rule forces
+      MODIFY/REJECT on any non-zero intersection. ALT-A would require a MODIFY
+      that removes the overlap before it could become ACCEPT-ready.
+  ALT-B_reconstruct_disjoint:
+    viable: true
+    reason: >-
+      A new benchmark CONSTRUCTION run (set assembly only; NO GPU training, NO
+      final holdout, within the C01 cycle constraints) could produce an Object
+      eval that excludes the 284 train-overlapping cases (or a target-train
+      that excludes the 292 eval cases) AND has zero holdout overlap. Counts
+      would change (e.g., restricting Object eval Repetition to non-train
+      cases leaves 8; or the target-train set must drop 284). This is hf's
+      MODIFY decision. No frozen threshold, count, or comparison-protocol
+      field changes.
+    requires_new_construction_run: true
+    requires_gpu: false
+    requires_final_holdout: false
+  ALT-C_reject_or_escalate:
+    viable: true
+    reason: >-
+      The leakage is confirmed and large (97.26% train overlap; 100% holdout
+      subset). If hf judges it irreparable without re-running training (GPU,
+      forbidden in C01), REJECT applies. The script_commit_sha gap and the
+      candidate-to-training-manifest DECLARED linkage (C01-RISK-09) also
+      support escalation if hf requires commit-pinned, fully-verified
+      construction before pinning. REJECT blocks target_Content_PASS /
+      target_Repetition_PASS evaluation, which blocks final adoption at
+      Human Gate 2.
+  a02_selection: NONE
+  a02_selection_note: >-
+    A02 explicitly does NOT choose among ALT-A/B/C. A02 supplies evidence that
+    ALT-A is not viable as-is and that ALT-B and ALT-C remain viable. Selection
+    is hf's at C01-H1, after A01 synthesizes at C01-S3.
+
+# ===========================================================================
+# 8. OPEN RISKS  (A02 C01-S2; resolves / upgrades / opens)
+# ===========================================================================
+open_risks:
+  - id: C01-RISK-02
+    severity: high
+    prior_state: UNKNOWN
+    new_state: CONFIRMED
+    statement: >-
+      Target-train leakage CONFIRMED: 284 of 292 Object eval cases (97.26%)
+      appear in the target training manifest cat_object_manip_fp32_20260811_0005.csv.
+      target_success would be inflated by train-on-eval overlap (constitution rule 8).
+    owner: hf (C01-H1)
+    mitigation: "MODIFY (ALT-B reconstruct disjoint) or REJECT (ALT-C)."
+  - id: C01-RISK-03
+    severity: high
+    prior_state: UNKNOWN
+    new_state: CONFIRMED
+    statement: >-
+      Holdout contamination CONFIRMED: the Object eval (292) is an exact subset
+      of the SEED-test full holdout (6938). Target-domain evidence and holdout
+      non-regression are NOT independent.
+    owner: hf (C01-H1)
+    mitigation: "MODIFY (ALT-B) or REJECT (ALT-C)."
+  - id: C01-RISK-06
+    severity: medium
+    prior_state: NEW
+    statement: >-
+      Transport warning observed during inventory collection (SSH bad RSA
+      signature). All reads succeeded, but the warning is a residual provenance
+      risk that must not be silently promoted away.
+    owner: hf / orchestrator (re-collect or attest)
+    mitigation: "Re-collect the inventory over a clean transport, or hf attests the warning is benign."
+  - id: C01-RISK-07
+    severity: medium
+    prior_state: NEW
+    statement: >-
+      construction.script_commit_sha MISSING: the construction root
+      kimodo_seed_repro_train is not a git repository. Construction is
+      hash-addressable (script_sha256 VERIFIED) but NOT commit-addressed.
+    owner: hf (C01-H1)
+    mitigation: >-
+      Accept hash-addressed construction (pin by script_sha256 + seed), or
+      require commit-pinning (forces ALT-C or a git-backed reconstruction).
+  - id: C01-RISK-08
+    severity: medium
+    prior_state: NEW
+    statement: >-
+      Paired ordered identity + metric aggregation MISSING; evaluation_protocol
+      scalar conformance (batch 1 / postprocess false / fp32) not attested for
+      the target run. Case-dir counts match only.
+    owner: A05 / A01 (C01-S3 synthesis)
+    mitigation: "Verify ordered case identity and protocol conformance before ACCEPT; otherwise MODIFY."
+  - id: C01-RISK-09
+    severity: medium
+    prior_state: NEW
+    statement: >-
+      The 284-case leakage is computed against
+      cat_object_manip_fp32_20260811_0005.csv, which is DECLARED-as-the-candidate's-
+      training-manifest by naming convention + source summary, not VERIFIED by
+      A02.
+    owner: A03 / A04 (confirm the manifest actually trained abl_object_lr1e7_s3000_20260811)
+    mitigation: "Confirm the training-manifest-to-candidate linkage; if confirmed, the 284 leakage stands."
+  - id: C01-RISK-10
+    severity: low
+    prior_state: NEW
+    statement: >-
+      Per-split SEPARATE manifest artifacts MISSING; one combined manifest
+      serves both splits. Per-case split-label encoding not independently
+      inspected by A02 (inventory gives counts, not column schema).
+    owner: A05
+    mitigation: "Inspect the combined manifest's per-case split label before ACCEPT; or produce per-split manifests."
+  - id: C01-RISK-04
+    severity: resolved-to-partial
+    prior_state: medium
+    new_state: PARTIALLY_RESOLVED
+    statement: >-
+      Prior C01-RISK-04 (construction script DECLARED, work/ absent) is
+      partially resolved: the script is now VERIFIED present + hashed via the
+      sanitized inventory. The commit sub-gap remains (folded into C01-RISK-07).
+
+# ===========================================================================
+# 9. DATA BOUNDARY REVIEW  (folded here; data-boundary-review.yaml is NOT in
+#    this run's allowed_output_refs. Preserves the role-profile requirement
+#    without writing outside allowed paths, as in the prior A02 run.)
+# ===========================================================================
+data_boundary_review:
+  scope_note: >-
+    Role profile lists data-boundary-review.yaml as a required output, but
+    this run's task-envelope allowed_output_refs list only
+    C01-object-benchmark-provenance.yaml and the C01-A02-to-A01 handoff. The
+    review is recorded here to preserve the boundary requirement without
+    writing outside allowed paths.
+  source: "human-gate-1 resource_and_data_boundary + inventory.approved_remote_scope"
+  boundaries:
+    approved_host: lintrain
+    approved_gpu_count: 2
+    approved_remote_roots:
+      - /home/share/user/zyc/kimodo
+      - /home/share/user/zyc/kimodo_seed_repro_train
+    private_data_allowed: false
+    raw_credentials_in_transcript: false
+    external_artifact_upload: false
+  a02_compliance:
+    private_data_accessed: false
+    credentials_in_outputs: false
+    external_upload_performed: false
+    remote_access_performed_by_a02: false
+    remote_access_note: >-
+      A02 consumed a sanitized read-only inventory collected by codex-primary
+      within the approved roots. A02 performed no remote access itself.
+    final_holdout_results_accessed: false
+    final_holdout_note: >-
+      Disjointness used set membership (motion_id intersection counts) only;
+      NO holdout metric values were inspected. The inventory sanitization block
+      confirms raw_final_metrics_included = false.
+    gpu_training_started: false
+    bash_used: false
+    bash_note: "Bash is unavailable in this context; A02 used Read/Glob/Grep only."
+    repository_wide_discovery_performed: false
+    operated_within_allowed_paths: true
+    allowed_paths_used:
+      - simulation/pilot-20260813/outputs/A01/C01-benchmark-decision-framing.yaml
+      - simulation/pilot-20260813/evidence/remote-object-benchmark-inventory.yaml
+      - simulation/pilot-20260813/outputs/A02/provenance-report.yaml
+      - simulation/pilot-20260813/outputs/A02/missing-evidence-register.yaml
+      - research/R004/protocol.yaml
+      - simulation/pilot-20260813/collaboration/ledger.yaml
+      - simulation/pilot-20260813/decisions/human-gate-1.yaml
+      - simulation/pilot-20260813/handoffs/C01-A01-to-A02.yaml
+      - simulation/pilot-20260813/handoffs/handoff-template.yaml
+    paths_not_accessed:
+      - "approved remote roots directly (A02 performed no remote access; consumed sanitized inventory only)"
+      - "GPU / training / final holdout execution (forbidden by C01 cycle)"
+  verdict: >-
+    All boundaries preserved. A02 accessed no remote roots, no final holdout
+    metrics, no private data, no credentials; performed no GPU training; used no
+    Bash; performed no repository-wide discovery. A02 consumed only a sanitized
+    read-only inventory collected within the approved roots.
+
+# ===========================================================================
+# 10. MISSING-EVIDENCE DELTA  (folded here; missing-evidence-register.yaml is
+#     NOT in this run's allowed_output_refs. Summarizes items still missing
+#     for the Object benchmark pin, vs the prior A02 register.)
+# ===========================================================================
+missing_evidence_delta:
+  scope_note: >-
+    Prior A02 missing-evidence-register.yaml (P01-A02) lists 11 items. This
+    section records the C01-S2 delta: what the sanitized inventory RESOLVED
+    vs the prior register, and what remains MISSING for the Object benchmark
+    pin. Full register unchanged on disk (outside this run's allowed outputs).
+  resolved_by_inventory:
+    - "Object benchmark manifest path + sha256 (was MISSING-TRAINING-MANIFESTS / MISSING-SEED-DATASET-AND-SPLITS for the eval side)"
+    - "Object benchmark case counts (Content 235 / Repetition 57 / total 292)"
+    - "Construction script path + sha256 + size + line_count + mtime (was MISSING-SCRIPT-CONTENT-HASHES for SCRIPT-DOMAIN-BENCHMARK)"
+    - "Target training manifest path + sha256 + row_count + ordered motion-id set hash"
+    - "Full holdout manifest path + sha256 + counts + ordered motion-id set hash (metadata only; results remain forbidden)"
+    - "Disjointness computations (object_eval vs target_train; object_eval vs full_holdout; target_train vs full_holdout)"
+  still_missing_for_pin:
+    - "construction.script_commit_sha (non-git root)"
+    - "construction.construction_invocation_and_input_hashes"
+    - "per-split SEPARATE manifest artifacts (one combined manifest serves both splits)"
+    - "evaluation_protocol scalar conformance for the target run (batch / postprocess / fp32)"
+    - "paired_run_exact_order_and_metric_aggregation (ordered identity, prompt/seed pairing)"
+    - "construction.source_dataset frozen version/hash"
+    - "candidate-to-training-manifest linkage VERIFICATION (DECLARED by naming + source summary)"
+  out_of_scope_confirmed:
+    - "final holdout metric values (forbidden; set membership only)"
+
+# ===========================================================================
+# 11. PROTOCOL DEVIATIONS
+# ===========================================================================
+protocol_deviations:
+  - item: "No R004 Protocol field was modified. (forbidden_action respected)"
+  - item: "No benchmark was selected on behalf of hf. (forbidden_action respected; a02_selection = NONE)"
+  - item: "No final holdout metric was inspected; set membership only. (forbidden_action respected)"
+  - item: "No path outside the approved remote roots was accessed by A02 or by the inventory A02 consumed. (forbidden_action respected)"
+  - item: "No GPU training and no final holdout start. (C01 cycle + task envelope respected)"
+  - item: "No Bash and no repository-wide discovery. (Bash unavailable; A02 used Read/Glob/Grep only)"
+
+# ===========================================================================
+# 12. FORBIDDEN-ACTION COMPLIANCE
+# ===========================================================================
+forbidden_action_compliance:
+  access_paths_outside_approved_roots: NOT_PERFORMED
+  expose_credentials_private_data_or_raw_holdout_metrics: NOT_PERFORMED
+  edit_R004: NOT_PERFORMED
+  choose_final_benchmark: NOT_PERFORMED
+  promote_names_or_prose_to_verified_without_primary_evidence: NOT_PERFORMED
+  promotion_note: >-
+    Only computed digests, counts, intersections, and frozen-R004 identity
+    matches were promoted to VERIFIED, each with disclosed provenance
+    (sanitized inventory / frozen R004) and residual risks. Names, prose,
+    canonical id strings, and approximate timestamps remain DECLARED.
+  operated_within_allowed_paths: true
+
+# ===========================================================================
+# 13. ACCEPTANCE-CRITERIA SELF-CHECK
+# ===========================================================================
+acceptance_criteria_self_check:
+  - criterion: "Cite the exact upstream A01 commit and output ref consumed."
+    status: MET
+    where: "section 0 upstream_A01_consumed (commit c5106bdc96aad9c4a8941275c91b821f9b8e2530; output_ref .../outputs/A01/C01-benchmark-decision-framing.yaml)"
+  - criterion: "Classify each requested pin field as VERIFIED, DECLARED, MISSING, or CONFLICTING."
+    status: MET
+    where: "section 4 benchmark_pin_classification (every benchmark_pin_schema field + subfield classified; NOT_APPLICABLE_AT_C01_S2 used only for the populate-at-revise freeze block)"
+  - criterion: "Check whether target training and target evaluation manifests can be shown disjoint."
+    status: MET
+    where: "section 5 disjointness_review (answer NO; REFUTED_BY_PRIMARY_EVIDENCE; intersection 284)"
+  - criterion: "Produce only evidence and viable candidate identities; do not choose for hf."
+    status: MET
+    where: "section 7 viable_candidate_identity + alternatives_viability (a02_selection = NONE; ALT-A not viable as-is; ALT-B/ALT-C viable; hf decides at C01-H1)"
+
+# ===========================================================================
+# 14. HANDOFF POINTER
+# ===========================================================================
+handoff:
+  to_agent: A01
+  handoff_path: simulation/pilot-20260813/handoffs/C01-A02-to-A01.yaml
+  cycle_step: C01-S2 -> C01-S3
+  next_action_for_A01: >-
+    Run C01-S3: synthesize ALT-A / ALT-B / ALT-C against A02's C01-S2 evidence
+    (ALT-A NOT viable as-is; ALT-B and ALT-C viable), produce a non-binding
+    recommendation, and hand to hf for C01-H1. Change NO frozen threshold, count,
+    or comparison-protocol field. Do NOT select the benchmark; that is hf's at
+    C01-H1. Record the pin (if hf ACCEPTs/MODIFYs) via research-revise AFTER
+    C01-H1, adding only an R004.inputs entry + benchmark snapshot.
+  forbidden_for_A01_at_C01_S3:
+    - do not select the benchmark for hf
+    - do not modify any frozen R004 evaluation rule
+    - do not inspect final holdout metrics
+  key_finding_for_A01: >-
+    C01-RISK-02 and C01-RISK-03 are CONFIRMED (not UNKNOWN): the Object eval
+    overlaps the target training manifest by 284/292 (97.26%) and is an exact
+    subset of the SEED-test holdout (292/292). ALT-A is NOT viable as-is; the
+    ACCEPT path requires MODIFY (ALT-B reconstruct disjoint) or REJECT (ALT-C).

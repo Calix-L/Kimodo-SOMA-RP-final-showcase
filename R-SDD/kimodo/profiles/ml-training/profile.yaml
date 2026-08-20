@@ -1,0 +1,22 @@
+schema_version: "1.0"
+id: ml-training
+name: Machine Learning Training
+description: Develop or adapt an ML model with versioned data, code, environment, and evaluation.
+required_fields:
+  research:
+    - scope.in
+    - scope.out
+  protocol:
+    - inputs
+    - method
+    - artifacts
+    - risks
+  experiment:
+    - run.code_ref
+    - run.environment
+    - evidence.metrics
+    - evidence.artifacts
+additional_gates:
+  - data-boundary-review
+  - baseline-or-reference-frozen
+  - evaluation-contract-frozen

@@ -1,0 +1,141 @@
+schema_version: '1.0'
+research_id: R004
+status: FROZEN
+owner: A01
+created_at: '2026-08-13T07:53:16+00:00'
+updated_at: '2026-08-13T08:21:58+00:00'
+inputs:
+- baseline:nvidia/Kimodo-SOMA-RP-v1.1
+- candidate:abl_object_lr1e7_s3000_20260811
+- benchmark:SEED-test-Content-3510
+- benchmark:SEED-test-Repetition-3428
+- remote-output:/home/share/user/zyc/kimodo/eval_work/seed_text_test_full_eval_20260813
+- simulation/pilot-20260813/decisions/human-gate-1.yaml
+method: After Human Gate 1 freezes numerical target, non-regression, aggregation,
+  and foot-skate rules, A04 completes or collects the holdout run without interpreting
+  success. A05 independently verifies sample counts and recomputes the gate table.
+  A06 receives only shared records and artifacts, performs cold-start recovery and
+  a low-cost reproduction or metric recomputation, then proposes validity, assessment,
+  and decision. Human Gate 2 owns the final decision.
+tasks:
+- Human Gate 1 resolves every blocking threshold before READY.
+- A04 registers baseline and candidate holdout artifacts as LIVE evidence.
+- A05 independently verifies splits, metric aggregation, deltas, and gate outcomes.
+- A06 performs cold-start recovery without A04 private transcript and submits a Review
+  Proposal.
+- A01 records disagreements, AI recommendations, risks, and the human response.
+- Human Gate 2 inspects primary evidence and records the final decision.
+outputs:
+- simulation/pilot-20260813/outputs/R004/holdout-run-card.yaml
+- simulation/pilot-20260813/outputs/R004/independent-gate-table.yaml
+- simulation/pilot-20260813/outputs/R004/cold-start-review.yaml
+- simulation/pilot-20260813/decisions/human-gate-2.yaml
+- reports/R004.md
+evaluation:
+  criteria:
+  - Baseline and candidate are evaluated on SEED Content 3510 and Repetition 3428
+    under one frozen contract
+  - A06 can recover and independently check the result without A04 private conversation
+  - Human Gate 2 records the final decision and rationale from primary evidence
+  comparison_protocol:
+    pairing: same_cases_same_prompts_same_seeds
+    generation_batch_size: 1
+    postprocess: false
+    text_encoder_precision: fp32
+    effect_direction: positive_is_candidate_better
+    bootstrap:
+      paired: true
+      iterations: 2000
+      confidence: one_sided_95_percent
+      pass_condition: lower_confidence_bound_greater_than_or_equal_to_negative_margin
+  target_success:
+    required_splits:
+    - Content
+    - Repetition
+    minimum_improved_primary_metrics_per_split: 2
+    thresholds:
+      TMR_R_at_3_improvement_pp: 1.0
+      TMR_t2m_similarity_improvement_abs: 0.005
+      TMR_FID_gen_text_relative_reduction: 0.05
+    one_required_metric:
+    - TMR_R_at_3
+    - TMR_FID_gen_text
+    all_other_primary_metrics_must_pass_non_regression: true
+    foot_skate_gate_must_pass: true
+  non_regression:
+    TMR_R_at_3_max_drop_pp: 1.0
+    TMR_t2m_similarity_max_drop_abs: 0.005
+    TMR_FID_gen_text_max_increase_abs: 0.005
+    TMR_FID_gen_text_max_increase_relative: 0.1
+    foot_contact_consistency_max_drop_abs: 0.005
+  foot_skate:
+    foot_skate_from_height_max_increase_mps: 0.002
+    foot_skate_from_height_max_relative_increase: 0.05
+    foot_skate_ratio_max_increase_abs: 0.01
+    foot_contact_consistency_max_drop_abs: 0.005
+    predicted_contact_metric_usable_only_if_contact_consistency_drop_max: 0.005
+    foot_skate_max_vel_warning_relative_increase: 0.1
+    foot_skate_max_vel_hard_fail_relative_increase: 0.2
+    qualitative_review:
+      sample_count: 50
+      selection_frozen_before_review: true
+      blind_randomized_AB: true
+      reviewer_count: 2
+      third_reviewer_on_disagreement: true
+      major_defect_rate_max_increase_pp: 5
+  aggregation:
+    content_and_repetition_must_pass_separately: true
+    cross_split_compensation: false
+    macro_average_for_display_only: true
+    macro_weights:
+      Content: 0.5
+      Repetition: 0.5
+    macro_average_can_determine_pass: false
+    missing_or_invalid_metric: INCONCLUSIVE
+  metric_priority:
+    hard:
+    - TMR/t2m_R/R03
+    - TMR/t2m_sim
+    - TMR/FID/gen_text
+    - foot_skate_from_height
+    - foot_skate_ratio
+    - foot_contact_consistency
+    diagnostic:
+    - TMR/t2m_R/R01
+    - TMR/t2m_R/R05
+    - TMR/t2m_R/MedR
+    - foot_skate_from_pred_contacts
+    - foot_skate_max_vel
+  final_adopt_rule:
+    all_required:
+    - target_Content_PASS
+    - target_Repetition_PASS
+    - holdout_Content_PASS
+    - holdout_Repetition_PASS
+    - foot_skate_PASS
+    - A06_independent_reproduction_VALID
+    - human_gate_2_APPROVED
+artifacts:
+- work/codex_pipeline/build_seed_text_test_benchmark.py
+- work/codex_pipeline/run_seed_full_text_holdout_eval.sh
+- work/codex_pipeline/generate_phase1_current_summary.py
+risks:
+- Full holdout results may be incomplete, corrupted, or non-comparable.
+- Cold-start reproduction may be blocked by missing environment or remote access.
+- Approver hf is uncertain whether final holdout results were visible before threshold
+  approval; treat this as a retrospective acceptance policy, not a preregistration.
+collaboration:
+  owner_agent: A04
+  coordinator_agent: A01
+  evaluator_agent: A05
+  reviewer_agent: A06
+  ready_human_gate: human-gate-1
+  decision_human_gate: human-gate-2
+ready_review:
+  reviewer: hf
+  approved_at: '2026-08-13T08:21:58+00:00'
+freeze:
+  frozen_at: '2026-08-13T08:21:58+00:00'
+  reviewer: hf
+  sha256: 1f911559b69c5a7d3b68cf269c746c76ad1384f96a23963d533560eb83e8f0e5
+  snapshot: .specify/rsdd/protocols/R004/1f911559b69c5a7d3b68cf269c746c76ad1384f96a23963d533560eb83e8f0e5.yaml

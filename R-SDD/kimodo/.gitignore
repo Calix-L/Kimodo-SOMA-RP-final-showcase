@@ -1,0 +1,10 @@
+.DS_Store
+__pycache__/
+*.pyc
+.worktrees/
+simulation/*/transcripts/raw/
+simulation/*/audit/raw/
+secrets/
+artifacts/
+*.key
+*.pem

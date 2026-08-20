@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spec-kit.dev/rsdd/experiment.schema.json",
+  "title": "R-SDD Experiment Record",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "id",
+    "research_id",
+    "status",
+    "owner",
+    "protocol",
+    "run",
+    "evidence",
+    "review",
+    "handoff"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^E[0-9]{3,}$"
+    },
+    "research_id": {
+      "type": "string",
+      "pattern": "^R[0-9]{3,}$"
+    },
+    "status": {
+      "enum": [
+        "CLOSED",
+        "PROPOSED",
+        "REVIEW",
+        "REVISE",
+        "RUNNING"
+      ]
+    },
+    "owner": {
+      "type": "string",
+      "minLength": 1
+    },
+    "protocol": {
+      "type": "object",
+      "required": [
+        "path",
+        "sha256"
+      ]
+    },
+    "run": {
+      "type": "object"
+    },
+    "evidence": {
+      "type": "object"
+    },
+    "review": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "handoff": {
+      "type": "object"
+    },
+    "lineage": {
+      "type": [
+        "object",
+        "null"
+      ]
+    }
+  }
+}

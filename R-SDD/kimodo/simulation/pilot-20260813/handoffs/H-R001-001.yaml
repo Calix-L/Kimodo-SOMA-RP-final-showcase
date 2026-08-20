@@ -1,0 +1,96 @@
+schema_version: "1.0"
+handoff_id: H-R001-001
+run_id: pilot-20260813
+mode: VERIFY
+from_agent: A01
+to_agent: A03
+research_id: R001
+experiment_id: null
+owner: A01
+input_refs:
+  - .specify/memory/constitution.md
+  - BRAIN.md
+  - registry.json
+  - README.md
+  - RUNBOOK.md
+  - simulation/pilot-20260813/workflow.yaml
+  - simulation/pilot-20260813/manifest.yaml
+  - simulation/pilot-20260813/evidence-map.yaml
+  - simulation/pilot-20260813/decisions/human-gate-1.yaml
+  - simulation/pilot-20260813/decisions/human-gate-2.yaml
+  - simulation/pilot-20260813/assessment/evidence-matrix.md
+  - simulation/pilot-20260813/agents/A01.yaml
+  - simulation/pilot-20260813/agents/A03.yaml
+  - simulation/pilot-20260813/tasks/P01-A01.yaml
+  - simulation/pilot-20260813/tasks/P01-A03.yaml
+  - research/R001/research.yaml
+  - research/R001/protocol.yaml
+  - research/R002/research.yaml
+  - research/R002/protocol.yaml
+  - research/R003/research.yaml
+  - research/R003/protocol.yaml
+  - research/R004/research.yaml
+  - research/R004/protocol.yaml
+  - .specify/rsdd/protocols/R004/1f911559b69c5a7d3b68cf269c746c76ad1384f96a23963d533560eb83e8f0e5.yaml
+  - .specify/rsdd/protocols/R004/37bbff58a5f60d38ffd8a3a1d0c47b54e42c9d9c81e9a707b7b6a187ed68ce1a.yaml
+  - source/phase1_ai_native_project_brain_20260813.md
+  - .specify/project.yaml
+output_refs:
+  - simulation/pilot-20260813/outputs/A01/project-state-snapshot.yaml
+  - simulation/pilot-20260813/outputs/A01/dependency-and-risk-log.yaml
+verified_actions:
+  - VERIFY read of constitution, BRAIN, registry, workflow, manifest, evidence-map, both human gates, all four Research+Protocol records, the frozen R004 protocol digest and its predecessor, the source brain, and the A01/A03 agent+task profiles.
+  - VERIFY cross-check that BRAIN.md and registry.json are internally consistent with research/* (no conflict found; both are generated views of primary state).
+  - VERIFY that the frozen R004 Protocol digest sha256 1f9115... equals human-gate-1.protocol_sha256 and R004 protocol.freeze.sha256 (consistency confirmed).
+  - VERIFY that Human Gate 1 result_visibility_at_approval = NOT_ATTESTED; classified as RETROSPECTIVE acceptance policy, not preregistration (blinding attestation MISSING).
+  - VERIFY that no Experiment Records exist for R001-R004 (registry.json experiments = {}); R001-R003 DRAFT, R004 READY/FROZEN.
+  - VERIFY that no agent has declared the Object candidate successful (candidate held PROVISIONAL; final_adopt_rule unmet; Human Gate 2 PENDING).
+  - Separated Facts / Hypotheses / Observations / Evidence / Recommendations / Human decisions in the state snapshot.
+gate_result: PARTIAL
+gate_result_detail: >
+  A01's P01 portion is complete (state snapshot + dependency-and-risk log produced,
+  every open item given an owner and next valid transition, historical work not
+  misrepresented as six-agent execution). The full P01 exit_gate
+  "independent-recovery-findings-handed-to-A03-and-A06" is NOT yet satisfied:
+  A02/A03/A04/A05/A06 P01 outputs are still MISSING, and the workflow exit_gate also
+  requires findings handed to A06 (A01's task-envelope handoff is to A03 only).
+open_risks:
+  - RISK-DEP-GATE-REPLAY: G01 approved / R004 frozen while R001-R003 pilot replay evidence NOT_STARTED (historical work was pre-R-SDD; pilot evidence still owed).
+  - RISK-INTEGRITY-BLINDING-MISSING: Gate 1 NOT_ATTESTED; treat as retrospective policy unless project owner records a blinding attestation (MISSING).
+  - RISK-EVID-HOLDOUT-DECLARED: seed_text_test_full_eval_20260813 still running at snapshot; completion UNCONFIRMED.
+  - RISK-INTEGRITY-COLDSTART-LEAK: A06 must not see A04 private transcript before cold-start; enforce at R004-independent-checks launch.
+  - RISK-INTEGRITY-AUDIT-GAP: audit/session-index.yaml NOT_STARTED; no session registered for any agent.
+  - RISK-INTEGRITY-FOOTSKATE: Object 3000-step has persistent foot-skate; foot_skate_gate_must_pass=true; semantic gains cannot compensate (Gate 1 rationale).
+  - RISK-INTEGRITY-SELF-INFLATION: source brain sec.10 self-scores 10/10 contingent on running holdout; this is NOT pilot evidence.
+next_owner: A03
+next_state: P01-cognition-recovery (A03 portion) -> R001-pipeline-replay / R003-ablation-replay
+next_action: >
+  A03 consumes outputs/A01/project-state-snapshot.yaml and outputs/A01/dependency-and-risk-log.yaml
+  to produce (a) outputs/A03/training-invariants.yaml and outputs/A03/ablation-design-review.yaml
+  for P01, verifying target/replay mixing, cache, loss, precision, learning-rate, and step-count
+  assumptions and checking claimed comparable runs for configuration drift (mark MISSING if unverified),
+  with NO training-side conclusion using final holdout results; then (b) R001 training-semantics
+  verification and R003 one-variable ablation boundary checks. A03 must keep the Object candidate
+  PROVISIONAL, must NOT modify the frozen R004 evaluation contract, and must NOT tune against holdout
+  evidence after READY. Hand A03's own P01 findings to A04 per task P01-A03 (required_handoff_to: A04).
+commit_sha: cd67942b718e92d1fc5961572063c30f11772bb7
+commit_sha_note: Base commit of worktree pilot-20260813-A01; A01 outputs are written but uncommitted in this worktree.
+kscc_session_id: MISSING-UNREGISTERED
+kscc_session_id_note: >
+  audit/session-index.yaml is NOT_STARTED (sessions = []). The official kscc_session_id has not been
+  recorded by the launcher. Only the worktree handle is available: worktree-pilot-20260813-A01.
+  This is an audit-registration gap (RISK-INTEGRITY-AUDIT-GAP), not a research-state gap. No session ID
+  is fabricated here; the orchestrator/launcher must populate session-index.yaml.
+timestamp: 2026-08-13T08:28:07Z
+attestation:
+  historical_work_not_misrepresented: true
+  historical_work_not_misrepresented_note: >
+    All historical Phase 1 work (pipeline, G+C/Dancing/Object 4000-step runs, 2000/3000-step ablations,
+    holdout) is described as completed BEFORE this R-SDD pilot (research.yaml provenance.
+    historical_work_completed_before_rsdd = true). REPLAY/VERIFY reconstruction in this pilot is NOT
+    represented as original six-agent execution. The candidate is held PROVISIONAL and not declared successful.
+  secrets_removed: true
+  secrets_removed_note: >
+    No credentials, private data, or remote-access secrets are included. Resource roots and remote
+    output paths are cited verbatim from the frozen Human Gate 1 resource_and_data_boundary
+    (already in committed records), not from any transcript. raw_credentials_in_transcript = false.

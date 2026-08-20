@@ -1,0 +1,101 @@
+schema_version: "1.0"
+artifact: ER1-disjoint-pool-inventory
+run_id: pilot-20260813
+cycle_id: C01-object-target-benchmark-pin
+evidence_request: ER-1
+collected_at: '2026-08-13T10:16:46Z'
+collection_mode: READ_ONLY_SANITIZED_SET_METADATA
+collector: codex-primary
+human_authorization:
+  ref: simulation/pilot-20260813/decisions/human-collaboration-C01.yaml
+  commit_sha: 6994bdad6d7d48f576dcbc3a27aaedca00b80a72
+  response: REQUEST_MORE_EVIDENCE
+  allowed: ER-1 disjoint Object pool investigation
+  prohibited: [GPU use, model training, final holdout metric access, R004 modification]
+approved_remote_scope:
+  host_alias: lintrain
+  roots:
+  - /home/share/user/zyc/kimodo
+  - /home/share/user/zyc/kimodo_seed_repro_train
+transport_warning:
+  state: OBSERVED
+  message: "client_global_hostkeys_prove_confirm: server gave bad signature for RSA key 0: incorrect signature"
+  handling: All reads exited successfully; carry as a provenance warning.
+
+source_universe:
+  metadata_path: /home/share/user/zyc/kimodo/seed/metadata/seed_metadata_v004.csv
+  metadata_sha256: 71d09422034946d17dbb0db027d569408c486545bdb12f7979d55e6ffd9bbc39
+  metadata_total_rows: 142220
+  category: Object Manipulation
+  mirror_policy: is_mirror == "False"
+  object_nonmirror_rows: 5810
+  object_nonmirror_unique_path_ids: 5810
+  split_columns_present: false
+  universe_set_sha256: bb2a995a0770ca18168c31434c3c7132d4672cca424de4dac1301cfb7430aba6
+
+exclusion_sets:
+  candidate_training_manifest:
+    path: /home/share/user/zyc/kimodo_seed_repro_train/work/manifests/cat_object_manip_fp32_20260811_0005.csv
+    sha256: 95dcd9c7f1e73d99e5bce10abb6bf94d55f58a17e8eefc7b83fbdfe74597bbd5
+    rows: 5810
+    unique_path_ids: 5810
+  full_holdout:
+    path: /home/share/user/zyc/kimodo/eval_work/seed_text_test_full_20260813/domain_manifest.json
+    sha256: 479f284385178ff323795a6b08a2458c7d161e148e8be6b626ef68fb82a47d20
+    unique_path_ids: 6938
+    final_metric_values_read: false
+
+identity_method:
+  authoritative_rule: last two BVH path components without the file suffix
+  normalized_form: take_date/motion_file_stem
+  basis:
+  - build_domain_text_benchmark.py rel_key uses move_soma_uniform_path with the soma_uniform/bvh prefix and .bvh suffix removed.
+  - training manifest exposes bvh_path; benchmark cases expose seed_motion.bvh_path.
+  construction_script_sha256: 18a602ddf4922f42dad03a2478a9ac731607663d54460dee1472210e393d88f3
+  why_motion_id_is_not_authoritative: Exact move_name/motion_id comparison produced 187 naming mismatches and a false 179-case residual pool; path identity resolves every training row to the metadata universe.
+
+set_results:
+  object_universe_x_training: 5810
+  object_universe_x_holdout: 292
+  training_not_in_object_universe: 0
+  object_universe_not_in_training: 0
+  object_universe_not_in_holdout: 5518
+  eligible_outside_training_and_holdout: 0
+  eligible_set_sha256: 01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b
+  eligible_set_sha256_note: SHA-256 of a canonical empty newline-terminated set serialization.
+  split_implication:
+    content:
+      current_cases: 235
+      training_intersection: 235
+      eligible_current_cases_after_training_exclusion: 0
+      maximum_eligible_from_observed_universe: 0
+    repetition:
+      current_cases: 57
+      training_intersection: 57
+      eligible_current_cases_after_training_exclusion: 0
+      maximum_eligible_from_observed_universe: 0
+
+identity_correction_audit:
+  preliminary_non_authoritative_motion_id_result:
+    exact_eligible_count: 179
+    state: REJECTED_IDENTITY_METHOD
+  authoritative_path_result:
+    eligible_count: 0
+    state: VERIFIED
+  correction_reason: The benchmark constructor and source metadata are keyed by dated BVH relative paths, not bare move_name text.
+
+feasibility_evidence:
+  classification: VERIFIED_DEGENERATE
+  statement: Within SEED metadata v004 and the approved training/holdout artifacts, no Object-Manipulation motion remains outside the candidate training manifest; therefore no non-empty Content or Repetition benchmark can be assembled without changing the candidate training data or sourcing a new dataset/version.
+  scope_limit:
+  - This proves degeneracy only for the observed SEED metadata v004 universe.
+  - No external or later dataset was searched because hf authorized only the approved roots and ER-1.
+  - Metadata contains no split column, so no alternative official split assignment exists in this source record; the zero universe residual makes that absence non-decisive.
+
+sanitization:
+  raw_case_ids_included: false
+  raw_training_rows_included: false
+  final_holdout_metrics_included: false
+  credentials_included: false
+  GPU_or_training_started: false
+  R004_modified: false

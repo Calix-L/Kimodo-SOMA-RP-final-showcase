@@ -1,0 +1,80 @@
+schema_version: '1.0'
+handoff_id: H-R004-A06
+run_id: pilot-20260813
+mode: VERIFY
+from_agent: A06
+to_agent: A01
+research_id: R004
+experiment_id: null
+owner: A06
+input_refs:
+- kimodo/.specify/memory/constitution.md
+- kimodo/BRAIN.md
+- kimodo/registry.json
+- kimodo/research/R004/research.yaml
+- kimodo/research/R004/protocol.yaml
+- kimodo/.specify/rsdd/protocols/R004/1f911559b69c5a7d3b68cf269c746c76ad1384f96a23963d533560eb83e8f0e5.yaml
+- kimodo/.specify/rsdd/protocols/R004/37bbff58a5f60d38ffd8a3a1d0c47b54e42c9d9c81e9a707b7b6a187ed68ce1a.yaml
+- kimodo/simulation/pilot-20260813/decisions/human-gate-1.yaml
+- kimodo/simulation/pilot-20260813/decisions/human-gate-2.yaml
+- kimodo/simulation/pilot-20260813/evidence-map.yaml
+- kimodo/simulation/pilot-20260813/workflow.yaml
+- kimodo/simulation/pilot-20260813/manifest.yaml
+- kimodo/simulation/pilot-20260813/audit/session-index.yaml
+- kimodo/source/phase1_ai_native_project_brain_20260813.md
+- kimodo/simulation/pilot-20260813/agents/A04.yaml
+- kimodo/simulation/pilot-20260813/tasks/P01-A06.yaml
+output_refs:
+- kimodo/simulation/pilot-20260813/outputs/A06/cold-start-cognition.yaml
+- kimodo/simulation/pilot-20260813/outputs/A06/ready-red-team-review.yaml
+verified_actions:
+- mode: VERIFY
+  action: Recovered R004 state (READY, owner A01, decision null) from registry.json and BRAIN.md without reading A04 private execution chat.
+- mode: VERIFY
+  action: Confirmed frozen R004 protocol digest 1f911559b69c5a7d3b68cf269c746c76ad1384f96a23963d533560eb83e8f0e5 declared consistently in protocol.yaml, human-gate-1.yaml, and workflow.yaml; confirmed content-identity of active protocol vs its named snapshot by reading both in full.
+- mode: VERIFY
+  action: >-
+    Compared the two frozen protocol snapshots (37bbff58 pre-amendment vs
+    1f911559 post-amendment) and confirmed the HG1 amendment changed ONLY
+    provenance fields; every numerical evaluation rule is byte-identical
+    (frozen contract not weakened post-gate).
+- mode: VERIFY
+  action: Confirmed Human Gate 1 status APPROVED and preserved its NOT_ATTESTED retrospective-acceptance-policy classification; no blinding attestation present.
+- mode: VERIFY
+  action: Confirmed Human Gate 2 status PENDING (decision null); final decision is human-owned and not yet made.
+- mode: VERIFY
+  action: Reproduced two low-cost independent checks (frozen-contract numerical stability = PASS; holdout count arithmetic 3510 + 3428 = 6938 = PASS) with no remote compute.
+- mode: VERIFY
+  action: Enumerated MISSING evidence (live holdout run DECLARED, R004 output files not created, scripts DECLARED, audit index NOT_STARTED) and preserved it as MISSING rather than inferring success.
+gate_result: PASS-cognition-recovery-and-red-team; NOT-ADOPT (A06 proposal only; adoption authority remains with Human Gate 2)
+open_risks:
+- id: DR-1
+  severity: low
+  description: Independent sha256 recomputation not performed (Bash disabled); content-identity used instead. Backfill via A05/A02 with shasum.
+- id: DR-2
+  severity: blocking-for-adoption
+  description: Live holdout evidence MISSING (run DECLARED, still running per source snapshot). Blocks any ADOPT decision.
+- id: DR-3
+  severity: high
+  description: Result blinding NOT attested; contract is a retrospective acceptance policy. HG2 must not describe thresholds as preregistered.
+- id: DR-4
+  severity: medium
+  description: Audit session index NOT_STARTED; per-agent audit fields unrecorded. Populate before P99.
+- id: DR-5
+  severity: medium
+  description: work/codex_pipeline/ scripts DECLARED and absent from this worktree; script provenance not independently checkable here.
+next_owner: A01
+next_state: R004 READY; cleared to enter staged execution of R004-holdout-live (LIVE). NOT cleared for adoption.
+next_action: >-
+  A01 records A06's recovery + red-team findings and the open risks, then
+  authorizes A04 to execute R004-holdout-live (register baseline+candidate
+  SEED full-test evaluation as LIVE evidence without interpreting success).
+  Route P01 recovery findings to A03 and A06 per workflow P01 exit gate
+  (independent-recovery-findings-handed-to-A03-and-A06). Do NOT treat A06's
+  proposal as a decision; the adoption decision is reserved for Human Gate 2.
+commit_sha: cd67942b718e92d1fc5961572063c30f11772bb7
+kscc_session_id: MISSING-audit-index-not-started   # audit/session-index.yaml sessions: []; backfill when the session index is populated
+timestamp: '2026-08-13T08:30:00Z'   # approximate; exact wall-clock unavailable (Bash disabled in this context)
+attestation:
+  historical_work_not_misrepresented: true   # REPLAY/VERIFY used; no historical step described as original six-agent execution
+  secrets_removed: true   # no credentials, private data, or A04 private transcript referenced

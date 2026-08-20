@@ -1,0 +1,268 @@
+schema_version: '1.0'
+task_id: P01-A06-cold-start-red-team
+run_id: pilot-20260813
+agent_id: A06
+research_id: R004
+experiment_id: null
+mode: VERIFY
+produced_at: '2026-08-13T08:30:00Z'  # approximate; exact wall-clock unavailable (Bash disabled in this context)
+companion_output: kimodo/simulation/pilot-20260813/outputs/A06/cold-start-cognition.yaml
+
+# ---------------------------------------------------------------------------
+# READY red-team review of R004. This file combines the red-team review and
+# the evidence-review-proposal required by the A06 role profile, because the
+# task envelope (P01-A06) authorizes exactly two output paths and folds the
+# proposal into the review.
+#
+# Findings are separated into:
+#   1. VALIDITY            — is the protocol / process sound?
+#   2. EVIDENCE ASSESSMENT — what does current evidence actually support?
+#   3. RECOMMENDATION     — proposed only; A06 does NOT decide.
+#   4. HUMAN DECISION AUTHORITY — who owns the final decision.
+# Fact / Hypothesis / Observation / Evidence / Recommendation / Human Decision
+# are labeled inline.
+# ---------------------------------------------------------------------------
+
+summary:
+  ready_for_staged_execution: true   # structurally ready to RUN the next LIVE phases
+  ready_for_adoption: false           # NOT ready to ADOPT the candidate
+  one_line: >-
+    Frozen contract is stable and valid as a retrospective acceptance policy;
+    cold-start recovery succeeds; live holdout evidence is MISSING; final
+    decision is PENDING and human-owned. A06 proposes proceeding to staged
+    execution, NOT adoption.
+
+# ===========================================================================
+# 1. VALIDITY — is the R004 protocol / process sound?
+# ===========================================================================
+validity_findings:
+
+- id: V1
+  claim: Frozen evaluation contract is intact and was not weakened post-gate.
+  type: FACT (from evidence)
+  evidence:
+  - research/R004/protocol.yaml status FROZEN, freeze.sha256 1f911559...
+  - snapshot .specify/rsdd/protocols/R004/1f911559...yaml
+  - snapshot .specify/rsdd/protocols/R004/37bbff58...yaml (pre-amendment)
+  observation: >-
+    Content comparison of the two frozen snapshots shows the HG1 amendment
+    changed ONLY provenance fields (reviewer project-owner -> hf; timestamps
+    08:10:14 -> 08:21:58; risk wording). Every numerical evaluation rule
+    (target_success, non_regression, foot_skate, aggregation, metric_priority,
+    final_adopt_rule, comparison_protocol) is byte-identical pre vs post.
+  verdict: PASS
+  constitution_rules: [6 Baseline First, 7 Evaluation Before Result, 11 Non-Regression Is a Contract, 16 Replay Integrity]
+
+- id: V2
+  claim: The frozen contract is a RETROSPECTIVE acceptance policy, NOT a preregistration.
+  type: FACT (from evidence; preserved, not resolved)
+  evidence:
+  - decisions/human-gate-1.yaml: result_visibility_at_approval = NOT_ATTESTED
+  - decisions/human-gate-1.yaml: policy_classification = RETROSPECTIVE_ACCEPTANCE_POLICY_UNLESS_BLINDING_ATTESTED
+  - decisions/human-gate-1.yaml: approver_statement = "uncertain whether the final holdout result was visible before threshold approval"
+  - README.md start-here step 3 instructs describing it as retrospective unless a blinding attestation is recorded
+  observation: >-
+    No separate blinding attestation exists in the shared records. The approver
+    (hf) explicitly does not attest that thresholds were chosen blind to
+    results.
+  verdict: FLAG (validity caveat, NOT a concealment — the project honestly preserves it)
+  impact: >-
+    Weakens the "evaluation-before-result" guarantee (constitution rule 7) for
+    this pilot. Human Gate 2 MUST explicitly weigh this when recording the
+    final decision and must not describe the thresholds as preregistered.
+  constitution_rules: [7 Evaluation Before Result, 13 Evidence Exceeds AI Opinion]
+
+- id: V3
+  claim: Separation of powers is structurally correct; AI cannot make the final decision.
+  type: FACT (from evidence)
+  evidence:
+  - agents/A04.yaml forbidden_actions: modify frozen contract; label metric change as adoption evidence
+  - agents/A06.yaml forbidden_actions: read A04 private transcript before cold-start completion; approve its own recommendation as the final decision; infer scientific success from an AI summary
+  - research/R004/protocol.yaml final_adopt_rule requires A06_independent_reproduction_VALID AND human_gate_2_APPROVED
+  - decisions/human-gate-2.yaml instructions: "AI agents cannot approve this file."
+  - constitution rules 8, 9, 13
+  verdict: PASS
+  note: >-
+    A04 (operator) cannot edit the contract; A06 (reviewer) cannot approve; HG2
+    (human) owns the decision. The final_adopt_rule makes an AI-independent
+    reproduction AND a human approval both necessary conditions.
+
+- id: V4
+  claim: Data / resource boundary is correctly declared.
+  type: FACT (from evidence; runtime not yet verified)
+  evidence:
+  - decisions/human-gate-1.yaml resource_and_data_boundary: private_data_allowed=false, raw_credentials_in_transcript=false, external_artifact_upload=false, approved_host=lintrain, approved_gpu_count=2, approved_remote_roots=[/home/share/user/zyc/kimodo, /home/share/user/zyc/kimodo_seed_repro_train]
+  - constitution rules 8 No Leakage, 15 Data Boundary
+  verdict: PASS (contract-level)
+  caveat: >-
+    Runtime adherence is not independently verifiable yet because
+    audit/session-index.yaml is NOT_STARTED. Flag carried as open risk DR-4.
+
+- id: V5
+  claim: Audit trail is not yet populated.
+  type: OBSERVATION
+  evidence:
+  - audit/session-index.yaml status NOT_STARTED, sessions []
+  - workflow.yaml audit.required_per_agent lists kscc_session_id, model, prompt_version, started_at, completed_at, token_usage, cost, output_refs, commit_sha, transcript_sha256
+  verdict: FLAG (expected at P01, must be populated before P99)
+  impact: Does not invalidate the contract; it is a process-completeness risk for the final assessment.
+
+validity_summary: >-
+  The R004 protocol is a valid, frozen, stable evaluation contract. Its one
+  structural weakness — result blinding is NOT attested — is honestly
+  preserved as a retrospective acceptance policy rather than hidden. The
+  process is structurally sound for entering staged execution.
+
+# ===========================================================================
+# 2. EVIDENCE ASSESSMENT — what does current evidence actually support?
+# ===========================================================================
+evidence_assessment:
+
+- id: E1
+  item: Live holdout evidence (seed_text_test_full_eval_20260813)
+  state: MISSING (independently verified)
+  evidence:
+  - evidence-map.yaml run state DECLARED; historical_observation "still running when the source snapshot was supplied"
+  - outputs/R004/holdout-run-card.yaml does NOT exist
+  - remote ref /home/share/user/zyc/kimodo/eval_work/seed_text_test_full_eval_20260813 unreachable from this worktree
+  assessment: >-
+    The baseline-vs-candidate result on SEED Content 3510 + Repetition 3428 is
+    not available as evidence. Per constitution rule 6 (Evidence Before
+    Decision) and the R004 integrity_rule, NO adoption claim may cite this
+    until A04 registers the run card and A05 independently recomputes the gate
+    table.
+  blocks: any ADOPT decision; final_adopt_rule items holdout_Content_PASS, holdout_Repetition_PASS
+
+- id: E2
+  item: Pipeline / eval scripts (work/codex_pipeline/*)
+  state: DECLARED (not independently checked)
+  evidence:
+  - evidence-map.yaml: all SCRIPT-* assets state DECLARED
+  - work/codex_pipeline/ tree is NOT present in this worktree (only kimodo/ is)
+  assessment: Script contents are not verifiable in this scope. Carried as MISSING.
+
+- id: E3
+  item: Source snapshot (phase1_ai_native_project_brain_20260813.md)
+  state: VERIFIED (as a project summary) but NOT primary experimental evidence
+  evidence:
+  - evidence-map.yaml SRC-PHASE1-BRAIN state VERIFIED, sha256 b71b202f...
+  - source snapshot read in full
+  assessment: >-
+    The source snapshot is an AI-generated project brain. Its metric
+    observations (Object 3000-step: Content retrieval/Similarity/FID/Contact
+    "较稳定"; Repetition R@2/R@3/R@5 and FID "提升明显"; foot-skate
+    "仍有退化") are HISTORICAL OBSERVATIONS, not frozen-contract-gated
+    results. They justify R004 existing; they CANNOT by themselves support the
+    final adoption claim (rule 6; integrity_rule). Inferring candidate success
+    from this summary would violate A06 forbidden_actions.
+
+- id: E4
+  item: Cold-start cognition recovery (this task)
+  state: VERIFIED
+  evidence: outputs/A06/cold-start-cognition.yaml
+  assessment: >-
+    R004 state, frozen digest, claim limits, and next valid transition were
+    recovered from shared records with NO A04 private transcript read. The
+    cold-start recovery acceptance criterion PASSES.
+
+- id: E5
+  item: Low-cost independent reproduction
+  state: VERIFIED (two checks)
+  evidence: outputs/A06/cold-start-cognition.yaml low_cost_reproduction
+  assessment: >-
+    (1) Frozen-contract numerical stability across the HG1 amendment = PASS,
+    no threshold changed. (2) Holdout count arithmetic 3510 + 3428 = 6938 =
+    PASS. Both within the no-remote-compute constraint. Note: full gate-table
+    recomputation requires the MISSING remote holdout artifacts and is A05's
+    later job.
+
+evidence_assessment_summary: >-
+  Current evidence supports "ready to execute the next stages" but does NOT
+  support "candidate succeeds." The success claim is contingent on live
+  holdout evidence that is currently MISSING.
+
+# ===========================================================================
+# 3. RECOMMENDATION — proposed only. A06 does NOT decide.
+# ===========================================================================
+recommendation:
+  proposed_by: A06
+  authority: PROPOSAL_ONLY   # A06 is forbidden from approving; HG2 owns the decision
+  primary: >-
+    PROCEED to staged execution of the R004 LIVE phases (R004-holdout-live ->
+    R004-independent-checks -> G02-final-human-gate). The pilot is structurally
+    ready: the contract is frozen and stable, HG1 is APPROVED, roles/gates are
+    correctly separated, cold-start recovery succeeds, and two low-cost
+    independent checks pass.
+  conditions_before_any_adoption:
+  - A04 registers outputs/R004/holdout-run-card.yaml with real counts, metrics, logs, environment, and deviations (exit gate: raw-holdout-evidence-registered-without-success-interpretation).
+  - A05 independently recomputes the full frozen gate table -> outputs/R004/independent-gate-table.yaml.
+  - A06 (or equivalent independent role) reproduces an independent check from the registered artifacts -> outputs/R004/cold-start-review.yaml; final_adopt_rule item A06_independent_reproduction_VALID must hold.
+  - Human Gate 2 records a decision that explicitly addresses the retrospective-policy caveat (V2) and states whether any blinding attestation exists.
+  guardrails:
+  - Do NOT cite the source-snapshot AI summary or DECLARED historical run observations as adoption evidence (rule 6; integrity_rule).
+  - Do NOT expand R004 to Phase 2 game-motion data or business prioritization (research.yaml scope.out).
+  - Do NOT treat agent count, command count, document count, or token spend as outcomes (assessment anti-inflation list).
+  - Do NOT describe the frozen thresholds as preregistered (V2); they are a retrospective acceptance policy unless a blinding attestation is later recorded.
+  explicitly_not_done:
+  - A06 does NOT approve R004.
+  - A06 does NOT infer candidate success from the AI summary or filenames.
+  - A06 does NOT make the final adoption decision.
+
+# ===========================================================================
+# 4. HUMAN DECISION AUTHORITY — who owns the final decision.
+# ===========================================================================
+human_decision_authority:
+  final_decision_owner: Human Gate 2 (decisions/human-gate-2.yaml)
+  final_decision_status: "PENDING (decision: null; reviewer_name: BLOCKING_INPUT)"
+  allowed_final_decisions: [ADOPT, REJECT, REVISE, REPRODUCE, STOP]
+  human_gate_1_authority_exercised: >-
+    Human Gate 1 (reviewer hf) already exercised human authority to
+    APPROVE_READY the evaluation contract, recorded explicitly as a
+    retrospective acceptance policy.
+  rule: 'AI may recommend; humans approve final claims (constitution rule 13).'
+  separation: >-
+    A06's recommendation above is a proposal. It becomes a final scientific
+    decision ONLY when Human Gate 2 records it with rationale and primary
+    evidence references. A06 cannot approve its own recommendation (A06
+    forbidden_actions; HG2 instructions: "AI agents cannot approve this file").
+
+# ===========================================================================
+# Open risks (cross-cutting)
+# ===========================================================================
+open_risks:
+- id: DR-1
+  severity: low
+  description: >-
+    Independent sha256 recomputation of the active protocol.yaml against the
+    declared digest 1f911559... was NOT performed (Bash disabled in this
+    verification context). Content-identity was established by reading both the
+    active file and the snapshot file in full.
+  mitigation: A05 (or A02) should recompute the digest with shasum during R004-independent-checks and record it.
+- id: DR-2
+  severity: blocking-for-adoption
+  description: Live holdout evidence is MISSING (DECLARED, run still running per source snapshot).
+  mitigation: Execute R004-holdout-live (A04) then R004-independent-checks (A05 + A06).
+- id: DR-3
+  severity: high
+  description: >-
+    Result blinding is NOT attested (HG1 NOT_ATTESTED). The contract is a
+    retrospective acceptance policy. If HG2 treats it as preregistered, the
+    final decision would overstate the evidential strength.
+  mitigation: HG2 must explicitly record the retrospective-policy status in its rationale.
+- id: DR-4
+  severity: medium
+  description: >-
+    Audit session index is NOT_STARTED; per-agent audit fields (kscc_session_id,
+    model, token_usage, cost, commit_sha, transcript_sha256) are unrecorded.
+  mitigation: Populate audit/session-index.yaml before P99-sync-and-assess.
+- id: DR-5
+  severity: medium
+  description: >-
+    work/codex_pipeline/ scripts are DECLARED only and not present in this
+    worktree; script-level provenance cannot be independently checked here.
+  mitigation: A02/A05 should verify script lineage during the R001/R002 replay phases.
+
+escalation_triggers_met:
+- missing primary evidence (live holdout run) -> reported, not inferred
+- result inspected before evaluation contract freeze -> NOT triggered (contract was frozen 08:21:58 BEFORE any live holdout evidence exists; the live run is still DECLARED). The NOT_ATTESTED visibility is a related but distinct caveat (V2).
+reviewer_owner_conflict: none   # A06 (reviewer) vs A01 (owner): no conflict; A06 proposes, A01 coordinates, HG2 decides

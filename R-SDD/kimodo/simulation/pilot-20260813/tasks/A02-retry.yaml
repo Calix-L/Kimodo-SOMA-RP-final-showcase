@@ -1,0 +1,29 @@
+schema_version: "1.0"
+task_id: P01-A02-provenance-recovery-r2
+run_id: pilot-20260813
+mode: VERIFY
+agent_id: A02
+research_id: R001
+experiment_id: null
+objective: Produce the two provenance outputs immediately from the four listed records; do not perform repository-wide or remote discovery, and mark every unverified path MISSING.
+input_refs:
+- kimodo/research/R001/protocol.yaml
+- kimodo/source/phase1_ai_native_project_brain_20260813.md
+- kimodo/simulation/pilot-20260813/evidence-map.yaml
+- kimodo/simulation/pilot-20260813/decisions/human-gate-1.yaml
+allowed_output_refs:
+- kimodo/simulation/pilot-20260813/outputs/A02/provenance-report.yaml
+- kimodo/simulation/pilot-20260813/outputs/A02/missing-evidence-register.yaml
+- kimodo/simulation/pilot-20260813/handoffs/H-R001-A02-r2.yaml
+acceptance_criteria:
+- Write both output files before any optional validation.
+- Separate VERIFIED, DECLARED, and MISSING; only the source snapshot digest may remain VERIFIED from the evidence map.
+- Preserve private-data, credential, external-upload, and approved-path boundaries.
+- Produce a structured handoff to A03 and stop.
+forbidden_actions:
+- use Bash or perform repository-wide discovery
+- access remote systems, private data, or final holdout results
+- promote DECLARED evidence to VERIFIED without primary material
+- decide model quality
+time_or_cost_limit: 10 turns; no remote compute
+required_handoff_to: A03

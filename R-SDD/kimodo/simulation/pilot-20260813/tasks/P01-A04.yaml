@@ -1,0 +1,26 @@
+schema_version: "1.0"
+task_id: P01-A04-execution-readiness
+run_id: pilot-20260813
+mode: VERIFY
+agent_id: A04
+research_id: R004
+experiment_id: null
+objective: Verify execution readiness, approved paths, commands, artifacts, environment assumptions, and stop conditions without running or interpreting the final holdout.
+input_refs:
+- kimodo/research/R004/protocol.yaml
+- kimodo/simulation/pilot-20260813/decisions/human-gate-1.yaml
+- kimodo/simulation/pilot-20260813/evidence-map.yaml
+- kimodo/source/phase1_ai_native_project_brain_20260813.md
+allowed_output_refs:
+- kimodo/simulation/pilot-20260813/outputs/A04/execution-readiness.yaml
+- kimodo/simulation/pilot-20260813/outputs/A04/artifact-register.yaml
+acceptance_criteria:
+- The active Protocol digest and Human Gate 1 digest match.
+- Every proposed command, host, GPU, input, output, and stop condition is listed or marked MISSING.
+- No PASS/FAIL or adoption interpretation is produced.
+forbidden_actions:
+- start training or final holdout evaluation during this readiness task
+- access paths outside the approved resource and data boundary
+- expose credentials or copy raw private transcripts
+time_or_cost_limit: 12 turns; read-only readiness checks; no GPU job
+required_handoff_to: A05

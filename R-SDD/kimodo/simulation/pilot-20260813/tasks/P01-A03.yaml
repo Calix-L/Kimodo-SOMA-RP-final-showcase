@@ -1,0 +1,27 @@
+schema_version: "1.0"
+task_id: P01-A03-training-invariants
+run_id: pilot-20260813
+mode: VERIFY
+agent_id: A03
+research_id: R001
+experiment_id: null
+objective: Recover the target-plus-replay training semantics, shared configuration invariants, and one-variable ablation boundaries from primary records.
+input_refs:
+- kimodo/research/R001/protocol.yaml
+- kimodo/research/R002/protocol.yaml
+- kimodo/research/R003/protocol.yaml
+- kimodo/source/phase1_ai_native_project_brain_20260813.md
+- kimodo/simulation/pilot-20260813/evidence-map.yaml
+allowed_output_refs:
+- kimodo/simulation/pilot-20260813/outputs/A03/training-invariants.yaml
+- kimodo/simulation/pilot-20260813/outputs/A03/ablation-design-review.yaml
+acceptance_criteria:
+- Target/replay mixing, cache, loss, precision, learning-rate, and step-count assumptions are explicit.
+- Claimed comparable runs are checked for configuration drift or marked MISSING.
+- No training-side conclusion uses final holdout results.
+forbidden_actions:
+- modify the frozen R004 evaluation contract
+- execute new training or tune against holdout evidence
+- change multiple core variables under one comparison
+time_or_cost_limit: 12 turns; no remote compute
+required_handoff_to: A04

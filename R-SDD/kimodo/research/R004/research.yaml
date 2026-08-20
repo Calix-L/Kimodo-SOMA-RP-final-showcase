@@ -1,0 +1,57 @@
+schema_version: '1.0'
+id: R004
+title: Kimodo Phase 1 candidate closure
+type: confirmatory
+status: READY
+owner: A01
+profile: kimodo-posttraining
+created_at: '2026-08-13T07:53:16+00:00'
+updated_at: '2026-08-13T08:21:58+00:00'
+question: Does abl_object_lr1e7_s3000_20260811 improve the Object target domain while
+  satisfying the SEED full-test non-regression contract and acceptable foot-skate
+  risk?
+motivation: Close Phase 1 with a frozen non-regression contract, independent evaluation,
+  cold-start recovery, and a human-owned final decision.
+scope:
+  in:
+  - Kimodo-SOMA-RP-v1.1 baseline
+  - abl_object_lr1e7_s3000_20260811 candidate
+  - SEED test Content 3510 and Repetition 3428
+  - target-domain results and foot-skate evidence
+  - independent cold-start reproduction or metric recomputation
+  out:
+  - Phase 2 private game-motion data
+  - business prioritization of future action categories
+  - unapproved long-running follow-up ablations
+hypothesis: The Object 3000-step checkpoint improves the target domain without exceeding
+  Human Gate 1-approved general-capability and foot-skate tolerances
+evaluation:
+  answer_criteria:
+  - Baseline and candidate are evaluated on SEED Content 3510 and Repetition 3428
+    under one frozen contract
+  - A06 can recover and independently check the result without A04 private conversation
+  - Human Gate 2 records the final decision and rationale from primary evidence
+references:
+- ../../source/phase1_ai_native_project_brain_20260813.md
+- ../../simulation/pilot-20260813/decisions/human-gate-1.yaml
+- ../../simulation/pilot-20260813/evidence-map.yaml
+provenance:
+  mode: MIXED
+  historical_work_completed_before_rsdd: true
+  live_work:
+  - holdout result verification and closure
+  - A06 cold-start reproduction
+  - two human decisions
+  integrity_rule: Final acceptance can cite only artifacts checked under the frozen
+    R004 Protocol.
+protocol_amendments:
+- from_sha256: 37bbff58a5f60d38ffd8a3a1d0c47b54e42c9d9c81e9a707b7b6a187ed68ce1a
+  from_snapshot: .specify/rsdd/protocols/R004/37bbff58a5f60d38ffd8a3a1d0c47b54e42c9d9c81e9a707b7b6a187ed68ce1a.yaml
+  reason: Record formal Human Gate 1 approver hf and explicit NOT_ATTESTED result
+    visibility before six-agent launch.
+  owner: A01
+  opened_at: '2026-08-13T08:20:10+00:00'
+  to_sha256: 1f911559b69c5a7d3b68cf269c746c76ad1384f96a23963d533560eb83e8f0e5
+  approved_at: '2026-08-13T08:21:58+00:00'
+  reviewer: hf
+decision: null

@@ -1,0 +1,425 @@
+schema_version: "1.0"
+artifact: dependency-and-risk-log
+run_id: pilot-20260813
+task_id: P01-A01-project-cognition
+agent_id: A01
+mode: VERIFY
+generated_at: 2026-08-13T08:28:07Z
+base_commit_sha: cd67942b718e92d1fc5961572063c30f11772bb7
+source_records: derived from workflow.yaml, manifest.yaml, evidence-map.yaml,
+  research/*/protocol.yaml, research/*/research.yaml, decisions/human-gate-1.yaml,
+  decisions/human-gate-2.yaml, source/phase1_ai_native_project_brain_20260813.md,
+  assessment/evidence-matrix.md
+
+# ---------------------------------------------------------------------------
+# 1. PHASE DEPENDENCY GRAPH  (Fact — workflow.yaml; states from primary records)
+#   Legend: status = PILOT-STATE of that phase (not historical Phase 1 work state).
+#   Historical Phase 1 runs were completed pre-R-SDD; pilot REPLAY/VERIFY evidence
+#   for R001-R003 is still owed (see MISSING section).
+# ---------------------------------------------------------------------------
+dependencies:
+  - phase: P00-bootstrap
+    mode: LIVE
+    status: ACTIVE-PENDING-AUDIT      # worktrees created; audit/session-index.yaml NOT_STARTED
+    depends_on: []
+    owners: [orchestrator]
+    exit_gate: six-session-identities-recorded
+    open: audit session index is empty; identities not yet recorded
+
+  - phase: P01-cognition-recovery
+    mode: VERIFY
+    status: IN_PROGRESS                # this task; A01 producing now, other agents parallel
+    depends_on: [P00-bootstrap]
+    owners: [A01, A02, A03, A04, A05, A06]
+    parallel: true
+    exit_gate: independent-recovery-findings-handed-to-A03-and-A06
+    open: A02/A03/A04/A05/A06 outputs not yet produced
+
+  - phase: R001-pipeline-replay
+    mode: REPLAY
+    status: NOT_STARTED
+    depends_on: [P01-cognition-recovery]
+    owners: [A02, A03, A04]
+    parallel: false
+    handoff_to: A06
+    exit_gate: A06-pipeline-evidence-review-proposal
+    open: no experiment records, no outputs/R001/* yet
+
+  - phase: R002-main-domain-replay
+    mode: REPLAY
+    status: NOT_STARTED
+    depends_on: [R001-pipeline-replay]
+    owners: [A02, A03, A04]
+    exit_gate: all-three-domain-cards-have-primary-evidence-refs
+    open: no outputs/R002/domain-run-cards.yaml
+
+  - phase: R002-main-domain-evaluation
+    mode: VERIFY
+    status: NOT_STARTED
+    depends_on: [R002-main-domain-replay]
+    owners: [A05, A06, A01]
+    exit_gate: reviewed-provisional-domain-selection
+    open: no outputs/R002/independent-domain-comparison.yaml; no outputs/A01/decision-trace.yaml
+
+  - phase: R003-ablation-replay
+    mode: REPLAY
+    status: NOT_STARTED
+    depends_on: [R002-main-domain-evaluation]
+    owners: [A03, A04]
+    exit_gate: four-ablation-cards-have-config-log-and-metric-refs
+    open: no outputs/R003/ablation-run-cards.yaml
+
+  - phase: R003-candidate-review
+    mode: VERIFY
+    status: NOT_STARTED
+    depends_on: [R003-ablation-replay]
+    owners: [A05, A06, A01]
+    exit_gate: provisional-candidate-with-visible-risks
+    open: no outputs/R003/candidate-review.yaml
+
+  - phase: G01-ready-human-gate
+    mode: LIVE
+    status: APPROVED                   # historically satisfied; gate file APPROVED
+    depends_on: [R003-candidate-review]
+    owners: [human-gate-1]
+    gate_status: APPROVED
+    protocol_sha256: 1f911559b69c5a7d3b68cf269c746c76ad1384f96a23963d533560eb83e8f0e5
+    exit_gate: human-gate-1-approved-and-R004-protocol-frozen
+    open: G01 itself is closed; but its declared depends_on R003-candidate-review is NOT_STARTED in the pilot. See dependency-risks RISK-DEP-GATE-REPLAY.
+
+  - phase: R004-holdout-live
+    mode: LIVE
+    status: NOT_STARTED
+    depends_on: [G01-ready-human-gate]   # satisfied (APPROVED)
+    owners: [A04]
+    handoff_to: A05
+    exit_gate: raw-holdout-evidence-registered-without-success-interpretation
+    open: holdout run completion not confirmed (was still running at snapshot)
+
+  - phase: R004-independent-checks
+    mode: LIVE
+    status: NOT_STARTED
+    depends_on: [R004-holdout-live]
+    owners: [A05, A06]
+    parallel: true
+    exit_gate: independent-evidence-review-proposal
+    open: A06 cold-start isolation rule not yet enforced (no transcript exists yet)
+
+  - phase: G02-final-human-gate
+    mode: LIVE
+    status: PENDING
+    depends_on: [R004-independent-checks]
+    owners: [human-gate-2]
+    exit_gate: human-owned-final-decision
+    open: decision null; AI cannot approve
+
+  - phase: P99-sync-and-assess
+    mode: LIVE
+    status: NOT_STARTED
+    depends_on: [G02-final-human-gate]
+    owners: [A01, orchestrator]
+    exit_gate: pilot-evidence-package-complete
+    open: reports/R004.md, BRAIN refresh, registry refresh, evidence-matrix completion
+
+# ---------------------------------------------------------------------------
+# 2. RISKS  (separated by source; each has owner + mitigation/next transition)
+# ---------------------------------------------------------------------------
+risks:
+
+  # --- Dependency / sequencing risks ---
+  - id: RISK-DEP-GATE-REPLAY
+    kind: dependency-sequence
+    severity: MEDIUM
+    state: OPEN
+    description: >
+      G01-ready-human-gate is APPROVED and R004 is FROZEN, but the pilot's own
+      R001-R003 REPLAY/VERIFY phases (which workflow.yaml lists as G01 depends_on)
+      are NOT_STARTED with no experiment records. Reconciliation: historical Phase 1
+      work was completed pre-R-SDD, so Gate 1 approval from history is coherent.
+      But the assessment evidence for R001-R003 reconstruction remains PLANNED.
+    evidence_ref: "workflow.yaml; registry.json (experiments: {}); decisions/human-gate-1.yaml"
+    owner: A01
+    next_transition: R001-pipeline-replay must still produce reconstruction evidence for the assessment matrix even though R004 is unblocked.
+
+  - id: RISK-DEP-R002-DECISION-TRACE
+    kind: dependency-owner
+    severity: LOW
+    state: OPEN
+    description: >
+      A01's decision-trace.yaml is listed as an output of R002-main-domain-evaluation,
+      not of P01. It is outside this task's allowed_output_refs.
+    evidence_ref: workflow.yaml (R002-main-domain-evaluation outputs); task P01-A01 allowed_output_refs
+    owner: A01
+    next_transition: produce decision-trace.yaml only in the R002 evaluation phase.
+
+  # --- Evidence / verification risks (from Protocols) ---
+  - id: RISK-EVID-DECLARED-NOT-VERIFIED
+    kind: evidence-state
+    severity: MEDIUM
+    state: OPEN
+    description: >
+      All 8 evidence-map scripts and 8 runs are DECLARED (referenced by the Phase 1
+      summary but not independently checked). DECLARED is the expected pilot start
+      state, not a defect, but none are VERIFIED yet.
+    evidence_ref: evidence-map.yaml
+    owner: A02 (assets), A03 (train scripts), A04 (runs), A05 (eval scripts)
+    next_transition: owners move items DECLARED -> VERIFIED/MISSING/INVALID during R001-R003 replay.
+
+  - id: RISK-EVID-HOLDOUT-DECLARED
+    kind: evidence-state
+    severity: HIGH
+    state: OPEN
+    description: >
+      seed_text_test_full_eval_20260813 (R004 E001, LIVE) is DECLARED and was still
+      running when the source snapshot was supplied. Completion, integrity, and
+      comparability are UNCONFIRMED.
+    evidence_ref: evidence-map.yaml; source brain sec.9
+    owner: A04
+    next_transition: A04 confirms completion and registers raw holdout evidence WITHOUT success interpretation.
+
+  - id: RISK-EVID-R001-COMMIT-ENV
+    kind: provenance
+    severity: MEDIUM
+    state: OPEN
+    description: Historical code commit or environment references may be incomplete; remote paths may exist without versioned manifests or hashes; a smoke verification cannot substitute for a full training rerun.
+    evidence_ref: research/R001/protocol.yaml risks
+    owner: A02
+    next_transition: A02 verifies repository/data/manifest/cache/checkpoint provenance; gaps marked MISSING.
+
+  - id: RISK-EVID-R002-COMPARABILITY
+    kind: metric-comparability
+    severity: MEDIUM
+    state: OPEN
+    description: Historical suites may not share identical sample counts or preprocessing; selecting only favorable Content metrics would overstate evidence; foot-skate/Repetition regression may invalidate an apparently positive candidate.
+    evidence_ref: research/R002/protocol.yaml risks
+    owner: A05 (eval), A06 (cherry-pick challenge)
+    next_transition: A05 recomputes/verifies all target-domain comparison tables; A06 challenges omissions.
+
+  - id: RISK-EVID-R003-CONFIG-DRIFT
+    kind: configuration-drift
+    severity: MEDIUM
+    state: OPEN
+    description: Run configurations may differ beyond learning rate and steps; target-domain gains may not generalize to the full SEED test distribution; foot-skate degradation may remain unacceptable despite retrieval improvements.
+    evidence_ref: research/R003/protocol.yaml risks
+    owner: A03
+    next_transition: A03 verifies each comparison changes only training duration; drift -> MISSING/INVALID flag.
+
+  - id: RISK-EVID-R004-INTEGRITY
+    kind: holdout-integrity
+    severity: HIGH
+    state: OPEN
+    description: Full holdout results may be incomplete, corrupted, or non-comparable; cold-start reproduction may be blocked by missing environment or remote access.
+    evidence_ref: research/R004/protocol.yaml risks
+    owner: A04 (integrity), A06 (cold-start)
+    next_transition: A05 independently recomputes gate table; A06 cold-start reproduction from shared records only.
+
+  # --- Integrity / policy risks ---
+  - id: RISK-INTEGRITY-BLINDING-MISSING
+    kind: policy-integrity
+    severity: HIGH
+    state: OPEN
+    description: >
+      Result visibility at Gate 1 approval is NOT_ATTESTED. The approver (hf) is
+      uncertain whether the final holdout result was visible before threshold approval.
+      Without a separate blinding attestation, the policy is a RETROSPECTIVE
+      acceptance policy, NOT a preregistration. Mislabeling it as preregistered
+      would inflate integrity.
+    evidence_ref: decisions/human-gate-1.yaml approval_context
+    owner: project-owner (human)
+    next_transition: project owner records a truthful blinding attestation OR all downstream artifacts explicitly label Gate 1 as retrospective.
+
+  - id: RISK-INTEGRITY-SELF-INFLATION
+    kind: inflation
+    severity: MEDIUM
+    state: OPEN
+    description: >
+      Source brain sec.10 self-assesses Phase 1 closure at 10/10 contingent on the
+      still-running holdout. This is an unverified self-assessment, NOT pilot
+      evidence. The candidate must NOT be described as successful.
+    evidence_ref: source/phase1_ai_native_project_brain_20260813.md sec.10, sec.11
+    owner: A01 (enforce label), A06 (red-team)
+    next_transition: all artifacts label candidate PROVISIONAL; final success only via final_adopt_rule + Human Gate 2.
+
+  - id: RISK-INTEGRITY-COLDSTART-LEAK
+    kind: information-isolation
+    severity: HIGH
+    state: OPEN
+    description: >
+      A06 must NOT see A04's private transcript before cold-start completion. The
+      launcher must not copy A04's private transcript into A06's cold-start task.
+    evidence_ref: RUNBOOK.md sec.2; manifest.yaml audit.secret_policy
+    owner: orchestrator / launcher
+    next_transition: enforce isolation when launching R004-independent-checks; sanitized transcripts only.
+
+  - id: RISK-INTEGRITY-AUDIT-GAP
+    kind: audit-traceability
+    severity: MEDIUM
+    state: OPEN
+    description: >
+      audit/session-index.yaml is NOT_STARTED with sessions = []. No kscc_session_id,
+      model, token_usage, or transcript_sha256 recorded for any agent. LIVE holdout
+      evidence must be traceable to a registered session.
+    evidence_ref: audit/session-index.yaml
+    owner: orchestrator / launcher
+    next_transition: populate session-index.yaml before any LIVE holdout registration.
+
+  - id: RISK-INTEGRITY-FOOTSKATE
+    kind: motion-quality
+    severity: HIGH
+    state: OPEN
+    description: >
+      The Object 3000-step candidate has persistent foot-skate degradation. Under
+      the frozen contract, foot_skate_gate_must_pass = true and semantic gains
+      cannot compensate for a hard foot-skate failure (Gate 1 rationale). Human
+      business judgment is required on acceptability.
+    evidence_ref: source brain sec.6.3, sec.11; R004 protocol foot_skate; human-gate-1 rationale
+    owner: human-gate-2 (final judgment), A05 (metric), A06 (review)
+    next_transition: A05 computes foot-skate gate; A06 reviews; Human Gate 2 decides acceptability.
+
+  - id: RISK-INTEGRITY-PROTOCOL-CHANGE
+    kind: contract-drift
+    severity: MEDIUM
+    state: CLOSED-MONITORED
+    description: >
+      One protocol amendment already occurred (37bbff... -> 1f9115..., recorded in
+      R004 research.yaml protocol_amendments by owner A01, reviewer hf). Any further
+      post-READY Protocol change requires research revise and re-READY; the frozen
+      snapshot must not be edited.
+    evidence_ref: research/R004/research.yaml protocol_amendments; manifest.yaml execution_policy.protocol_change_after_ready
+    owner: A01
+    next_transition: any future change uses `research revise`; never edit the frozen snapshot.
+
+  - id: RISK-RES-GPU1-NOT-PARALLEL
+    kind: resource
+    severity: LOW
+    state: OPEN
+    description: GPU1 not used in parallel; long holdout evaluation is slow. Phase 1 risk note only; not a pilot blocker.
+    evidence_ref: source brain sec.11
+    owner: human (resource decision)
+    next_transition: optional future split of baseline/candidate or Content/Repetition across dual cards; requires unapproved resource change -> escalate.
+
+# ---------------------------------------------------------------------------
+# 3. DISAGREEMENTS  (Fact — none recorded yet)
+# ---------------------------------------------------------------------------
+disagreements:
+  - count: 0
+    state: NONE-RECORDED
+    note: 'BRAIN.md "Latest Decisions: No reviewed decisions yet"; Human Gate 2 PENDING with null AI recommendation and null human response. No AI-vs-human or agent-vs-agent disagreement has been recorded. A01 will record disagreements in decision-trace.yaml during R002-main-domain-evaluation when they arise.'
+
+# ---------------------------------------------------------------------------
+# 4. MISSING / UNCONFIRMED EVIDENCE  (preserved verbatim — do not synthesize)
+# ---------------------------------------------------------------------------
+missing_evidence:
+  - id: MISS-BLINDING-ATTESTATION
+    item: Truthful result-visibility blinding attestation
+    state: MISSING
+    owner: project-owner (human)
+    impact: Gate 1 cannot be called preregistered
+    next_transition: record attestation or keep retrospective classification
+
+  - id: MISS-AUDIT-SESSION-A01
+    item: Registered kscc session for A01 (session_id, model, started_at, token_usage, transcript_sha256)
+    state: MISSING
+    owner: orchestrator / launcher
+    impact: A01 output not yet traceable to a registered session
+    next_transition: populate audit/session-index.yaml
+
+  - id: MISS-EXPERIMENT-RECORDS
+    item: Experiment Records for R001-R004
+    state: MISSING
+    owner: A04 (R001-R004), A03 (R003)
+    impact: registry.json experiments = {} for all four research ids
+    next_transition: created via `specify research new-experiment` after the relevant replay/verify phase
+
+  - id: MISS-R001-OUTPUTS
+    item: outputs/R001/provenance-report.yaml, pipeline-verification.md
+    state: MISSING
+    owner: A02, A03, A04, A06
+    next_transition: R001-pipeline-replay phase
+
+  - id: MISS-R002-OUTPUTS
+    item: outputs/R002/domain-run-cards.yaml, independent-domain-comparison.yaml; outputs/A01/decision-trace.yaml
+    state: MISSING
+    owner: A04, A05, A06, A01
+    next_transition: R002-main-domain-replay then R002-main-domain-evaluation
+
+  - id: MISS-R003-OUTPUTS
+    item: outputs/R003/ablation-run-cards.yaml, candidate-review.yaml
+    state: MISSING
+    owner: A03, A04, A05, A06
+    next_transition: R003-ablation-replay then R003-candidate-review
+
+  - id: MISS-R004-OUTPUTS
+    item: outputs/R004/holdout-run-card.yaml, independent-gate-table.yaml, cold-start-review.yaml, reports/R004.md
+    state: MISSING
+    owner: A04, A05, A06, A01
+    next_transition: R004-holdout-live -> R004-independent-checks -> P99
+
+  - id: MISS-HOLDOUT-COMPLETION
+    item: Confirmation that seed_text_test_full_eval_20260813 finished
+    state: UNCONFIRMED
+    owner: A04
+    impact: R004-holdout-live cannot register LIVE evidence until completion confirmed
+    next_transition: A04 confirms completion and registers raw evidence without success interpretation
+
+  - id: MISS-A02-A03-A04-A05-A06-P01-OUTPUTS
+    item: P01 cognition-recovery outputs for the other five agents (provenance-report, training-invariants, execution-readiness, benchmark-integrity-review, ready-red-team-review)
+    state: MISSING
+    owner: A02, A03, A04, A05, A06
+    next_transition: produced in parallel during P01; required to satisfy P01 exit_gate
+
+# ---------------------------------------------------------------------------
+# 5. ESCALATION TRIGGERS (A01 profile) — status against current records
+# ---------------------------------------------------------------------------
+escalation_triggers:
+  - trigger: missing owner or next state
+    status: NOT-MET  (every open item above has an owner + next transition)
+  - trigger: conflicting primary records
+    status: REVIEWED -> see RISK-DEP-GATE-REPLAY; reconciled as coherent (historical work pre-R-SDD), not a true conflict
+  - trigger: unapproved cost, data, or evaluation change
+    status: NOT-MET  (resource boundary frozen by Gate 1; no unapproved change observed)
+  - trigger: an agent attempts to declare success without evidence
+    status: NOT-MET  (candidate stays PROVISIONAL; Gate 2 PENDING)
+
+# ---------------------------------------------------------------------------
+# 6. HANDOFF MAP  (Fact — workflow.yaml handoff_to; task P01-A01 required_handoff_to)
+# ---------------------------------------------------------------------------
+handoff_map:
+  - from: A01 (this task)
+    to: A03
+    research_id: R001
+    phase: P01-cognition-recovery -> R001-pipeline-replay / R003-ablation-replay
+    reason: task envelope required_handoff_to = A03; A03 owns training invariants and ablation boundaries
+    artifacts: [outputs/A01/project-state-snapshot.yaml, outputs/A01/dependency-and-risk-log.yaml, handoffs/H-A01-A03-P01.yaml]
+  - from: P01 (all agents)
+    to: A03 and A06
+    phase_exit_gate: independent-recovery-findings-handed-to-A03-and-A06
+    note: workflow P01 exit gate requires all six recovery findings handed to A03 AND A06; A01's direct handoff per task envelope is to A03.
+  - from: R001
+    to: A06
+    gate: A06-pipeline-evidence-review-proposal
+  - from: R002-main-domain-replay
+    to: A05
+  - from: R003-ablation-replay
+    to: A05
+  - from: R004-holdout-live
+    to: A05
+  - from: R004-independent-checks
+    to: human-gate-2 (G02)
+
+# ---------------------------------------------------------------------------
+# 7. NEXT VALID TRANSITIONS (A01-coordinated)
+# ---------------------------------------------------------------------------
+next_valid_transitions:
+  - transition_id: T1-A01-HANDOFF
+    action: A01 completes handoff H-A01-A03-P01.yaml to A03
+    state_after: P01-cognition-recovery (A01 portion) DONE; awaits other 5 agents
+  - transition_id: T2-A03-INSTRUCTIONS
+    action: A03 consumes this snapshot + risk log to begin training-invariants.yaml (P01) and later R001/R003 replay
+    state_after: A03 P01 output produced
+  - transition_id: T3-ORCHESTRATOR-AUDIT
+    action: orchestrator populates audit/session-index.yaml for all six sessions
+    state_after: P00 exit_gate satisfied; LIVE evidence traceable
+  - transition_id: T4-R004-HOLDOUT
+    action: once audit registered and holdout completion confirmed, A04 registers raw holdout evidence (LIVE) without success interpretation
+    state_after: R004-holdout-live -> R004-independent-checks

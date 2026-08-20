@@ -1,0 +1,135 @@
+schema_version: "1.0"
+artifact: ER2-training-manifest-linkage-inventory
+run_id: pilot-20260813
+cycle_id: C01-object-target-benchmark-pin
+evidence_request: ER-2
+collected_at: '2026-08-13T10:16:46Z'
+collection_mode: READ_ONLY_SANITIZED_OPERATIONAL_LINEAGE
+collector: codex-primary
+human_authorization:
+  ref: simulation/pilot-20260813/decisions/human-collaboration-C01.yaml
+  commit_sha: 6994bdad6d7d48f576dcbc3a27aaedca00b80a72
+  response: REQUEST_MORE_EVIDENCE
+  allowed: ER-2 candidate-to-training-manifest linkage verification
+  prohibited: [GPU use, model training, final holdout metric access, R004 modification]
+approved_remote_scope:
+  host_alias: lintrain
+  roots:
+  - /home/share/user/zyc/kimodo
+  - /home/share/user/zyc/kimodo_seed_repro_train
+transport_warning:
+  state: OBSERVED
+  message: "client_global_hostkeys_prove_confirm: server gave bad signature for RSA key 0: incorrect signature"
+  handling: All reads exited successfully; carry as a provenance warning.
+
+lineage_question:
+  candidate: abl_object_lr1e7_s3000_20260811
+  asserted_training_manifest: /home/share/user/zyc/kimodo_seed_repro_train/work/manifests/cat_object_manip_fp32_20260811_0005.csv
+  chain_to_verify: manifest -> target feature cache -> mixed feature cache -> launch command -> run directory -> checkpoint
+
+manifest_to_target_cache:
+  manifest:
+    path: /home/share/user/zyc/kimodo_seed_repro_train/work/manifests/cat_object_manip_fp32_20260811_0005.csv
+    sha256: 95dcd9c7f1e73d99e5bce10abb6bf94d55f58a17e8eefc7b83fbdfe74597bbd5
+    rows: 5810
+    unique_path_ids: 5810
+  cache_build_log:
+    path: /home/share/user/zyc/kimodo_seed_repro_train/work/codex_pipeline/two_category_domain_20260811_0005.nohup.log
+    sha256: e220120d4708f311e995e3e4b8971c38c44ea758721ce138578a162113ba1be7
+    observed_sequence:
+    - build target category manifest at 2026-08-11T02:36:03+08:00
+    - wrote 5810 rows to the asserted manifest
+    - cache target features into cat_object_manip_fp32_20260811_0005_target
+    - combine target and replay into cat_object_manip_fp32_20260811_0005
+  target_cache_index:
+    path: /home/share/user/zyc/kimodo_seed_repro_train/work/feature_cache/cat_object_manip_fp32_20260811_0005_target/index.jsonl
+    sha256: 60124c2b526e2b37848097c340c98779cc95c2d529434402530bd5da07989291
+    rows: 5810
+    unique_path_ids: 5810
+    manifest_path_set_intersection: 5810
+    manifest_only: 0
+    cache_only: 0
+    set_equal: true
+
+target_cache_to_mixed_cache:
+  mixed_cache_root: /home/share/user/zyc/kimodo_seed_repro_train/work/feature_cache/cat_object_manip_fp32_20260811_0005
+  index_path: /home/share/user/zyc/kimodo_seed_repro_train/work/feature_cache/cat_object_manip_fp32_20260811_0005/index.jsonl
+  index_sha256: b2aea4b3442077387aacce84fd0c96bb1c6d5a01a15832ef50a22f76e7f1f4fb
+  mix_manifest_path: /home/share/user/zyc/kimodo_seed_repro_train/work/feature_cache/cat_object_manip_fp32_20260811_0005/mix_manifest.json
+  mix_manifest_sha256: 35a8fa933266fa380e6c3b5641ec68ed4145e46fe68482938fba2af8ebd78fdf
+  total_rows: 15620
+  target_rows: 11620
+  replay_rows: 4000
+  target_unique_path_ids: 5810
+  target_repeat_histogram: {2: 5810}
+  target_set_equals_target_cache: true
+  declared_target_cache: /home/share/user/zyc/kimodo_seed_repro_train/work/feature_cache/cat_object_manip_fp32_20260811_0005_target
+  declared_replay_cache: /home/share/user/zyc/kimodo_seed_repro_train/work/feature_cache/cat_object_manip_fp32_20260811_0005_replay
+
+mixed_cache_to_candidate_run:
+  launch_script:
+    path: /home/share/user/zyc/kimodo_seed_repro_train/work/codex_pipeline/run_phase1_ablation_s3000_from_cache.sh
+    sha256: e45ed7a59f809c10336bff1dfdc9b153a5964cbd6dd81411fff9eb8a226e4563
+    observed_call: train_one abl_object_lr1e7_s3000_20260811 cat_object_manip_fp32_20260811_0005 object_manip
+    resolved_feature_cache: /home/share/user/zyc/kimodo_seed_repro_train/work/feature_cache/cat_object_manip_fp32_20260811_0005
+    resolved_output_dir: /home/share/user/zyc/kimodo_seed_repro_train/work/runs/abl_object_lr1e7_s3000_20260811
+  training_entrypoint:
+    path: /home/share/user/zyc/kimodo_seed_repro_train/train.py
+    sha256: 180b3ec5ff08af80425b63b476b48b41d33744a1efc0bd104d53e6b524c3bf95
+    behavior: Requires --feature-cache and passes it to MotionFeatureDataset.
+  dataset_loader:
+    path: /home/share/user/zyc/kimodo_seed_repro_train/kimodo_seed_repro/data.py
+    sha256: c9d25e179878851380fd6e495e14635c3dc5aee0ea43320ab65bc554562b4cce
+    behavior: read_feature_index reads cache_dir/index.jsonl; MotionFeatureDataset constructs training items from that index.
+  source_config:
+    path: /home/share/user/zyc/kimodo_seed_repro_train/work/codex_pipeline/soma_rp_category_domain_finetune_fp32_lr1e7_s3000.yaml
+    sha256: 4489a812a611dcf97e993933c64595aad5e5cb858df6d6037dc09ae4e201b171
+  copied_run_config:
+    path: /home/share/user/zyc/kimodo_seed_repro_train/work/runs/abl_object_lr1e7_s3000_20260811/config.yaml
+    sha256: 50c709dd75f74f887a8726de6c329fee099fd4499938e5b2909a120402987e48
+  config_semantic_equality: true
+  config_semantic_equality_note: YAML mappings are equal; byte hashes differ because serialization formatting differs.
+
+run_to_checkpoint:
+  training_log:
+    path: /home/share/user/zyc/kimodo_seed_repro_train/work/codex_pipeline/phase1_ablation_lr1e7_s3000_20260811.nohup.log
+    sha256: b0eb15a1aafb7c8302f868a279d94f5b004be628db9b74a196b8a60ab4e2fffc
+    observed_events:
+    - 2026-08-11T17:55:08+08:00 TRAIN candidate with the resolved mixed feature cache and source config
+    - Training finished with checkpoints in the candidate run directory
+    - 2026-08-11T18:11:11+08:00 candidate checkpoint_last.pt selected for Object evaluation
+    - evaluator loaded checkpoint_last.pt at step 3000
+  checkpoint_step_3000:
+    path: /home/share/user/zyc/kimodo_seed_repro_train/work/runs/abl_object_lr1e7_s3000_20260811/checkpoint_step_3000.pt
+    size_bytes: 3399909925
+    mtime_ns: 1786443065000000000
+    inode: 366586283
+    metadata_sha256: 959429d50e40be95c8e6e06b533e2757791694fe393c92baf13ade3f9ff3a1d6
+  checkpoint_last:
+    path: /home/share/user/zyc/kimodo_seed_repro_train/work/runs/abl_object_lr1e7_s3000_20260811/checkpoint_last.pt
+    size_bytes: 3399901735
+    mtime_ns: 1786443070000000000
+    inode: 366586832
+    metadata_sha256: bd9aa35d76d85b87b853e1b474cd80ad8fcaadc3feff00f8d2ca0193de181542
+  checkpoint_content_sha256: MISSING_NOT_COMPUTED
+  checkpoint_content_sha256_reason: ER-2 requires linkage, not a 3.4 GB content scan; path, log step, size, time, inode, and metadata digest were collected read-only.
+
+lineage_evidence_summary:
+  manifest_to_target_cache_set_equality: VERIFIED
+  target_cache_to_mixed_cache_membership: VERIFIED
+  mixed_cache_to_candidate_launch: VERIFIED
+  candidate_run_to_step_3000_checkpoint: VERIFIED
+  suggested_classification_for_role_review: VERIFIED
+  residual_risks:
+  - The training workspace is not a Git repository; code is hash-addressed but not commit-addressed.
+  - SSH emitted the recorded RSA host-key signature warning.
+  - Full checkpoint content hash was not computed; this does not break the observed manifest-to-run lineage but limits artifact-level reproducibility.
+
+sanitization:
+  raw_metric_values_included: false
+  final_holdout_metrics_included: false
+  raw_manifest_rows_included: false
+  credentials_included: false
+  GPU_or_training_started: false
+  checkpoint_content_read: false
+  R004_modified: false

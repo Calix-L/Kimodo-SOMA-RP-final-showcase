@@ -1,0 +1,28 @@
+schema_version: "1.0"
+task_id: P01-A01-project-cognition
+run_id: pilot-20260813
+mode: VERIFY
+agent_id: A01
+research_id: R001
+experiment_id: null
+objective: Recover the current Kimodo Phase 1 goal, boundaries, Research states, owners, unresolved decisions, dependencies, and next valid transitions from primary records.
+input_refs:
+- kimodo/.specify/memory/constitution.md
+- kimodo/BRAIN.md
+- kimodo/registry.json
+- kimodo/research/
+- kimodo/source/phase1_ai_native_project_brain_20260813.md
+allowed_output_refs:
+- kimodo/simulation/pilot-20260813/outputs/A01/project-state-snapshot.yaml
+- kimodo/simulation/pilot-20260813/outputs/A01/dependency-and-risk-log.yaml
+acceptance_criteria:
+- Facts, hypotheses, evidence, recommendations, and decisions are separated.
+- Every open item has an owner and next valid transition.
+- Historical work is not described as original six-agent execution.
+forbidden_actions:
+- approve any Research as READY
+- edit raw evidence
+- declare the Object candidate successful
+time_or_cost_limit: 12 turns; no remote compute
+required_handoff_to: A03
+

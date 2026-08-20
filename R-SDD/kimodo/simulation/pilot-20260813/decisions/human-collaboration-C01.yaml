@@ -1,0 +1,192 @@
+schema_version: "1.0"
+id: human-collaboration-C01
+cycle_id: C01-object-target-benchmark-pin
+human_owned: true
+status: EVIDENCE_REQUEST_FULFILLED_SUPERSEDED_BY_C01_H2
+reviewer_name: hf
+decision_type: BENCHMARK_PIN
+allowed_responses: [ACCEPT, MODIFY, REJECT, REQUEST_MORE_EVIDENCE]
+ai_recommendation:
+  choice: REQUEST_MORE_EVIDENCE
+  by: A01
+  cycle_step: C01-S3
+  binding: false
+  upstream_a02_commit_sha: fcdd2a4a49f97be40bcae9ce3fd700407557eee3
+  reason: >
+    A02 (C01-S2, commit fcdd2a4a49f97be40bcae9ce3fd700407557eee3) confirmed the
+    existing Object benchmark is contaminated: target-train overlap 284/292
+    (97.26%) and the Object eval is an exact subset of the SEED-test holdout
+    (292/292). ALT-A (ACCEPT as-is) is therefore NOT viable and not
+    recommended. The remaining choice between MODIFY (ALT-B) and REJECT
+    (ALT-C) hinges on two unknowns A02 did NOT survey: (1) whether a
+    non-degenerate Object-Manipulation pool disjoint from BOTH the candidate
+    training manifest and the SEED-test holdout exists — A02's data show the
+    current eval is 100% inside the holdout and 97.26% inside training, so a
+    naive train-disjoint eval collapses Content to 0 cases; (2) whether
+    cat_object_manip_fp32_20260811_0005.csv actually trained the candidate
+    (C01-RISK-09, still DECLARED). Both are closable with a bounded, no-GPU,
+    no-holdout set-membership evidence pass before hf must decide.
+  secondary_preference_if_evidence_closes_positive: ALT-B (MODIFY via disjoint reconstruction; no GPU, no holdout)
+  secondary_preference_if_evidence_closes_negative: ALT-C (REJECT / escalate)
+  not_a_selection: >
+    A01 does NOT select the benchmark. hf may override and ACCEPT / MODIFY /
+    REJECT now on the existing evidence; this is a non-binding recommendation.
+alternatives:
+  - id: ALT-A
+    decision_type_if_chosen: ACCEPT
+    name: Pin the existing Object benchmark as-is
+    impact: >
+      Formalizes train-on-eval leakage (284/292 = 97.26%) and holdout
+      non-independence (292/292 exact subset) into the frozen contract;
+      target_success would be inflated and target/holdout evidence
+      non-independent. Construction is not commit-pinned (script_commit_sha
+      MISSING).
+    residual_risk: SEVERE
+    residual_risk_detail: >
+      Violates constitution rule 8 (No Leakage) and A01's own C01-S1
+      acceptance rule (any non-zero intersection forces MODIFY/REJECT); A02
+      classified ALT-A NOT_VIABLE_AS_IS. NOT recommended.
+  - id: ALT-B
+    decision_type_if_chosen: MODIFY
+    name: Reconstruct a disjoint Object target benchmark (set assembly only; no GPU, no holdout)
+    impact: >
+      Could yield a VERIFIED-disjoint pin (train-eval 0, holdout 0) resolving
+      C01-RISK-02/03 without GPU training or final holdout, within the C01
+      cycle constraints; no frozen threshold/count/comparison-protocol field
+      changes. Also the opportunity to close C01-RISK-07/08/10.
+    residual_risk: HIGH
+    residual_risk_detail: >
+      FEASIBILITY UNKNOWN. A02's by_split data show a naive train-disjoint
+      eval collapses Content to 0 and Repetition to 8; holdout-disjoint Object
+      cases are unsurveyed. Requires a sufficient disjoint pool, C01-RISK-09
+      linkage verification, C01-RISK-07 commit-pinning, C01-RISK-08 protocol
+      conformance, C01-RISK-10 per-split manifests, and C01-RISK-06 clean
+      re-collect. If the disjoint pool is degenerate, ALT-C is forced.
+  - id: ALT-C
+    decision_type_if_chosen: REJECT
+    name: Reject pinning / escalate
+    impact: >
+      Refuses to pin a contaminated benchmark; target_Content_PASS /
+      target_Repetition_PASS cannot be evaluated, blocking final adoption at
+      Human Gate 2; surfaces the contamination as a material finding.
+    residual_risk: MEDIUM
+    residual_risk_detail: >
+      Leaves R004's confirmatory question unanswerable as framed; does not by
+      itself fix the underlying contamination; may require a research-revise to
+      drop target_* requirements, redefine the target benchmark from a
+      disjoint pool, or retrain a candidate on a disjoint set (GPU, outside
+      C01). Conservative but premature if a disjoint pool exists.
+verified_evidence_refs:
+  - ref: simulation/pilot-20260813/outputs/A02/C01-object-benchmark-provenance.yaml
+    upstream_a02_commit_sha: fcdd2a4a49f97be40bcae9ce3fd700407557eee3
+    upstream_a02_commit_sha_source: collaboration/ledger.yaml cycles[C01].sequence[C01-S2].commit_sha (state COMPLETE); consistent with session-start gitStatus short sha fcdd2a4 "Verify C01 Object benchmark provenance"
+    upstream_a02_commit_sha_note: Carried from the ledger primary record; NOT recomputed (Bash unavailable). A02's own handoff recorded base 6c3f651 with the recording commit pending; the ledger now confirms fcdd2a4.
+    consumed_fields:
+      - disjointness_review.object_eval_vs_target_train (CONFLICTING; intersection 284; ratio 0.972603; by_split content 235/235 non_overlapping 0, repetition 49/57 non_overlapping 8)
+      - disjointness_review.object_eval_vs_full_holdout (CONFLICTING; intersection 292; object_only_count 0; exact subset)
+      - disjointness_review.target_train_vs_full_holdout (CONFLICTING; intersection 284)
+      - benchmark_pin_classification.splits (Content 235 / Repetition 57 / total 292 VERIFIED; manifest_sha256 97d13dcc78016c66396faee8a59a0cd8f126c9552542e2ad94de914d4bf519a3)
+      - benchmark_pin_classification.construction (script_sha256 18a602ddf4922f42dad03a2478a9ac731607663d54460dee1472210e393d88f3 VERIFIED; script_commit_sha MISSING)
+      - benchmark_pin_classification.leakage_prevention (train_eval_disjointness CONFLICTING/284; holdout_disjointness CONFLICTING/292)
+      - answers_to_A01_questions (Q1-Q7)
+      - viable_candidate_identity (baseline nvidia/Kimodo-SOMA-RP-v1.1; candidate abl_object_lr1e7_s3000_20260811; accept_ready false)
+      - alternatives_viability (ALT-A NOT_VIABLE_AS_IS; ALT-B VIABLE; ALT-C VIABLE; a02_selection NONE)
+      - open_risks (C01-RISK-02/03 CONFIRMED; C01-RISK-06/07/08/09/10 NEW; C01-RISK-04 partially resolved)
+  - ref: simulation/pilot-20260813/handoffs/C01-A02-to-A01.yaml
+    consumed_fields:
+      - key_evidence_summary_for_A01 (manifest sha256s, counts, disjointness, alternatives viability, a02_selection NONE)
+  - ref: research/R004/protocol.yaml
+    consumed_fields:
+      - evaluation.comparison_protocol (FROZEN; pairing/generation_batch_size/postprocess/text_encoder_precision/effect_direction)
+      - evaluation.final_adopt_rule.all_required (target_Content_PASS, target_Repetition_PASS, holdout_Content_PASS, holdout_Repetition_PASS, foot_skate_PASS, A06_independent_reproduction_VALID, human_gate_2_APPROVED)
+      - inputs (baseline/candidate/SEED-test-Content-3510/SEED-test-Repetition-3428/remote-output/human-gate-1; NO Object target benchmark enumerated)
+      - freeze (sha256 1f911559b69c5a7d3b68cf269c746c76ad1384f96a23963d533560eb83e8f0e5)
+missing_evidence:
+  - id: ME-1
+    name: Disjoint Object-Manipulation pool feasibility (UNSURVEYED)
+    statement: >
+      Whether a non-degenerate Object-Manipulation case pool exists that is
+      disjoint from BOTH the candidate training manifest
+      (cat_object_manip_fp32_20260811_0005.csv, 5810 ids) AND the SEED-test
+      full holdout (6938 ids). A02's data show the current Object eval (292) is
+      100% inside the holdout and 97.26% inside training; the disjoint pool has
+      not been surveyed. GATES ALT-B vs ALT-C.
+    owner: A02 (bounded set-membership pass; no GPU, no holdout, no holdout metrics)
+  - id: ME-2
+    name: Candidate-to-training-manifest linkage (C01-RISK-09, DECLARED)
+    statement: >
+      Whether cat_object_manip_fp32_20260811_0005.csv actually trained
+      abl_object_lr1e7_s3000_20260811. If NOT, the 284 train-overlap is not
+      real leakage and the decision frame changes.
+    owner: A03 / A04
+  - id: ME-3
+    name: Construction commit-pinning (C01-RISK-07)
+    statement: >
+      construction.script_commit_sha MISSING (construction root
+      kimodo_seed_repro_train is not a git repository); pin is hash-addressable
+      but not commit-addressed.
+    owner: hf (C01-H1) — accept hash-pinning or require git-backed reconstruction
+  - id: ME-4
+    name: Paired ordered identity + protocol conformance (C01-RISK-08)
+    statement: >
+      evaluation_protocol scalar conformance (batch 1 / postprocess false /
+      fp32) and paired ordered case identity not attested for the target run;
+      case-dir counts match only.
+    owner: A05
+  - id: ME-5
+    name: Per-split manifests + construction invocation hashes (C01-RISK-10 + construction)
+    statement: >
+      One combined manifest serves both splits; per-split separate manifests
+      MISSING; construction_invocation_and_input_hashes MISSING.
+    owner: A05 / A02
+  - id: ME-6
+    name: Transport warning re-collection (C01-RISK-06)
+    statement: >
+      SSH bad RSA signature observed during inventory collection; all reads
+      succeeded but residual provenance risk remains.
+    owner: hf / orchestrator (re-collect over clean transport or attest)
+human_response: REQUEST_MORE_EVIDENCE
+human_modification:
+  authorized_scope:
+  - ER-1 disjoint Object pool investigation
+  - ER-2 candidate-to-training-manifest linkage verification
+  prohibited_scope:
+  - GPU use
+  - model training
+  - reading final holdout metric values
+  - modifying R004
+response_reason: "审批人：hf。同意 REQUEST_MORE_EVIDENCE，仅开展 ER-1 数据池调查和 ER-2 训练 manifest 关联核验；禁止 GPU、训练、读取最终 holdout 指标及修改 R004。"
+decided_at: '2026-08-13T10:05:26Z'
+decision_source: direct_user_statement
+next_human_gate: C01-H2
+evidence_result:
+  completed: true
+  er1:
+    classification: VERIFIED_DEGENERATE
+    statement: Under the authoritative dated-BVH-path identity, all 5810 non-mirror Object motions are in the candidate training manifest; eligible disjoint pool is zero for Content and Repetition.
+    output_ref: simulation/pilot-20260813/outputs/A02/C01-ER1-disjoint-pool-survey.yaml
+    commit_sha: 51a3fb434c71a67e52eab72dc91b060568c58d59
+  er2:
+    a03_classification: VERIFIED
+    a04_verdict: CONFIRM
+    statement: The manifest with sha256 95dcd9c7... supplied the target cache used by candidate abl_object_lr1e7_s3000_20260811; A04 independently confirmed the four-link chain.
+    a03_output_ref: simulation/pilot-20260813/outputs/A03/C01-ER2-training-manifest-linkage.yaml
+    a04_output_ref: simulation/pilot-20260813/outputs/A04/C01-ER2-independent-linkage-verification.yaml
+    a04_commit_sha: ffae6aecb898e04eae0127922396190d182c7e13
+  correction:
+    superseded_value: 284/292 train-eval overlap under bare motion_id identity
+    authoritative_value: 292/292 train-eval overlap under dated BVH path identity
+    effect: Leakage conclusion is strengthened; prior eight-case Repetition residual is invalid.
+  next_decision_ref: simulation/pilot-20260813/decisions/human-collaboration-C01-H2.yaml
+next_action_if_accepted: Run R004 REVISE, embed the approved benchmark identity, and return to hf for READY approval.
+instructions: AI must populate evidence and alternatives but cannot fill the human response.
+ai_side_populated_at: '2026-08-13T09:58:52+00:00'
+ai_side_populated_by: A01
+ai_side_populated_at_precision: launcher_audit_completed_at
+ai_side_note: >
+  AI populated ai_recommendation, alternatives, verified_evidence_refs, and
+  missing_evidence at C01-S3 and advanced status PENDING_AI_EVIDENCE ->
+  PENDING_HUMAN_DECISION. human_response, human_modification, response_reason,
+  and decided_at are deliberately left null for hf at C01-H1. No frozen R004
+  field was modified; no benchmark was selected for hf; no final holdout metric
+  was inspected.
