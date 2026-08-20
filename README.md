@@ -73,6 +73,7 @@ flowchart LR
 | 原始文档 | 可检索的 Markdown 原文 | [`source-report.md`](./source-report.md) |
 | 实验媒体 | 43 个图片/动图素材与 Blender 插件演示视频 | [`assets/final`](./assets/final) |
 | 训练实现 | 后训练配置、数据制备、推理评测与可视化脚本 | [`train`](./train) |
+| 推理评测 | 批量推理、overview 整理、输出校验及 TMR、物理质量、RTE/BPE 评测链路 | [`inference`](./inference) |
 | 研究记录 | R-SDD 规范、实验协议、证据映射与协作记录 | [`R-SDD/kimodo`](./R-SDD/kimodo) |
 | Blender 助手 | Kimodo 中文助手插件发布包 | [`proscenium-blender`](./proscenium-blender) |
 
@@ -88,6 +89,7 @@ flowchart LR
 ├── report.css                  # 完整报告样式
 ├── assets/final/               # 实验图片、动图与演示视频
 ├── train/                      # 训练配置与数据/评测脚本
+├── inference/                  # 可复现的批量推理与量化评测链路
 ├── R-SDD/kimodo/               # 研究规范、协议与证据记录
 ├── proscenium-blender/         # Blender 中文助手发布包
 ├── CONTRIBUTING.md             # 贡献指南
