@@ -1,0 +1,43 @@
+model: Kimodo-SOMA-RP-v1.1
+init_mode: pretrained
+mode: overfit_human7951_paper_loss_probe
+
+seed: 7
+device: cuda
+dtype: bf16
+
+data:
+  clip_frames: 150
+  min_frames: 1
+  random_crop: true
+  num_workers: 0
+  text_feature_dir: /home/share/user/zyc/kimodo-overfit/work/feature_cache/human7951_text
+
+train:
+  optimizer: adamw
+  batch_size: 256
+  grad_accum_steps: 1
+  max_steps: 2
+  lr: 5.0e-5
+  betas: [0.9, 0.999]
+  weight_decay: 0.0
+  warmup_steps: 50
+  log_every: 10
+  save_every: 2
+  max_grad_norm: 1.0
+  text_dropout: 0.0
+  num_base_steps: null
+  structured_loss:
+    enabled: true
+    smooth_l1_beta: 0.1
+    weights:
+      root_position: 10.0
+      root_angle: 2.0
+      joint_position: 10.0
+      joint_velocity: 3.0
+      joint_rotation: 10.0
+      foot_contact: 4.0
+      fk_position: 5.0
+    joint_weights:
+      high: []
+      high_weight: 2.0

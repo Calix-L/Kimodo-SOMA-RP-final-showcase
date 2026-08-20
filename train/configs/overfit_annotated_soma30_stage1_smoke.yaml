@@ -1,0 +1,42 @@
+data:
+  clip_frames: 150
+  min_frames: 1
+  num_workers: 0
+  random_crop: true
+  text_feature_dir: /home/share/user/zyc/kimodo-overfit/work/feature_cache/annotated_soma30_text
+device: cuda
+dtype: bf16
+init_mode: pretrained
+mode: overfit_annotated_soma30_stage1
+model: Kimodo-SOMA-RP-v1.1
+seed: 7
+train:
+  batch_size: 4
+  betas:
+  - 0.9
+  - 0.999
+  grad_accum_steps: 1
+  log_every: 1
+  lr: 5.0e-05
+  max_grad_norm: 1.0
+  max_steps: 2
+  num_base_steps: null
+  optimizer: adamw
+  save_every: 1000
+  structured_loss:
+    enabled: true
+    joint_weights:
+      high: []
+      high_weight: 2.0
+    smooth_l1_beta: 0.1
+    weights:
+      fk_position: 5.0
+      foot_contact: 4.0
+      joint_position: 10.0
+      joint_rotation: 10.0
+      joint_velocity: 3.0
+      root_angle: 2.0
+      root_position: 10.0
+  text_dropout: 0.0
+  warmup_steps: 50
+  weight_decay: 0.0
